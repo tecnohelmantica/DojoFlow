@@ -1,0 +1,63 @@
+.glow-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-button::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  z-index: -1;
+  border-radius: inherit;
+  transition: all 0.3s ease;
+}
+
+.glow-color-cyan {
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+.glow-color-cyan:hover {
+  background: rgba(0, 243, 255, 0.15);
+  box-shadow: var(--glow-cyan);
+  text-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+}
+
+.glow-color-purple {
+  border: 1px solid var(--accent-purple);
+  color: var(--accent-purple);
+  box-shadow: 0 0 10px rgba(174, 0, 255, 0.2);
+}
+
+.glow-color-purple:hover {
+  background: rgba(174, 0, 255, 0.15);
+  box-shadow: var(--glow-purple);
+  text-shadow: 0 0 8px rgba(174, 0, 255, 0.8);
+}
+
+.glow-color-green {
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+}
+
+.glow-color-green:hover {
+  background: rgba(0, 255, 102, 0.15);
+  box-shadow: var(--glow-green);
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.8);
+}

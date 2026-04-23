@@ -1,0 +1,22 @@
+export const TINKERCAD_CHALLENGES = [
+  {"numero": 1, "titulo": "Figuras", "descripcion": "Creación de diversas formas geométricas básicas estableciendo sus medidas y colores."},
+  {"numero": 2, "titulo": "Combinar", "descripcion": "Práctica para mover, agrupar y unir figuras básicas en un solo objeto."},
+  {"numero": 3, "titulo": "Hacer huecos", "descripcion": "Perforación de figuras agrupando objetos sólidos con objetos definidos como huecos."},
+  {"numero": 4, "titulo": "Polígonos", "descripcion": "Inserción y modificación de polígonos cambiando su número de lados, dimensiones y rotación."},
+  {"numero": 5, "titulo": "Llavero", "descripcion": "Construcción de llaveros personalizados combinando formas básicas e insertando texto."},
+  {"numero": 6, "titulo": "Copa", "descripcion": "Modelado de una copa agrupando una base, un cilindro y paraboloides."},
+  {"numero": 7, "titulo": "Taza", "descripcion": "Diseño de una taza practicando la alineación, rotación y vaciado con huecos."},
+  {"numero": 8, "titulo": "Dado", "descripcion": "Creación de un dado intersectando un cubo y una esfera hueca para redondear esquinas."},
+  {"numero": 9, "titulo": "Ensamblar", "descripcion": "Diseño de piezas con salientes y huecos que encajen perfectamente entre sí."},
+  {"numero": 10, "titulo": "Escalera", "descripcion": "Modelado de una escalera duplicando y desplazando progresivamente un cubo."},
+  {"numero": 11, "titulo": "Poleas", "descripcion": "Construcción de poleas alineando y restando toroides huecos."},
+  {"numero": 12, "titulo": "Engranaje", "descripcion": "Diseño combinando un círculo inicial con dientes duplicados y rotados."},
+  {"numero": 13, "titulo": "Objeto imposible", "descripcion": "Taza absurda con asa interior inspirada en la obra de Jacques Carelman."},
+  {"numero": 14, "titulo": "Edición de modelos STL", "descripcion": "Importación y modificación de un modelo 3D externo para convertirlo en un soporte."},
+  {"numero": 15, "titulo": "Bola enjaulada", "descripcion": "Modelado de una esfera atrapada dentro de un cubo ahuecado con vértices redondeados."},
+  {"numero": 16, "titulo": "Spinner", "descripcion": "Diseño de precisión de un spinner de dos y tres brazos con exactitud milimétrica."},
+  {"numero": 17, "titulo": "Cohete", "descripcion": "Ensamblaje de un cohete uniendo sus patas, cuerpo, cabina y punta."},
+  {"numero": 18, "titulo": "Arco del Triunfo", "descripcion": "Modelado del monumento parisino ajustando estrictamente el diseño a unas cotas predefinidas."},
+  {"numero": 19, "titulo": "Piezas industriales", "descripcion": "Copia de una pieza técnica de polea Lego basada en planos 2D precisos."},
+  {"numero": 20, "titulo": "Robot", "descripcion": "Ensamblaje paso a paso de un robot de aspecto humanoide desde los pies hasta la cabeza."}
+];

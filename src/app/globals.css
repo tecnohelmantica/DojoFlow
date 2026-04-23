@@ -1,0 +1,286 @@
+:root {
+  --color-bg: #f2f7f9;
+  --color-card: #ffffff;
+  --color-text: #1a1a24;
+  --color-text-muted: #8a8a9e;
+  
+  --accent-cyan: #66e2d5;
+  --accent-teal: #00878a;
+  --accent-purple: #c581ff;
+  --accent-blue: #5b8bb3;
+  --accent-gray: #e6ecef;
+  
+  --shadow-soft: 0px 8px 24px rgba(13, 24, 46, 0.05);
+  --shadow-hover: 0px 12px 30px rgba(13, 24, 46, 0.09);
+  --border-radius: 16px;
+  --border-radius-lg: 24px;
+
+  --sidebar-width: 90px;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: #e2e8f0;
+  color: var(--color-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════
+   APP CONTAINER — Bloque central que contiene todo
+   ═══════════════════════════════════════════════════════ */
+.app-container {
+  width: 100%;
+  max-width: 1600px;
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 80px rgba(0,0,0,0.05);
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN CONTENT — Zona principal scrollable
+   ═══════════════════════════════════════════════════════ */
+.main-content {
+  flex: 1;
+  width: 100%;
+  padding: 0 5%;
+  padding-bottom: 100px; /* espacio para navbar bottom en móvil */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Utils */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-teal { color: var(--accent-teal); }
+.text-purple { color: var(--accent-purple); }
+.text-muted { color: var(--color-text-muted); }
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER — Pie de página legal centrado
+   ═══════════════════════════════════════════════════════ */
+.app-footer {
+  width: 100%;
+  padding: 24px 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  margin-top: auto;
+}
+
+.app-footer p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(138, 138, 158, 0.7);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.footer-links {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer-link {
+  font-size: 0.75rem;
+  color: var(--accent-teal);
+  font-weight: 500;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAVEGACIÓN — Bottom bar (móvil) / Sidebar (desktop)
+   ═══════════════════════════════════════════════════════ */
+.global-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1600px;
+  height: 80px;
+  background-color: var(--color-card);
+  border-top-left-radius: var(--border-radius-lg);
+  border-top-right-radius: var(--border-radius-lg);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  padding: 0 10px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  gap: 6px;
+  transition: color 0.2s ease;
+  width: 60px;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: var(--accent-teal);
+}
+
+.nav-item .nav-icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Header General Global */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+}
+
+.top-header .profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: var(--accent-teal);
+}
+
+.top-header .avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MEDIA QUERIES — TABLET Y ESCRITORIO
+   ═══════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  .app-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  /* Sidebar fija DENTRO del contenedor */
+  .global-navbar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 40px;
+    gap: 40px;
+    border-radius: 0;
+    border-top-right-radius: var(--border-radius-lg);
+    border-bottom-right-radius: var(--border-radius-lg);
+    border-top-left-radius: 0;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.04);
+    transform: none;
+  }
+  
+  /* Contenido se desplaza para dejar hueco a la sidebar */
+  .main-content {
+    margin-left: var(--sidebar-width);
+    padding: 20px 5%;
+    padding-bottom: 40px;
+    width: calc(100% - var(--sidebar-width));
+  }
+  
+  /* Footer respeta el margen de la sidebar */
+  .app-footer {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+  
+  .top-header {
+    padding: 24px 0;
+  }
+
+  /* Ajustes cuando NO hay sidebar */
+  .app-container.no-sidebar .main-content,
+  .app-container.no-sidebar .app-footer {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Notificaciones visuales DojoFlow */
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.bg-ninja-notif {
+  background: linear-gradient(135deg, #ff4b2b, #ff416c);
+}
+
+/* 🌀 ANIMACIONES Y SPINNERS */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0,0,0,0.1);
+  border-top: 4px solid var(--accent-teal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDownIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
