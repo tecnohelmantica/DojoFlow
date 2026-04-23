@@ -1,8 +1,6 @@
-const { chromium } = require('playwright');
-const path = require('path');
-const fs = require('fs');
+import { chromium } from 'playwright';
 
-async function fetchResource(notebookUrl, prompt) {
+export async function fetchResource(notebookUrl, prompt) {
     // Usamos un perfil temporal para evitar bloqueos de SingletonLock
     // MODO HEADLESS OBLIGATORIO: Evita que el usuario vea la ventana del navegador
     const browser = await chromium.launch({
@@ -103,7 +101,7 @@ async function fetchResource(notebookUrl, prompt) {
         }
 
         // Esperar respuesta
-        console.log('Esperando respuesta (este paso es lento)...');
+        console.log('Esperar respuesta (este paso es lento)...');
         await page.waitForFunction(() => {
             const msgs = document.querySelectorAll('.chat-message, [role="log"], .conversation-turn');
             return msgs.length >= 2;
@@ -121,15 +119,7 @@ async function fetchResource(notebookUrl, prompt) {
         return result;
 
     } catch (error) {
-        await browser.close();
+        if (browser) await browser.close();
         throw error;
     }
 }
-
-const [,, url, prompt] = process.argv;
-fetchResource(url, prompt)
-    .then(res => console.log(res))
-    .catch(err => {
-        console.error(err);
-        process.exit(1);
-    });

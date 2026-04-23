@@ -75,32 +75,10 @@ export async function POST(req) {
             }, { status: 401 });
         }
 
-        const { spawn } = await import('child_process');
-        const path = await import('path');
-        const fetcherPath = path.join(process.cwd(), 'src', 'app', 'api', 'notebooklm', 'fetcher.js');
+        // --- Importación Directa del Fetcher ---
+        const { fetchResource } = await import('./fetcher');
         
-        const resultText = await new Promise((resolve, reject) => {
-            const child = spawn('node', [fetcherPath, notebookUrl, finalPrompt], {
-                shell: true,
-                env: process.env
-            });
-
-            let output = '';
-            let errorOutput = '';
-
-            child.stdout.on('data', (data) => output += data.toString());
-            child.stderr.on('data', (data) => errorOutput += data.toString());
-
-            child.on('close', (code) => {
-                if (code === 0) resolve(output.trim());
-                else reject(new Error(errorOutput || `Fetcher failed with code ${code}`));
-            });
-
-            setTimeout(() => {
-                child.kill();
-                reject(new Error('Timeout de generación (5 min)'));
-            }, 300000);
-        });
+        const resultText = await fetchResource(notebookUrl, finalPrompt);
 
         if (userId) {
             let dbType = promptData.action;
