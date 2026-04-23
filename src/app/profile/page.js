@@ -18,7 +18,7 @@ import './page.css';
 
 const MASTER_PROFESOR_ID = '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
 
-export default function ProfilePage() {
+function ProfileContent() {
   const router = useRouter();
   const { session, role, profile: authProfile, loading: authLoading, signOut, updateProfile } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -1011,5 +1011,13 @@ export default function ProfilePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <React.Suspense fallback={<div className="flex-center" style={{ minHeight: '60vh', color: '#8a8a9e' }}>Cargando Sector...</div>}>
+      <ProfileContent />
+    </React.Suspense>
   );
 }
