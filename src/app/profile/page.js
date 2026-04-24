@@ -779,7 +779,7 @@ function ProfileContent() {
           <div className="avatar-hero">
             <div className="avatar-circle" style={{ position: 'relative' }}>
               <img src={profile?.avatar_url || "https://i.pravatar.cc/150?img=11"} alt="Avatar" className="avatar-img" />
-              <div className="lvl-badge-pop">LVL 42</div>
+              <div className="lvl-badge-pop">LVL 0</div>
 
               <button
                 onClick={() => setIsChangingAvatar(!isChangingAvatar)}
@@ -847,11 +847,11 @@ function ProfileContent() {
           <div className="stats-row">
             <GlassCard className="stat-card">
               <p>XP POINTS</p>
-              <h2 className="text-teal">12,850</h2>
+              <h2 className="text-teal">0</h2>
             </GlassCard>
             <GlassCard className="stat-card">
               <p>STREAK</p>
-              <h2 className="text-purple">14 Days</h2>
+              <h2 className="text-purple">0 Days</h2>
             </GlassCard>
           </div>
         </div>
