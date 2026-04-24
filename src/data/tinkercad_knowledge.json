@@ -1,0 +1,17 @@
+{
+  "planet": "3d",
+  "knowledge_base": {
+    "interface": {
+      "editor": "Tinkercad 3D Design is a browser-based 3D modeling tool.",
+      "main_tools": "Use 'Group' (Ctrl+G) to combine shapes and 'Hole' to cut shapes out of others."
+    },
+    "technical_constraints": {
+      "workplane": "The blue grid where you build. Use the 'W' key to move the workplane to any surface.",
+      "scaling": "Hold 'Shift' while resizing to maintain the proportions of the object."
+    },
+    "tips": [
+      "The 'Ruler' (L) is essential for precision and exact measurements.",
+      "Export as .STL for 3D printing or .OBJ for virtual reality/Unity."
+    ]
+  }
+}

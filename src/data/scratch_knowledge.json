@@ -1,0 +1,19 @@
+{
+  "planet": "scratch",
+  "knowledge_base": {
+    "interface": {
+      "stage_size": "480x360 pixels",
+      "coordinates": "X from -240 to 240, Y from -180 to 180",
+      "variable_blocks": "Found in the orange 'Variables' category. You must create a variable first using the 'Make a Variable' button to see the specific blocks like 'set', 'change', 'show', and 'hide'."
+    },
+    "technical_constraints": {
+      "cloud_variables": "Can only store numeric values. For text/names, use a numeric encoding system.",
+      "custom_blocks": "The 'Run without screen refresh' option is essential for complex physics and instant calculations."
+    },
+    "tips": [
+      "Use 'collision detection' logic for games like 'Eliminar Marcianitos'.",
+      "Geometry spirals are best done with the 'Pen' extension blocks.",
+      "10 short activities are the best way to introduce logic before big projects."
+    ]
+  }
+}

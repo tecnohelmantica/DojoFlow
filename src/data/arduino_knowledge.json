@@ -1,0 +1,17 @@
+{
+  "planet": "arduino",
+  "knowledge_base": {
+    "interface": {
+      "main_functions": "Every Arduino sketch needs setup() for initialization and loop() for the main logic that runs forever.",
+      "tinkercad_specifics": "In Tinkercad, you can find the 'Code' button on the top right. Use the 'Blocks + Text' view to see how the blocks translate to C++ code."
+    },
+    "technical_constraints": {
+      "digital_pins": "Pins 0 to 13. Pin 13 usually has a built-in LED.",
+      "analog_pins": "A0 to A5. Used for reading sensors like potentiometers or light sensors (LDR)."
+    },
+    "tips": [
+      "Always add a 'delay(100)' in loops to prevent the simulation from crashing or running too fast.",
+      "Connect the long leg of the LED (anode) to the signal pin and the short leg (cathode) to GND with a 220-ohm resistor."
+    ]
+  }
+}

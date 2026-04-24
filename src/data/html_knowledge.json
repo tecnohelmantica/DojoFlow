@@ -1,0 +1,18 @@
+{
+  "planet": "html",
+  "knowledge_base": {
+    "interface": {
+      "structure": "HTML provides the skeleton (tags like <h1>, <p>, <div>).",
+      "style": "CSS provides the visual look (colors, margins, fonts).",
+      "interactivity": "JavaScript provides the brain (actions, buttons, logic)."
+    },
+    "technical_constraints": {
+      "nesting": "Always close your tags! An open <div> can break the whole layout.",
+      "selectors": "In CSS, use '.' for classes and '#' for unique IDs."
+    },
+    "tips": [
+      "Use 'Flexbox' or 'Grid' to align elements easily.",
+      "The 'Inspector' tool in the browser (F12) is the most powerful tool for web developers."
+    ]
+  }
+}

@@ -5,7 +5,7 @@ import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
 import {
   Settings, User, Medal, BookOpen, Send, TrendingUp,
-  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation
+  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones
 } from 'lucide-react';
 import TutorExperience from '@/components/TutorExperience';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,9 +14,38 @@ import TopHeader from '../../components/TopHeader';
 import NinjaChallenges from '../../components/NinjaChallenges';
 import { getPlanetById } from '../../lib/planets';
 import ResourceUploader from '../../components/ResourceUploader';
+import CodeBadges from '../../components/CodeBadges';
 import './page.css';
 
 const MASTER_PROFESOR_ID = '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
+
+const TIPO_ORDER = {
+  'presentacion': 1,
+  'presentación': 1,
+  'infografia': 2,
+  'infografía': 2,
+  'video': 3,
+  'resumen de vídeo': 3,
+  'resumen de video': 3,
+  'slide': 1,
+  'mapa mental': 4,
+  'tarjetas': 5,
+  'cuestionario': 6,
+  'informe': 7,
+  'tabla': 8,
+  'reto': 9,
+  'enlace': 10,
+  'lanzadera': 11
+};
+
+const sortRecursos = (a, b) => {
+  const typeA = a.tipo_recurso?.toLowerCase() || '';
+  const typeB = b.tipo_recurso?.toLowerCase() || '';
+  const orderA = TIPO_ORDER[typeA] || 99;
+  const orderB = TIPO_ORDER[typeB] || 99;
+  if (orderA !== orderB) return orderA - orderB;
+  return new Date(b.fecha_creacion || 0) - new Date(a.fecha_creacion || 0);
+};
 
 function ProfileContent() {
   const router = useRouter();
@@ -28,7 +57,7 @@ function ProfileContent() {
   const activePlanet = searchParams.get('planet') || 'scratch';
 
   const [messages, setMessages] = useState([
-    { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${activePlanet.toUpperCase()}. ¿En qué puedo ayudarte hoy?` }
+    { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${getPlanetById(activePlanet)?.name || activePlanet.toUpperCase()}. ¿En qué puedo ayudarte hoy?` }
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -47,12 +76,18 @@ function ProfileContent() {
   const [isUploading, setIsUploading] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [tempEmail, setTempEmail] = useState('');
+  const [validatingBadge, setValidatingBadge] = useState(null);
+  const [validatingChallenge, setValidatingChallenge] = useState(null);
+  const [badgeRefreshTrigger, setBadgeRefreshTrigger] = useState(0);
 
   const [assessmentCompleted, setAssessmentCompleted] = useState(false);
   const [studentLevel, setStudentLevel] = useState('Junior');
   const [showUploader, setShowUploader] = useState(false);
-  const [selectedScroll, setSelectedScroll] = useState(null); // Nuevo: Visor de Pergaminos
+  const [selectedScroll, setSelectedScroll] = useState(null); 
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false); 
 
+  const [isAutodidact, setIsAutodidact] = useState(true);
+  
   // ── Estadísticas de Docente ──
   const [teacherStats, setTeacherStats] = useState({
     clases: 0,
@@ -191,6 +226,7 @@ function ProfileContent() {
           .eq('alumno_id', session.user.id);
 
         const claseIds = (memberships || []).map(m => m.clase_id);
+        setIsAutodidact(claseIds.length === 0);
 
         // 🗺️ 1. Fetch Global/Master Resources
         const { data: globalRes } = await supabase
@@ -222,7 +258,13 @@ function ProfileContent() {
         // Add class specific
         classResourcesCombined.forEach(r => allResourcesMap.set(r.id, r));
 
-        setTeacherResources(Array.from(allResourcesMap.values()));
+        const resourcesList = Array.from(allResourcesMap.values());
+        setTeacherResources(resourcesList);
+
+        // Auto-seleccionar infografía por defecto al cargar o cambiar de planeta
+        const defaultInfo = resourcesList.find(r => r.tipo_recurso?.toLowerCase().includes('info'));
+        if (defaultInfo) setSelectedScroll(defaultInfo);
+        else if (resourcesList.length > 0) setSelectedScroll(resourcesList[0]);
       } catch (err) {
         console.error("Error al cargar datos de aula:", err);
       } finally {
@@ -560,24 +602,177 @@ function ProfileContent() {
       const res = await fetch('/api/tutor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: isNinjaValidator ? 'validador' : 'tutor', message: userMessage, planet: activePlanet })
+        body: JSON.stringify({ 
+          mode: (isNinjaValidator || validatingBadge) ? 'validador' : 'tutor', 
+          message: userMessage, 
+          history: [...messages, { role: 'user', text: userMessage }],
+          planet: activePlanet 
+        })
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
-      if (data.text.includes('[VALIDADO]')) {
-        setIsNinjaValidator(false);
-        setEvidenceStatus('Validado');
+      
+      if (data.success && data.text) {
+        setMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
+        
+        // Lógica de Validación (Solo si la respuesta fue exitosa)
+        if (data.text.includes('[VALIDADO]')) {
+          if (validatingBadge) {
+            // Guardar Insignia en Supabase
+            const { error } = await supabase.from('badges').insert({
+              student_id: session.user.id,
+              planet_id: 'code',
+              badge_name: validatingBadge.id
+            });
+            
+            if (!error) {
+              setBadgeRefreshTrigger(prev => prev + 1);
+              setMessages(prev => [...prev, { role: 'tutor', text: `¡Felicidades! Has ganado la insignia de ${validatingBadge.name}. Ya brilla en tu perfil.` }]);
+              
+              setTimeout(() => {
+                setIsChatModalOpen(false);
+              }, 4500);
+            }
+            setValidatingBadge(null);
+          } else if (isNinjaValidator && validatingChallenge) {
+            // Guardar Validación de Reto en Supabase
+            const { error } = await supabase
+              .from('user_challenges')
+              .update({ status: 'Validado' })
+              .eq('student_id', session.user.id)
+              .eq('challenge_id', validatingChallenge.fullId);
+
+            if (!error) {
+              setIsNinjaValidator(false);
+              setValidatingChallenge(null);
+              setMessages(prev => [...prev, { role: 'tutor', text: `¡Excelente explicación! He validado oficialmente tu reto. Tu progreso ha sido registrado en el Dojo.` }]);
+              
+              setTimeout(() => {
+                setIsChatModalOpen(false);
+              }, 4500);
+            }
+          }
+        }
+      } else {
+        // Error controlado desde la API (ej: cuota agotada)
+        setMessages(prev => [...prev, { 
+          role: 'tutor', 
+          text: `⚠️ **Sensei en Meditación**: ${data.error || 'No puedo responder ahora mismo.'} Inténtalo de nuevo en unos minutos.` 
+        }]);
       }
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'tutor', text: 'Fallo neural. Mis sensores están bloqueados.' }]);
+      console.error("Error en chat:", err);
+      setMessages(prev => [...prev, { 
+        role: 'tutor', 
+        text: '⚠️ **Fallo Neural**: Mis sensores están bloqueados. Verifica tu conexión o la API Key.' 
+      }]);
     } finally {
       setIsTyping(false);
     }
   };
 
+  const handleStartBadgeValidation = (badge) => {
+    setValidatingBadge(badge);
+    setIsChatModalOpen(true); 
+    
+    // 🤖 Mensaje de inicio limpio
+    const startMsg = `¡Hola Sensei! He completado la sección de ${badge.name} en la Academia Digital (Code.org) y quiero demostrar lo que he aprendido para ganar mi insignia.`;
+    
+    if (!isAutodidact) {
+      // 🏫 CASO: Con Profesor
+      const initialMessages = [
+        { role: 'user', text: `¡Hola! He completado la sección de **${badge.name}** en Code.org. He enviado una solicitud de validación a mi profesor.` },
+        { role: 'tutor', text: `¡Entendido, Explorer! He enviado tu solicitud de validación de **${badge.name}** a tu profesor. En cuanto la revise, tu insignia se iluminará en el perfil. ¡Buen trabajo!` }
+      ];
+      setMessages(initialMessages);
+      console.log("Enviando solicitud al profesor para el badge:", badge.id);
+      return;
+    }
+
+    // 🤖 CASO: Autodidacta (Mentor IA)
+    // Definimos la secuencia exacta solicitada por el usuario para el arranque
+    const initialMessages = [
+      { 
+        role: 'tutor', 
+        text: `¡Hola, Explorer! Veo que has terminado la sección de ${badge.name}. ¡Excelente progreso!` 
+      },
+      { 
+        role: 'user', 
+        text: startMsg 
+      },
+      { 
+        role: 'tutor', 
+        text: `¿podrías explicarme brevemente qué es lo más importante que has aprendido en esta parte?` 
+      }
+    ];
+    
+    setMessages(initialMessages);
+  };
+
+  const handleStartChallengeValidation = (challenge, evidenceUrl, challengeId) => {
+    setValidatingChallenge({ ...challenge, fullId: challengeId });
+    setIsNinjaValidator(true);
+    setIsChatModalOpen(true);
+    
+    const title = challenge.titulo || challenge.title || challenge.name || "Reto Ninja";
+    const startMsg = `¡Hola Sensei! He completado el reto **${title}** en ${getPlanetById(activePlanet)?.name}. Aquí está mi evidencia: ${evidenceUrl || 'No adjunta'}. Quiero demostrar lo que he aprendido para validar este reto.`;
+
+    if (!isAutodidact) {
+      // 🏫 CASO: Con Profesor
+      setMessages([
+        { role: 'user', text: `¡Hola! He completado el reto **${title}**. He enviado la evidencia a mi profesor.` },
+        { role: 'tutor', text: `¡Excelente trabajo, Explorer! He recibido tu entrega para **${title}**. Tu profesor la revisará pronto y verás el estado actualizado en tu itinerario. ¡Sigue así!` }
+      ]);
+      return;
+    }
+
+    // 🤖 CASO: Autodidacta
+    setMessages([
+      { role: 'user', text: startMsg },
+      { role: 'tutor', text: `¡Felicidades por terminar **${title}**! Veo que has enviado tu evidencia. Para validarla oficialmente, ¿podrías explicarme brevemente qué lógica has usado para resolver la parte más difícil del reto?` }
+    ]);
+  };
+
   return (
     <div className="layout-container" style={{ padding: '20px 5%' }}>
       <TopHeader />
+
+      {/* 🔙 BOTÓN VOLVER AL DOJO */}
+      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-start' }}>
+        <button
+          onClick={() => router.push('/')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 20px',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(13, 207, 207, 0.2)',
+            borderRadius: '12px',
+            color: '#1a1a2e',
+            fontSize: '0.8rem',
+            fontWeight: '800',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateX(-5px)';
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+            e.currentTarget.style.borderColor = 'var(--accent-teal)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateX(0)';
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.7)';
+            e.currentTarget.style.borderColor = 'rgba(13, 207, 207, 0.2)';
+          }}
+        >
+          <ArrowLeft size={18} color="var(--accent-teal)" />
+          Volver al Dojo
+        </button>
+      </div>
 
       <div className="profile-dashboard-grid">
         <div className="profile-col-left">
@@ -796,6 +991,23 @@ function ProfileContent() {
                   </div>
                 </div>
 
+                {/* Ninja Tip */}
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '10px', 
+                  background: `${getPlanetById(activePlanet)?.barColor || '#ffc107'}10`, 
+                  borderRadius: '12px', 
+                  borderLeft: `4px solid ${getPlanetById(activePlanet)?.barColor || '#ff9800'}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <Sparkles size={14} color={getPlanetById(activePlanet)?.barColor || "#ff9800"} />
+                  <p style={{ fontSize: '0.65rem', color: '#1a1a2e', margin: 0, fontWeight: '600', lineHeight: '1.4' }}>
+                    <strong>Tip Ninja:</strong> Regístrate e inicia sesión siempre para que tus proyectos se guarden correctamente.
+                  </p>
+                </div>
+
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                   {getPlanetById(activePlanet)?.buttons ? (
                     getPlanetById(activePlanet).buttons.map((btn, bidx) => (
@@ -840,6 +1052,7 @@ function ProfileContent() {
                 .length > 0 ? (
                 teacherResources
                   .filter(r => ['infografia', 'video', 'presentacion', 'Infografia', 'Quiz', 'Podcast', 'Mapa Mental', 'Slide', 'Explicación', 'Documento'].includes(r.tipo_recurso))
+                  .sort(sortRecursos)
                   .slice(0, 8).map((scroll, idx) => (
                 <div 
                   key={idx} 
@@ -887,12 +1100,7 @@ function ProfileContent() {
                       <BookOpen size={16} color={getPlanetById(activePlanet)?.barColor} />
                       <span style={{ fontSize: '0.85rem', fontWeight: '800', fontFamily: 'Outfit' }}>{selectedScroll.nombre_recurso || selectedScroll.tipo_recurso}</span>
                    </div>
-                   <button 
-                     onClick={() => setSelectedScroll(null)}
-                     style={{ background: 'white', border: '1px solid #eee', borderRadius: '8px', padding: '4px 12px', fontSize: '0.7rem', fontWeight: 'bold', cursor: 'pointer' }}
-                   >
-                     CERRAR VISTA
-                   </button>
+                    {/* Botón de cerrar eliminado para mantener visibilidad constante según petición */}
                 </div>
                 
                 <div style={{ background: 'white', minHeight: '400px' }}>
@@ -951,20 +1159,86 @@ function ProfileContent() {
           )}
         </div>
 
-        {/* 🥷 RETOS NINJA DEL DOJO */}
-        {!getPlanetById(activePlanet)?.noChallenges && (
+        {/* 🥷 RETOS NINJA DEL DOJO (Solo si no es Code.org) */}
+        {activePlanet !== 'tinkercad' && !getPlanetById(activePlanet)?.noChallenges && (
           <div className="challenges-section" style={{ marginTop: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '15px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-              <Zap size={18} color={getPlanetById(activePlanet)?.barColor || '#0dcfcf'} /> ITINERARIO NINJA {getPlanetById(activePlanet)?.name?.toUpperCase()}
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+              <Zap size={18} color={getPlanetById(activePlanet)?.barColor || '#0dcfcf'} /> {activePlanet === 'makecode-arcade' ? 'ITINERARIO WE TEACH ROBOTICS' : `ITINERARIO NINJA ${getPlanetById(activePlanet)?.name?.toUpperCase()}`}
             </h3>
+            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+              Consigue una insignia galáctica por cada {activePlanet === 'makecode-arcade' ? '3 retos We Teach Robotics' : '10 retos ninja'} completados (los tutoriales de la academia no cuentan para las insignias).
+            </p>
             <NinjaChallenges
               planetId={activePlanet}
               userId={session?.user?.id}
               accentColor={getPlanetById(activePlanet)?.barColor || '#0dcfcf'}
               targetLevel={studentLevel}
+              onValidateChallenge={handleStartChallengeValidation}
+              isAutodidact={isAutodidact}
             />
           </div>
         )}
+
+        {/* 🏢 ESPECIAL TINKERCAD (ITINERARIOS 3D Y CÓDIGO) */}
+        {activePlanet === 'tinkercad' && (
+          <>
+            <div className="challenges-section" style={{ marginTop: '30px' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#ff9800" /> ITINERARIO NINJA DISEÑO 3D
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Consigue una insignia galáctica por cada 10 retos ninja de Diseño 3D completados.
+              </p>
+              <NinjaChallenges
+                planetId="tinkercad"
+                itinerary="3d"
+                userId={session?.user?.id}
+                accentColor="#ff9800"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+              />
+            </div>
+
+            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#0dcfcf" /> ITINERARIO NINJA BLOQUES DE CÓDIGO
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Consigue una insignia galáctica por cada 5 retos ninja de Bloques de Código completados.
+              </p>
+              <NinjaChallenges
+                planetId="tinkercad"
+                itinerary="codeblocks"
+                userId={session?.user?.id}
+                accentColor="#0dcfcf"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+              />
+            </div>
+            
+            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#ff9800" /> ITINERARIO NINJA BLOCKSCAD
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Consigue una insignia galáctica por cada 10 retos ninja de BlocksCAD completados.
+              </p>
+              <NinjaChallenges
+                planetId="tinkercad"
+                itinerary="blockscad"
+                userId={session?.user?.id}
+                accentColor="#ff9800"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+              />
+            </div>
+          </>
+        )}
+
+
       </div>
 
       {showUploader && (
@@ -1008,6 +1282,123 @@ function ProfileContent() {
               CERRAR
             </button>
           </div>
+        </div>
+      )}
+      {/* 🤖 SENSEI FLOTANTE (MODAL DE VALIDACIÓN) */}
+      {isChatModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          width: '400px',
+          zIndex: 2000,
+          animation: 'slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          pointerEvents: 'none' // Permitir clics detrás si no es en el modal
+        }}>
+          <GlassCard 
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              display: 'flex', 
+              flexDirection: 'column', 
+              padding: 0,
+              overflow: 'hidden',
+              boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.3)',
+              border: `2px solid ${getPlanetById(activePlanet)?.barColor}88`,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(15px)',
+              pointerEvents: 'auto' // Reactivar clics para el modal
+            }} 
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header del Modal */}
+            <div style={{ 
+              padding: '16px 20px', 
+              background: `linear-gradient(135deg, ${getPlanetById(activePlanet)?.barColor}22, rgba(255,255,255,0.5))`,
+              borderBottom: '1px solid rgba(0,0,0,0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '32px', 
+                  height: '32px', 
+                  borderRadius: '50%', 
+                  background: getPlanetById(activePlanet)?.barColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}>
+                  <Brain size={18} />
+                </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', fontFamily: 'Outfit' }}>Validación del Sensei</h4>
+                  <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: '600' }}>DEMUESTRA TU LÓGICA NINJA</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsChatModalOpen(false)}
+                style={{ background: 'white', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+              >
+                <X size={16} color="#8a8a9e" />
+              </button>
+            </div>
+
+            {/* Cuerpo del Chat */}
+            <div style={{ 
+              flex: 1, 
+              padding: '20px', 
+              overflowY: 'auto', 
+              background: 'rgba(255,255,255,0.3)',
+              minHeight: '300px'
+            }}>
+              {validatingBadge && (
+                <div style={{ textAlign: 'center', marginBottom: '20px', padding: '15px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: '1px dashed #ddd' }}>
+                  <Award size={24} color="#FFD700" style={{ marginBottom: '8px' }} />
+                  <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: '700', color: '#1a1a2e' }}>Validando Insignia: {validatingBadge.name}</p>
+                </div>
+              )}
+              
+              <div className="chat-thread-modal">
+                {messages.map((msg, index) => (
+                  <div key={index} className={`chat-bubble ${msg.role === 'tutor' ? 'tutor-bubble' : 'user-bubble'}`} style={{ marginBottom: '12px' }}>
+                    <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: '1.5' }}>{msg.text}</p>
+                  </div>
+                ))}
+                {isTyping && (
+                  <div className="chat-bubble tutor-bubble" style={{ width: '40px', textAlign: 'center' }}>
+                    <span className="typing-dots">...</span>
+                  </div>
+                )}
+                <div ref={(el) => el?.scrollIntoView({ behavior: 'smooth' })} />
+              </div>
+            </div>
+
+            {/* Input del Chat */}
+            <div style={{ padding: '15px', background: 'white', borderTop: '1px solid #eee' }}>
+              <div className="chat-input-row" style={{ display: 'flex', gap: '10px' }}>
+                <input 
+                  type="text" 
+                  placeholder="Escribe tu explicación técnica aquí..." 
+                  className="tutor-input" 
+                  value={inputText} 
+                  onChange={(e) => setInputText(e.target.value)} 
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid #eee', fontSize: '0.85rem', background: '#f8f9fa' }}
+                />
+                <button 
+                  className="tutor-send-btn" 
+                  onClick={handleSendMessage}
+                  style={{ background: getPlanetById(activePlanet)?.barColor, color: 'white', border: 'none', borderRadius: '10px', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                >
+                  <Send size={18} />
+                </button>
+              </div>
+            </div>
+          </GlassCard>
         </div>
       )}
     </div>

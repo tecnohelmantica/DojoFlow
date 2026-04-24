@@ -1,0 +1,17 @@
+{
+  "planet": "arkae",
+  "knowledge_base": {
+    "interface": {
+      "editor": "Microsoft MakeCode Arcade is a block-based editor for creating retro games.",
+      "main_categories": "Sprites (for characters), Controller (for inputs), Game (for logic and updates), and Music."
+    },
+    "technical_constraints": {
+      "sprites": "You must define a 'kind' (Player, Enemy, Projectile, Food) for collision logic to work.",
+      "tilemaps": "Use tilemaps to create the walls and floor of your game levels."
+    },
+    "tips": [
+      "Use the 'on sprite overlaps' event to handle what happens when the player touches an enemy.",
+      "Variables are essential for tracking 'Life' and 'Score'."
+    ]
+  }
+}

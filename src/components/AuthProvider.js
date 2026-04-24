@@ -37,7 +37,7 @@ export default function AuthProvider({ children }) {
       
       let { data, error, status } = await supabase
         .from('profiles')
-        .select('id, role, alias, real_name, email_real, avatar_url')
+        .select('id, role, alias, real_name, email_real, avatar_url, has_seen_onboarding')
         .eq('id', userId)
         .single();
 
@@ -49,7 +49,7 @@ export default function AuthProvider({ children }) {
         
         const { data: rows, error: err2 } = await supabase
           .from('profiles')
-          .select('id, role, alias, real_name, email_real, avatar_url')
+          .select('id, role, alias, real_name, email_real, avatar_url, has_seen_onboarding')
           .eq('id', userId);
         
         console.log('[AuthProvider] Fallback response:', { rows, err2 });

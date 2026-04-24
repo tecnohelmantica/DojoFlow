@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
@@ -13,6 +13,21 @@ export default function AuthPage() {
   const { updateProfile } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [isRecovering, setIsRecovering] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+
+  // Detectar si venimos de un enlace de recuperación
+  useEffect(() => {
+    const handleRecovery = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      // Si hay una sesión y la URL tiene el hash de recovery
+      if (session && window.location.hash.includes('type=recovery')) {
+        setIsUpdatingPassword(true);
+      }
+    };
+    handleRecovery();
+  }, [router]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -42,6 +57,27 @@ export default function AuthPage() {
   };
   const isValidAlias = Object.values(aliasRules).every(Boolean);
 
+  const handleLoginSuccess = async (authData) => {
+    if (authData?.user) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single();
+      
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectTo = searchParams.get('redirect');
+
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else if (profileData?.role === 'profesor') {
+        router.push('/'); // Dojo Studio
+      } else {
+        router.push('/profile'); // Perfil Explorador
+      }
+    }
+  };
+
   const handleAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -50,15 +86,29 @@ export default function AuthPage() {
     // Flujo de Recuperación
     if (isRecovering) {
       try {
-        // Buscar el perfil por alias para ver si tiene email_real
-        const { data: profileData, error: profileError } = await supabase
+        const cleanAlias = alias.trim();
+        
+        // Intento 1: Buscar por alias
+        let { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('email_real')
-          .eq('alias', alias)
-          .single();
+          .select('email_real, role')
+          .eq('alias', cleanAlias)
+          .maybeSingle();
+
+        // Intento 2: Si no se encuentra, buscar por email_real
+        if (!profileData && !profileError) {
+          const { data: emailData, error: emailError } = await supabase
+            .from('profiles')
+            .select('email_real, role')
+            .eq('email_real', cleanAlias)
+            .maybeSingle();
+          
+          profileData = emailData;
+          profileError = emailError;
+        }
 
         if (profileError || !profileData?.email_real) {
-          setErrorMsg("⚠️ No tienes un correo vinculado. Contacta con tu profesor en el Dojo Studio para restablecer tu contraseña.");
+          setErrorMsg("⚠️ No se ha encontrado una identidad vinculada a ese alias o correo. Si eres alumno, contacta con tu profesor.");
           setLoading(false);
           return;
         }
@@ -93,37 +143,57 @@ export default function AuthPage() {
        return;
     }
 
-    // Conversión interna: Alias -> Virtual Email
-    const internalAuthEmail = `${alias.toLowerCase()}@dojoflow.local`;
+      const cleanAlias = alias.trim();
+      const internalAuthEmail = `${cleanAlias.toLowerCase()}@dojoflow.local`;
 
-    try {
-      if (isLogin) {
-        // Lógica de Login
-        const { data: authData, error } = await supabase.auth.signInWithPassword({
-          email: internalAuthEmail,
-          password
-        });
-        if (error) throw new Error("Credenciales inválidas o identidad no encontrada.");
+      try {
+        if (isLogin) {
+          // Lógica de Login Inteligente
+          let finalAuthEmail = cleanAlias.includes('@') ? cleanAlias : internalAuthEmail;
 
-        // Redirección inteligente
-        if (authData?.user) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', authData.user.id)
-            .single();
+          // Si es un alias, intentamos buscar si tiene un correo real asociado en auth
+          if (!cleanAlias.includes('@')) {
+            const { data: pData } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('alias', cleanAlias)
+              .maybeSingle();
           
-          const searchParams = new URLSearchParams(window.location.search);
-          const redirectTo = searchParams.get('redirect');
-
-          if (redirectTo) {
-            router.push(redirectTo);
-          } else if (profileData?.role === 'profesor') {
-            router.push('/'); // Dojo Studio
-          } else {
-            router.push('/profile'); // Perfil Explorador
+          if (pData) {
+            // Intentar obtener el email de auth.users (vía una función o asumiendo que el login fallará si el virtual no existe)
+            // Para mayor robustez, intentamos login con el virtual y si falla, informamos.
+            // Pero como hemos cambiado el maestro a gmail, vamos a permitir login directo con email.
           }
         }
+
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
+          email: finalAuthEmail,
+          password
+        });
+
+        // Si falla con el alias/virtual, intentamos ver si el usuario existe por email_real
+        if (error && !cleanAlias.includes('@')) {
+           // Primero buscamos el perfil para obtener el email real
+           const { data: pData } = await supabase
+             .from('profiles')
+             .select('email_real')
+             .eq('alias', cleanAlias)
+             .maybeSingle();
+           
+           if (pData?.email_real) {
+             const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+               email: pData.email_real,
+               password
+             });
+             if (!retryError) {
+               handleLoginSuccess(retryData);
+               return;
+             }
+           }
+        }
+
+        if (error) throw new Error("Credenciales inválidas o identidad no encontrada.");
+        handleLoginSuccess(authData);
       } else {
         // Lógica de Registro (Signup) con Email Real Opcional
         const { data, error } = await supabase.auth.signUp({
@@ -190,23 +260,66 @@ export default function AuthPage() {
     }
   };
 
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      setErrorMsg("Error al actualizar: " + error.message);
+    } else {
+      setErrorMsg("¡Éxito! Contraseña actualizada. Redirigiendo...");
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="auth-container">
       <GlassCard className="auth-card">
         <div className="auth-header">
           <Sparkles className="colorful-icon" size={60} strokeWidth={2.5} />
           <h1 className="glow-text-cyan">DojoFlow</h1>
-          <p>{isRecovering ? 'Recuperación de Señal de Acceso' : isLogin ? 'Accede a tus simuladores de código' : 'Forja tu identidad en la academia'}</p>
+          <p>{isUpdatingPassword ? 'Actualización de Protocolos' : isRecovering ? 'Recuperación de Señal de Acceso' : isLogin ? 'Accede a tus simuladores de código' : 'Forja tu identidad en la academia'}</p>
         </div>
 
         {errorMsg && (
-          <div className={`auth-alert ${errorMsg.includes('Exitoso') || errorMsg.includes('enviado') ? 'success' : 'error'}`}>
+          <div 
+            className={`auth-alert ${errorMsg.includes('Exitoso') || errorMsg.includes('enviado') || errorMsg.includes('Éxito') ? 'success' : 'error'}`}
+            style={errorMsg.includes('Exitoso') || errorMsg.includes('enviado') || errorMsg.includes('Éxito') ? { color: '#065f46', borderColor: '#10b981', backgroundColor: '#ecfdf5' } : {}}
+          >
             <AlertCircle size={20} />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleAuth} className="auth-form">
+        {isUpdatingPassword ? (
+          <form onSubmit={handleUpdatePassword} className="auth-form">
+            <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
+              <input 
+                type={showPwd ? "text" : "password"} 
+                placeholder="Nueva Contraseña Secreta" 
+                value={newPassword} 
+                onChange={(e) => setNewPassword(e.target.value)} 
+                required
+                className="auth-input"
+                minLength={6}
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPwd(!showPwd)}
+                style={{ position: 'absolute', right: '14px', top: '14px', background: 'none', border: 'none', color: '#8a8a9e', cursor: 'pointer' }}
+              >
+                {showPwd ? <Eye size={18} /> : <EyeOff size={18} />}
+              </button>
+            </div>
+            <button type="submit" className="auth-button primary" disabled={loading}>
+              {loading ? <div className="spinner-small" /> : 'Confirmar Nueva Contraseña'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleAuth} className="auth-form">
           <input 
             type="text" 
             placeholder="Tu Alias Ninja" 
@@ -296,7 +409,8 @@ export default function AuthPage() {
           <GlowButton color={isRecovering ? 'teal' : isLogin ? 'cyan' : 'purple'} className="auth-submit" disabled={loading}>
             {loading ? 'Transmitiendo...' : isRecovering ? 'Enviar Enlace de Recuperación' : isLogin ? <><LogIn /> Ingresar</> : <><UserPlus /> Crear Identidad</>}
           </GlowButton>
-        </form>
+          </form>
+        )}
 
         <div className="auth-switcher">
           {isRecovering ? (

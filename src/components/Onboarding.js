@@ -5,9 +5,10 @@ import GlowButton from './GlowButton';
 import { X, Rocket, BookOpen, Users, Sparkles, BrainCircuit, Trophy, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { usePathname } from 'next/navigation';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Onboarding() {
-  const { profile, role } = useAuth();
+  const { profile, role, updateProfile } = useAuth();
   const pathname = usePathname();
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(0);
@@ -15,9 +16,12 @@ export default function Onboarding() {
   useEffect(() => {
     if (pathname === '/auth') return;
     if (profile?.id) {
-      const hasSeen = localStorage.getItem(`onboarding_seen_${profile.id}`);
-      if (!hasSeen) {
-        setStep(0); // Forzar inicio en el primer paso
+      // Usar flag de base de datos si existe, si no fallback a localStorage
+      const hasSeenDB = profile.has_seen_onboarding;
+      const hasSeenLocal = localStorage.getItem(`onboarding_seen_${profile.id}`);
+      
+      if (!hasSeenDB && !hasSeenLocal) {
+        setStep(0); 
         setShow(true);
       }
     }
@@ -28,9 +32,23 @@ export default function Onboarding() {
     if (show) setStep(0);
   }, [show]);
 
-  const closeOnboarding = () => {
+  const closeOnboarding = async () => {
     if (profile?.id) {
+      // 1. Guardar en localStorage para feedback inmediato
       localStorage.setItem(`onboarding_seen_${profile.id}`, 'true');
+      
+      // 2. Guardar en base de datos para persistencia real
+      try {
+        await supabase
+          .from('profiles')
+          .update({ has_seen_onboarding: true })
+          .eq('id', profile.id);
+        
+        // 3. Actualizar estado local del profile
+        updateProfile({ has_seen_onboarding: true });
+      } catch (err) {
+        console.error("Error saving onboarding status:", err);
+      }
     }
     setShow(false);
   };

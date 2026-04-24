@@ -1,0 +1,17 @@
+{
+  "planet": "appinventor",
+  "knowledge_base": {
+    "interface": {
+      "designer": "Where you drag buttons and labels to design the screen.",
+      "blocks": "Where you program the behavior using logic blocks."
+    },
+    "technical_constraints": {
+      "components": "Non-visible components like TextToSpeech or TinyDB are essential for advanced features.",
+      "ai_companion": "The best way to test your app in real-time on a phone."
+    },
+    "tips": [
+      "Use 'HorizontalArrangement' to put two buttons side by side.",
+      "TinyDB is perfect for saving high scores even when the app is closed."
+    ]
+  }
+}

@@ -20,7 +20,7 @@ const STATUS_CONFIG = {
 };
 
 const PLANET_LABELS = {
-  scratch: 'Scratch', arduino: 'Arduino', tinkercad: 'Tinkercad',
+  scratch: 'Scratch', arduino: 'Arduino', 'tinkercad': 'Tinkercad',
   'makecode-microbit': 'micro:bit', 'makecode-arcade': 'Arcade',
   code: 'Code.org', learningml: 'LearningML', python: 'Python',
   html: 'HTML/JS', appinventor: 'App Inventor',
@@ -274,9 +274,9 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
     { id: 'code', name: 'Code.org' },
     { id: 'scratch', name: 'Scratch' },
     { id: 'makecode-microbit', name: 'micro:bit (MakeCode)' },
-    { id: 'arkade', name: 'Makecode Arcade' },
-    { id: 'tinkercad', name: 'Tinkercad / 3D' },
-    { id: 'arduino', name: 'Arduino (Tinkercad)' },
+    { id: 'makecode-arcade', name: 'MakeCode Arcade' },
+    { id: 'tinkercad', name: 'Tinkercad' },
+    { id: 'learningml', name: 'LearningML' },
     { id: 'appinventor', name: 'App Inventor' },
     { id: 'ia', name: 'LearningML / IA' },
     { id: 'python', name: 'Python' },

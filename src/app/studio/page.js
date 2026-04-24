@@ -24,7 +24,7 @@ export default function StudioPage() {
             {[
               { id: 'scratch', name: 'Scratch', color: '#ff7700', icon: '🧩' },
               { id: 'arduino', name: 'Arduino / C++', color: '#00979d', icon: '🤖' },
-              { id: 'tinkercad', name: 'Tinkercad 3D', color: '#e74c3c', icon: '🏗️' },
+              { id: 'tinkercad', name: 'Tinkercad', color: '#e74c3c', icon: '🏗️' },
               { id: 'python', name: 'Python', color: '#3776ab', icon: '🐍' },
               { id: 'html', name: 'Desarrollo Web (HTML/JS)', color: '#e34f26', icon: '🌐' },
               { id: 'makecode-microbit', name: 'BBC micro:bit', color: '#00ceca', icon: '📟' }

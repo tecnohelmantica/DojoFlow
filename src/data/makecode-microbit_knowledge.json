@@ -1,0 +1,17 @@
+{
+  "planet": "microbit",
+  "knowledge_base": {
+    "interface": {
+      "editor": "Microsoft MakeCode for micro:bit.",
+      "inputs": "Button A, Button B, and the Touch Logo are the main ways to interact."
+    },
+    "technical_constraints": {
+      "led_grid": "A 5x5 grid. Use 'show icon' or 'plot x y' to light up specific LEDs.",
+      "radio": "Use the 'radio' category to send messages between two or more micro:bits."
+    },
+    "tips": [
+      "The 'on shake' event is perfect for making a digital dice.",
+      "Use the 'Light Level' sensor to make a night light that turns on automatically."
+    ]
+  }
+}

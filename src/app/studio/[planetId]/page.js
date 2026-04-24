@@ -33,7 +33,7 @@ const matchTech = (resourceTech, planetId) => {
     'code': ['code.org', 'planeta code', 'code'],
     'makecode-microbit': ['microbit', 'makecode-microbit', 'makecode microbit', 'micro:bit'],
     'makecode-arcade': ['arcade', 'makecode-arcade', 'makecode arcade', 'arkae'],
-    'tinkercad': ['3d', 'tinkercad', 'diseño 3d'],
+    'tinkercad': ['3d', 'tinkercad', 'diseño 3d', 'codeblocks', 'bloques de código', 'tinkercad codeblocks', 'tinkercad-3d', 'tinkercad-codeblocks'],
     'ia': ['learningml', 'ia', 'inteligencia artificial'],
     'html': ['html', 'css', 'js', 'web', 'html/css/js']
   };
@@ -81,12 +81,14 @@ const TIPO_BADGE = {
 };
 
 const TIPO_ORDER = {
-  'infografia': 1,
-  'infografía': 1,
-  'video': 2,
-  'resumen de vídeo': 2,
-  'presentacion': 3,
-  'presentación': 3,
+  'presentacion': 1,
+  'presentación': 1,
+  'infografia': 2,
+  'infografía': 2,
+  'video': 3,
+  'resumen de vídeo': 3,
+  'resumen de video': 3,
+  'slide': 1,
   'mapa mental': 4,
   'tarjetas': 5,
   'cuestionario': 6,

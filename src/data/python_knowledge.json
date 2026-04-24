@@ -1,0 +1,17 @@
+{
+  "planet": "python",
+  "knowledge_base": {
+    "interface": {
+      "editor": "Python is usually written in Replit or VS Code. In Replit, the 'Run' button executes the main.py file.",
+      "syntax": "Indentation is not optional; it defines the blocks of code."
+    },
+    "technical_constraints": {
+      "data_types": "Strings (text) must be inside quotes. Integers are whole numbers. Floats have decimals.",
+      "loops": "Use 'for i in range(10):' to repeat code a specific number of times."
+    },
+    "tips": [
+      "The command 'print()' is essential to see what your program is doing.",
+      "Input from the user always comes as a string. Use 'int()' to convert it if you need a number."
+    ]
+  }
+}

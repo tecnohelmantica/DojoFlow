@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Brain, Award, ArrowRight, CheckCircle2, XCircle, Send, LogOut } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { diagnosticQuizzes } from '../data/diagnosticQuizzes';
+import { getPlanetById } from '../lib/planets';
 
 const TutorExperience = ({ technology, onComplete }) => {
   const { signOut } = useAuth();
@@ -14,7 +15,10 @@ const TutorExperience = ({ technology, onComplete }) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackType, setFeedbackType] = useState(null);
   
-  let techKey = technology;
+  const planet = getPlanetById(technology);
+  const planetName = planet?.name || technology.toUpperCase();
+
+  let techKey = technology?.toLowerCase();
   if (typeof diagnosticQuizzes[techKey] === 'string') {
     techKey = diagnosticQuizzes[techKey];
   }
@@ -224,7 +228,7 @@ const TutorExperience = ({ technology, onComplete }) => {
           </div>
           <div className="tutor-bubble">
             <p style={{ margin: 0, lineHeight: '1.6' }}>
-              ¡Hola joven Ninja! Soy tu tutor IA. Antes de empezar tu viaje en <strong>{technology.toUpperCase()}</strong>, 
+              ¡Hola joven Ninja! Soy tu tutor IA. Antes de empezar tu viaje en <strong>{planetName}</strong>, 
               necesito saber qué secretos de este planeta ya dominas. <br/><br/>
               ¿Hacemos un pequeño desafío de nivelación?
             </p>
@@ -300,7 +304,7 @@ const TutorExperience = ({ technology, onComplete }) => {
           <Award size={64} color="#0dcfcf" />
           <h2>¡Evaluación Completada!</h2>
           <div className="level-badge">{levelInfo.icon}</div>
-          <p style={{ margin: 0, color: '#666' }}>Tu nivel actual en {technology.toUpperCase()} es:</p>
+          <p style={{ margin: 0, color: '#666' }}>Tu nivel actual en {planetName} es:</p>
           <div className={`level-text ${levelInfo.style}`}>{levelInfo.label}</div>
           
           <div className="tutor-bubble" style={{ textAlign: 'left', borderRadius: '20px' }}>

@@ -67,12 +67,12 @@ export default function HomePage() {
     }
   };
 
-  // Enriquecer planetas con iconos y estados mock
+  // Enriquecer planetas con iconos y estados
   const planets = PLANETS.map(p => ({
     ...p,
     icon: getIcon(p.icon),
-    level: p.id === 'code' ? 14 : p.id === 'scratch' ? 5 : 1,
-    complete: p.id === 'code' ? 100 : p.id === 'scratch' ? 45 : 0
+    level: 1,
+    complete: 0
   }));
 
   // Estado para aulas del alumno y sus enlaces

@@ -79,7 +79,7 @@ export const diagnosticQuizzes = {
       explicacion: "Lambda es muy útil para funciones rápidas y cortas que solo hacen una cosa."
     }
   ],
-  web: [
+  html: [
     {
       pregunta: "¿Qué atributo usamos en <img> para poner la ruta de la imagen?",
       opciones: ["href", "src", "link"],
@@ -111,19 +111,92 @@ export const diagnosticQuizzes = {
       opciones: ["En la Vista Diseñador", "En el Editor de Bloques", "En la Tienda de Apps"],
       correcta: 1,
       explicacion: "La lógica siempre se hace en el Editor de Bloques. El Diseñador es solo para lo visual."
+    },
+    {
+      pregunta: "¿Cuál es la forma más rápida de probar tu app en un móvil real?",
+      opciones: ["Subiéndola a la Play Store", "Usando el AI Companion y escaneando el código QR", "Enviándola por correo"],
+      correcta: 1,
+      explicacion: "¡Exacto! El AI Companion te permite ver los cambios en tiempo real mientras programas."
     }
   ],
-  learningml: [
+  ia: [
     {
       pregunta: "¿Qué es 'entrenar' un modelo en LearningML?",
       opciones: ["Hacer que la IA haga ejercicio", "Darle muchos ejemplos para que aprenda a reconocer patrones", "Instalar el programa"],
       correcta: 1,
       explicacion: "Entrenar es enseñar. Cuantos más ejemplos le des (perros, gatos, etc.), mejor aprenderá."
+    },
+    {
+      pregunta: "En Inteligencia Artificial, ¿qué son las 'Etiquetas' (Labels)?",
+      opciones: ["Pegatinas para el ordenador", "Categorías para clasificar los datos (ej: 'Perro' o 'Gato')", "Nombres de los alumnos"],
+      correcta: 1,
+      explicacion: "Las etiquetas ayudan a la IA a saber qué está viendo en cada ejemplo durante su entrenamiento."
+    },
+    {
+      pregunta: "¿Qué sucede si entrenamos a una IA con datos sesgados o incompletos?",
+      opciones: ["La IA se vuelve más inteligente", "La IA aprenderá prejuicios y cometerá errores injustos", "No pasa nada"],
+      correcta: 1,
+      explicacion: "¡Importante! Si solo le enseñas fotos de perros blancos, la IA no sabrá reconocer a un perro negro. ¡La calidad de los datos es clave!"
     }
   ],
-  // Mapping for consistency
-  html: 'web',
-  arcade: 'scratch',
-  microbit: 'arduino',
-  '3d': 'arduino'
+  'makecode-microbit': [
+    {
+      pregunta: "¿Qué sensor del micro:bit detecta si lo estamos agitando o inclinando?",
+      opciones: ["Termómetro", "Acelerómetro", "Brújula"],
+      correcta: 1,
+      explicacion: "El acelerómetro mide el movimiento y la inclinación en tres ejes. ¡Ideal para juegos de agitar!"
+    },
+    {
+      pregunta: "¿Cuántos botones programables tiene el micro:bit en su parte frontal?",
+      opciones: ["Solo 1", "2 (A y B)", "5 botones"],
+      correcta: 1,
+      explicacion: "Tiene dos botones principales, A y B, que puedes usar para activar cualquier acción en tu código."
+    },
+    {
+      pregunta: "¿Cómo se llama el bloque que se ejecuta una sola vez al encender el micro:bit?",
+      opciones: ["Para siempre", "Al iniciar", "Si entonces"],
+      correcta: 1,
+      explicacion: "El bloque 'Al iniciar' es perfecto para configurar variables o mostrar un mensaje de bienvenida."
+    }
+  ],
+  'makecode-arcade': [
+    {
+      pregunta: "¿Qué es un 'Sprite' en MakeCode Arcade?",
+      opciones: ["Una bebida gaseosa", "Un personaje u objeto que puede moverse e interactuar", "Un tipo de fuente de texto"],
+      correcta: 1,
+      explicacion: "Los sprites son el corazón de tus juegos: jugadores, enemigos, proyectiles o comida."
+    },
+    {
+      pregunta: "¿Cuál es el bloque más rápido para hacer que tu personaje se mueva con el simulador?",
+      opciones: ["Mover con botones", "Cambiar X por 10", "Seguir al ratón"],
+      correcta: 0,
+      explicacion: "El bloque 'mover sprite con botones' configura automáticamente el control básico por ti."
+    },
+    {
+      pregunta: "¿Qué sucede si no usas el bloque 'Establecer color de fondo'?",
+      opciones: ["El juego no funciona", "El fondo será negro por defecto", "La pantalla parpadeará"],
+      correcta: 1,
+      explicacion: "Por defecto la pantalla está vacía (negra). ¡Dale color o pon una imagen para que tu mundo cobre vida!"
+    }
+  ],
+  tinkercad: [
+    {
+      pregunta: "¿Qué es el 'Plano de trabajo' en Tinkercad?",
+      opciones: ["Un papel para dibujar", "La rejilla azul donde colocas y diseñas tus formas", "Una herramienta de corte"],
+      correcta: 1,
+      explicacion: "Es tu base de operaciones 3D. Todo lo que construyas se apoya sobre este plano."
+    },
+    {
+      pregunta: "¿Cómo se crea un 'Hueco' (Hole) en una pieza sólida?",
+      opciones: ["Borrando la pieza", "Cambiando su propiedad a 'Hueco' y agrupándola con un sólido", "Pintándola de blanco"],
+      correcta: 1,
+      explicacion: "Al agrupar un objeto tipo 'Hueco' con uno sólido, el hueco 'come' la parte del sólido que toca."
+    },
+    {
+      pregunta: "¿Qué función cumple la herramienta 'Agrupar' (Ctrl+G)?",
+      opciones: ["Cambiar el color", "Unir varias formas en una sola pieza", "Duplicar el objeto"],
+      correcta: 1,
+      explicacion: "Agrupar fusiona las formas. Es esencial para crear diseños complejos a partir de piezas simples."
+    }
+  ]
 };

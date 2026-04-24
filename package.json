@@ -7,9 +7,11 @@
     "sync:docs": "node scripts/syncMasterDocs.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sensei:auth": "node scratch/vincular_sensei.mjs"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@supabase/supabase-js": "^2.103.3",
     "lucide-react": "^1.8.0",

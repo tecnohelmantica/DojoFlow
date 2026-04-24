@@ -1,0 +1,17 @@
+{
+  "planet": "ia",
+  "knowledge_base": {
+    "interface": {
+      "process": "The cycle is: Collect Data -> Train Model -> Test -> Export to Scratch.",
+      "classes": "You need at least two 'classes' or categories for the machine to learn to differentiate."
+    },
+    "technical_constraints": {
+      "training_data": "Quality is better than quantity. 10 clear images are better than 100 blurry ones.",
+      "confidence": "The 'Confidence' score tells you how sure the IA is about its prediction."
+    },
+    "tips": [
+      "Try the 'Rock, Paper, Scissors' project to see how fast the machine can learn.",
+      "Export your trained model to Scratch to create a game that reacts to your voice or movements."
+    ]
+  }
+}

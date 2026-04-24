@@ -1,0 +1,17 @@
+{
+  "planet": "code",
+  "knowledge_base": {
+    "interface": {
+      "app_lab": "Used for building mobile apps with JavaScript or blocks.",
+      "game_lab": "Used for building interactive animations and games using the Game Score library."
+    },
+    "technical_constraints": {
+      "ids": "Every element in App Lab must have a unique ID to be controlled by 'onEvent' blocks.",
+      "draw_loop": "In Game Lab, all movement and drawing happens inside the function 'draw()'."
+    },
+    "tips": [
+      "Use 'setScreen' to navigate between different pages of your app.",
+      "The 'console.log' block is your best friend for debugging why a variable isn't changing."
+    ]
+  }
+}
