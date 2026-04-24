@@ -679,7 +679,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                            (planetId === 'makecode-arcade' ? "/arcade_hero.png" : 
                            (itinerary === 'blockscad' ? "/planets/blockscad.png" :
                            (planetId?.startsWith('tinkercad') ? (itinerary === 'codeblocks' ? "/planets/tinkercad_codeblocks.png" : "/planets/tinkercad_3d.png") : 
-                           (planetId === 'code' ? "/planets/code.png" : "/planets/microbit.jpeg")))))} 
+                           (planetId === 'code' ? "/planets/code-pro.png" : "/planets/microbit.jpeg")))))} 
                       alt="Planet Hero"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: '0.9' }}
                     />
