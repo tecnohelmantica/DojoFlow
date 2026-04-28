@@ -253,7 +253,8 @@ function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ flex: 1 }}>
                         <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: '700', color: '#1a1a2e' }}>
-                          {PLANET_LABELS[rn.planet_id] || rn.planet_id}: <span style={{ color: '#666', fontWeight: '500' }}>{rn.challenge_id.split('_').pop().toUpperCase()}</span>
+                          {PLANET_LABELS[rn.planet_id] || rn.planet_id}: <span style={{ color: '#666', fontWeight: '500' }}>{(rn.challenge_id || 'RETO').split('_').pop().toUpperCase()}</span>
+
                         </p>
                         <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
                           {rn.evidence_url && (
@@ -316,7 +317,8 @@ function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
 }
 
 // ── Detalle de Clase ──
-const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh, currentUser, misRecursos = [], onVincular, onDesvincular, onValidarReto, onEliminarAlumno, loadingDash, dashData, claseRecursos, onMsg, setShowUploadModal }) => {
+const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh, currentUser, misRecursos = [], onVincular, onDesvincular, onValidarReto, onValidarRetoNinja, onEliminarAlumno, loadingDash, dashData, claseRecursos, onMsg, setShowUploadModal }) => {
+
   const [activeTab, setActiveTab] = useState('alumnos');
   const [showVincular, setShowVincular] = useState(false);
   const [launcherPlatform, setLauncherPlatform] = useState('');
@@ -430,7 +432,21 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
         <span style={{ color: '#ccc' }}>›</span>
         <h2 style={{ fontFamily: 'Outfit', fontSize: '1.2rem', fontWeight: '800', color: '#1a1a2e', margin: 0 }}>🏫 {clase.nombre_clase}</h2>
         <span style={{ padding: '3px 11px', borderRadius: '20px', background: '#ede7f6', color: '#9c27b0', fontSize: '0.78rem', fontWeight: '800', fontFamily: 'monospace' }}>🔑 {clase.codigo_invitacion}</span>
+        <button 
+          onClick={onRefresh}
+          title="Actualizar datos del aula"
+          style={{ background: 'none', border: 'none', color: '#8a8a9e', cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'transform 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'rotate(30deg)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'rotate(0)'}
+        >
+          <RefreshCw size={16} />
+        </button>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
+      `}} />
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '12px' }}>
         <button onClick={() => setActiveTab('alumnos')} style={{ background: activeTab === 'alumnos' ? '#9c27b0' : 'white', color: activeTab === 'alumnos' ? 'white' : '#666', border: '1.5px solid ' + (activeTab === 'alumnos' ? '#9c27b0' : '#ddd'), borderRadius: '10px', padding: '10px 20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '700', fontFamily: 'Outfit' }}>
@@ -470,13 +486,13 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                   <Sparkles size={15}/> Generación en Masa
                 </button>
               </div>
-              {dashData?.alumnos.length === 0 ? (
+              {dashData?.alumnos?.length > 0 ? (
+                dashData?.alumnos.map(a => <AlumnoRow key={a.id} alumno={a} onValidar={onValidarReto} onValidarNinja={onValidarRetoNinja} onEliminar={onEliminarAlumno}/>)
+              ) : (
                 <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.7)', borderRadius: '14px', border: '1.5px dashed #ddd' }}>
                   <Users size={32} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.25 }}/>
                   <p style={{ color: '#8a8a9e' }}>No hay alumnos todavía.</p>
                 </div>
-              ) : (
-                dashData?.alumnos.map(a => <AlumnoRow key={a.id} alumno={a} onValidar={onValidarReto} onValidarNinja={onValidarRetoNinja} onEliminar={onEliminarAlumno}/>)
               )}
             </>
           )}
@@ -694,10 +710,26 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
       if (error) throw error;
 
       const con = await Promise.all((clasesData || []).map(async c => {
-        const { count } = await supabase.from('clase_alumnos').select('*', { count: 'exact', head: true }).eq('clase_id', c.id);
-        const { data: revs } = await supabase.from('explore_progress').select('student_id').in('student_id', (await supabase.from('clase_alumnos').select('alumno_id').eq('clase_id', c.id)).data?.map(a => a.alumno_id) || []).eq('status', 'En revisión');
-        return { ...c, num_alumnos: count || 0, revisiones_pendientes: new Set((revs || []).map(r => r.student_id)).size };
+        try {
+          const { data: alumnosIds } = await supabase.from('clase_alumnos').select('alumno_id').eq('clase_id', c.id);
+          const ids = alumnosIds?.map(a => a.alumno_id) || [];
+          
+          let pendingCount = 0;
+          if (ids.length > 0) {
+            const [resRegular, resNinja] = await Promise.all([
+              supabase.from('explore_progress').select('id', { count: 'exact', head: true }).in('student_id', ids).eq('status', 'En revisión'),
+              supabase.from('user_challenges').select('id', { count: 'exact', head: true }).in('student_id', ids).eq('status', 'En revisión')
+            ]);
+            pendingCount = (resRegular.count || 0) + (resNinja.count || 0);
+          }
+
+          return { ...c, num_alumnos: ids.length, revisiones_pendientes: pendingCount };
+        } catch (innerErr) {
+          console.error("Error cargando clase:", c.id, innerErr);
+          return { ...c, num_alumnos: 0, revisiones_pendientes: 0 };
+        }
       }));
+
 
       setClases(con);
     } catch (err) {
@@ -712,31 +744,47 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
   const abrirDashboard = async (clase) => {
     setClaseActiva(clase);
     setView('dashboard');
+    setDashData(null); // Reset data to show loading state
     setLoadingDash(true);
     try {
       const { data: vincs } = await supabase.from('clase_alumnos').select('alumno_id, fecha_union').eq('clase_id', clase.id);
       const ids = (vincs || []).map(v => v.alumno_id);
 
       if (ids.length > 0) {
-        const [{ data: perfiles }, { data: progreso }, { data: insignias }, { data: retosNinja }] = await Promise.all([
+        const [resP, resPr, resI, resN] = await Promise.all([
           supabase.from('profiles').select('id, alias, real_name').in('id', ids),
           supabase.from('explore_progress').select('student_id, planet_id, status').in('student_id', ids),
           supabase.from('badges').select('student_id, planet_id, badge_name, awarded_at').in('student_id', ids),
           supabase.from('user_challenges').select('student_id, challenge_id, planet_id, status, evidence_url, evidence_file_url').in('student_id', ids)
         ]);
 
-        const alumnos = (perfiles || []).map(p => {
-          const retos = (progreso || []).filter(r => r.student_id === p.id);
-          const badges = (insignias || []).filter(b => b.student_id === p.id);
-          const nimbus = (retosNinja || []).filter(rn => rn.student_id === p.id);
-          const v = (vincs || []).find(v => v.alumno_id === p.id);
-          return {
-            ...p, fecha_union: v?.fecha_union,
-            metricas: { validados: retos.filter(r => r.status === 'Validado').length, en_revision: retos.filter(r => r.status === 'En revisión').length, total_retos: retos.length, insignias: badges.length },
-            retos_detalle: retos, insignias_detalle: badges,
-            retos_ninja: nimbus
-          };
-        });
+        const perfiles = resP.data || [];
+        const progreso = resPr.data || [];
+        const insignias = resI.data || [];
+        const retosNinja = resN.data || [];
+
+          const alumnos = (perfiles || []).map(p => {
+            const retos = (progreso || []).filter(r => r.student_id === p.id);
+            const badges = (insignias || []).filter(b => b.student_id === p.id);
+            const nimbus = (retosNinja || []).filter(rn => rn.student_id === p.id);
+            const v = (vincs || []).find(v => v.alumno_id === p.id);
+            
+            const enRevisionRegular = retos.filter(r => r.status === 'En revisión').length;
+            const enRevisionNinja = nimbus.filter(rn => rn.status === 'En revisión').length;
+
+            return {
+              ...p, fecha_union: v?.fecha_union,
+              metricas: { 
+                validados: retos.filter(r => r.status === 'Validado').length, 
+                en_revision: enRevisionRegular + enRevisionNinja, 
+                total_retos: retos.length, 
+                insignias: badges.length 
+              },
+              retos_detalle: retos, insignias_detalle: badges,
+              retos_ninja: nimbus
+            };
+          });
+
         setDashData({ alumnos });
       } else {
         setDashData({ alumnos: [] });
@@ -745,8 +793,8 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
       const { data: recs } = await supabase.from('clase_recursos').select('*, recursos_docentes(*)').eq('clase_id', clase.id);
       setClaseRecursos(recs || []);
     } catch (err) {
-      msg('err', 'Error al cargar dashboard');
-    } finally {
+      console.error("Dashboard Load Error:", err);
+      msg('err', 'Error al cargar dashboard: ' + err.message);
       setLoadingDash(false);
     }
   };

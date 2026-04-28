@@ -22,12 +22,68 @@ export default function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
 
-  // Notificaciones (inicialmente vacías hasta implementar sistema real)
+  // Sistema de Notificaciones Reales
+  const fetchNotifications = async (userId, userRole) => {
+    if (!userId || userRole !== 'profesor') return;
+
+    try {
+      // 1. Obtener IDs de las clases del profesor
+      const { data: clases } = await supabase
+        .from('clases')
+        .select('id, nombre_clase')
+        .eq('profesor_id', userId);
+      
+      if (!clases || clases.length === 0) return;
+      const claseIds = clases.map(c => c.id);
+
+      // 2. Obtener IDs de todos los alumnos en esas clases
+      const { data: vincs } = await supabase
+        .from('clase_alumnos')
+        .select('alumno_id, clase_id')
+        .in('clase_id', claseIds);
+      
+      if (!vincs || vincs.length === 0) return;
+      const studentIds = [...new Set(vincs.map(v => v.alumno_id))];
+
+      // 3. Contar retos pendientes de revisión (Regular + Ninja)
+      const [resRegular, resNinja] = await Promise.all([
+        supabase.from('explore_progress').select('student_id, planet_id').in('student_id', studentIds).eq('status', 'En revisión'),
+        supabase.from('user_challenges').select('student_id, challenge_id').in('student_id', studentIds).eq('status', 'En revisión')
+      ]);
+
+      const totalPending = (resRegular.data?.length || 0) + (resNinja.data?.length || 0);
+      
+      const newNotifs = [];
+      if (totalPending > 0) {
+        newNotifs.push({
+          id: 'pending-reviews',
+          type: 'pending',
+          text: `Tienes ${totalPending} reto${totalPending > 1 ? 's' : ''} esperando tu validación.`,
+          time: 'Ahora',
+          count: totalPending
+        });
+      }
+
+      setNotifications(newNotifs);
+    } catch (err) {
+      console.error('[AuthProvider] Error fetching notifications:', err);
+    }
+  };
+
   useEffect(() => {
-    setNotifications([]);
+    if (profile) {
+      fetchNotifications(profile.id, profile.role);
+      
+      // Polling suave cada 5 minutos
+      const interval = setInterval(() => fetchNotifications(profile.id, profile.role), 1000 * 60 * 5);
+      return () => clearInterval(interval);
+    } else {
+      setNotifications([]);
+    }
   }, [profile]);
 
   const markNotificationsAsRead = () => {
+    // Por ahora solo limpiamos visualmente
     setNotifications([]);
   };
 
