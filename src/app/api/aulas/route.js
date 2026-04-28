@@ -10,7 +10,7 @@ export async function POST(req) {
         const body = await req.json();
         const { action } = body;
         
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         if (action === 'vincular_recurso') {
             const { claseId, recursoId } = body;
@@ -28,9 +28,18 @@ export async function POST(req) {
 
         if (action === 'unirse_con_codigo') {
             const { codigo, alumnoId } = body;
-            const { data: clase } = await supabase.from('clases').select('id, nombre_clase').eq('codigo_invitacion', codigo.trim().toUpperCase()).single();
+            const { data: clase } = await supabase.from('clases').select('id, nombre_clase').ilike('codigo_invitacion', codigo.trim()).single();
             if (!clase) return NextResponse.json({ error: 'Codigo invalido' }, { status: 404 });
-            await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId });
+            const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId });
+            
+            if (insertError) {
+                // Si ya está unido (error de clave duplicada), lo tratamos como éxito pero con mensaje
+                if (insertError.code === '23505') {
+                    return NextResponse.json({ success: true, clase, message: 'Ya estabas unido a esta clase.' });
+                }
+                throw insertError;
+            }
+            
             return NextResponse.json({ success: true, clase });
         }
 

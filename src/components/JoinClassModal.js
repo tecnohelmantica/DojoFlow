@@ -12,8 +12,8 @@ export default function JoinClassModal({ isOpen, onClose, onJoin, loading }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (code.length < 5) {
-      setError('El código debe tener al menos 6 caracteres (ej. DF-1234)');
+    if (code.length < 8) {
+      setError('El código debe tener 8 caracteres (ej. 646df897)');
       return;
     }
     setError(null);
@@ -95,7 +95,7 @@ export default function JoinClassModal({ isOpen, onClose, onJoin, loading }) {
             </label>
             <input 
               type="text"
-              placeholder="Ej: DF-8923"
+              placeholder="Ej: 646df897"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               style={{

@@ -79,43 +79,41 @@ export default function HomePage() {
   const [studentLaunchers, setStudentLaunchers] = useState({});
   const [studentAulas, setStudentAulas] = useState([]);
 
-  // Cargar lanzadores del alumno
-  React.useEffect(() => {
+  const fetchStudentData = async () => {
     if (!session?.user?.id || role !== 'alumno') return;
 
-    const fetchLaunchers = async () => {
-      // 1. Obtener IDs de las clases en las que está el alumno
-      const { data: vincs } = await supabase
-        .from('clase_alumnos')
-        .select('clase_id')
-        .eq('alumno_id', session.user.id);
-      
-      const claseIds = (vincs || []).map(v => v.clase_id);
-      setStudentAulas(claseIds);
+    // 1. Obtener IDs de las clases en las que está el alumno
+    const { data: vincs } = await supabase
+      .from('clase_alumnos')
+      .select('clase_id')
+      .eq('alumno_id', session.user.id);
+    
+    const claseIds = (vincs || []).map(v => v.clase_id);
+    setStudentAulas(claseIds);
 
-      if (claseIds.length === 0) return;
+    if (claseIds.length === 0) return;
 
-      // 2. Obtener recursos vinculados a esas clases que sean enlaces
-      const { data: recs } = await supabase
-        .from('clase_recursos')
-        .select('*, recursos_docentes(*)')
-        .in('clase_id', claseIds);
-      
-      const launchers = {};
-      (recs || []).forEach(r => {
-        const res = r.recursos_docentes;
-        // Si el recurso es un enlace de la tecnología correspondiente
-        if (res && res.tipo_recurso === 'enlace') {
-          // Guardamos el primer link encontrado por tecnología
-          if (!launchers[res.tecnologia]) {
-            launchers[res.tecnologia] = res.contenido.markdown; // Asumimos que la URL está en contenido.markdown para enlaces
-          }
+    // 2. Obtener recursos vinculados a esas clases que sean enlaces
+    const { data: recs } = await supabase
+      .from('clase_recursos')
+      .select('*, recursos_docentes(*)')
+      .in('clase_id', claseIds);
+    
+    const launchers = {};
+    (recs || []).forEach(r => {
+      const res = r.recursos_docentes;
+      if (res && res.tipo_recurso === 'enlace') {
+        if (!launchers[res.tecnologia]) {
+          launchers[res.tecnologia] = res.contenido.markdown;
         }
-      });
-      setStudentLaunchers(launchers);
-    };
+      }
+    });
+    setStudentLaunchers(launchers);
+  };
 
-    fetchLaunchers();
+  // Cargar lanzadores del alumno
+  React.useEffect(() => {
+    fetchStudentData();
   }, [session?.user?.id, role]);
 
   // Estado de carga - Esperar a que el perfil se cargue si hay sesión
@@ -205,7 +203,7 @@ export default function HomePage() {
       if (data.success) {
         showToast('ok', data.message || `¡Genial! Ya eres parte de ${data.clase.nombre_clase}`);
         setIsJoinModalOpen(false);
-        // Podríamos recargar el perfil o las clases aquí si fuera necesario
+        fetchStudentData(); // Recargar datos del alumno
       } else {
         showToast('err', data.error || 'No se pudo unir a la clase. Revisa el código.');
       }
