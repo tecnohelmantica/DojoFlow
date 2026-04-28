@@ -672,7 +672,7 @@ function ProfileContent() {
           
           {/* BOTÓN VOLVER */}
           <div style={{ marginBottom: '30px' }}>
-            <GlowButton color="white" onClick={() => router.push('/profile')} style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '800', border: '1px solid #e2e8f0', color: '#64748b' }}>
+            <GlowButton color="white" onClick={() => router.push('/')} style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '800', border: '1px solid #e2e8f0', color: '#64748b' }}>
               <ArrowLeft size={16} style={{ marginRight: '8px' }} /> VOLVER AL DOJO
             </GlowButton>
           </div>
