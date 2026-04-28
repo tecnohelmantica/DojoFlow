@@ -67,6 +67,7 @@ function ProfileContent() {
   const [isTyping, setIsTyping] = useState(false);
   const [isNinjaValidator, setIsNinjaValidator] = useState(false);
   const [evidenceStatus, setEvidenceStatus] = useState('No Iniciado');
+  const [studentClassrooms, setStudentClassrooms] = useState([]);
 
   // ── Recursos del Maestro ──
   const [teacherResources, setTeacherResources] = useState([]);
@@ -89,6 +90,7 @@ function ProfileContent() {
 
   const [assessmentCompleted, setAssessmentCompleted] = useState(false);
   const [studentLevel, setStudentLevel] = useState('Junior');
+  const [itinerary, setItinerary] = useState(null);
   const [showUploader, setShowUploader] = useState(false);
   const [selectedScroll, setSelectedScroll] = useState(null); 
   const [isChatModalOpen, setIsChatModalOpen] = useState(false); 
@@ -107,6 +109,9 @@ function ProfileContent() {
     medallas: 0,
     progreso: 0
   });
+
+  const [activeResource, setActiveResource] = useState(null);
+  const [isFullscreenResource, setIsFullscreenResource] = useState(false);
 
   const handleFileUpload = async (event) => {
     try {
@@ -155,11 +160,19 @@ function ProfileContent() {
 
     // Check assessment state
     const savedLevel = localStorage.getItem(`dojoflow_level_${activePlanet}`);
+    const savedItinerary = localStorage.getItem(`dojoflow_itinerary_${activePlanet}`);
+    
     if (savedLevel) {
       setAssessmentCompleted(true);
       setStudentLevel(savedLevel);
     } else {
       setAssessmentCompleted(false);
+    }
+
+    if (savedItinerary) {
+      setItinerary(savedItinerary);
+    } else {
+      setItinerary(null);
     }
   }, [activePlanet]);
 
@@ -247,9 +260,20 @@ function ProfileContent() {
         // Buscar aulas del alumno
         const { data: memberships } = await supabase
           .from('clase_alumnos')
-          .select('clase_id')
+          .select(`
+            clase_id,
+            clases:clase_id (
+              id,
+              nombre
+            )
+          `)
           .eq('alumno_id', session.user.id);
 
+        const classroomNames = (memberships || [])
+          .map(m => m.clases?.nombre)
+          .filter(Boolean);
+        
+        setStudentClassrooms(classroomNames);
         const claseIds = (memberships || []).map(m => m.clase_id);
         setIsAutodidact(claseIds.length === 0);
 
@@ -334,6 +358,13 @@ function ProfileContent() {
     localStorage.setItem(`dojoflow_level_${activePlanet}`, level);
     setStudentLevel(level);
     setAssessmentCompleted(true);
+    
+    // Iniciar conversación socrática con feedback del nivel
+    const welcomeMsg = { 
+      role: 'tutor', 
+      text: `¡Excelente trabajo completando la evaluación! He detectado que tienes un nivel **${level}** en este sector. He preparado un itinerario personalizado para ti. ¿Quieres que empecemos con el primer reto o tienes alguna duda técnica?` 
+    };
+    setSocraticMessages([welcomeMsg]);
   };
 
   const handleSocraticSubmit = async (e) => {
@@ -666,6 +697,34 @@ function ProfileContent() {
               <h2 style={{ fontFamily: 'Outfit', fontWeight: '900', fontSize: '2.2rem', margin: '0 0 5px', color: '#1a1a2e' }}>
                 {profile?.alias || 'Explorador'}
               </h2>
+
+              {studentClassrooms.length > 0 && (
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '8px', 
+                  flexWrap: 'wrap', 
+                  justifyContent: 'center',
+                  marginTop: '5px',
+                  marginBottom: '15px'
+                }}>
+                  {studentClassrooms.map((cls, idx) => (
+                    <span key={idx} style={{ 
+                      fontSize: '0.65rem', 
+                      fontWeight: '800', 
+                      background: 'rgba(16, 185, 129, 0.1)', 
+                      color: '#059669', 
+                      padding: '4px 12px', 
+                      borderRadius: '20px', 
+                      border: '1px solid rgba(16, 185, 129, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}>
+                      <Shield size={10} /> {cls}
+                    </span>
+                  ))}
+                </div>
+              )}
               
               <p style={{ fontSize: '0.65rem', color: '#8a8a9e', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '25px' }}>
                 FASE: DESAFÍO {activePlanet.toUpperCase()}
@@ -760,7 +819,13 @@ function ProfileContent() {
                 {planetLaunchers.length > 0 ? (
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {planetLaunchers.map(l => (
-                      <GlowButton key={l.id} color="purple" onClick={() => window.open(l.contenido?.url || l.contenido?.markdown, '_blank')} className="w-100" style={{ padding: '15px' }}>
+                      <GlowButton 
+                        key={l.id} 
+                        color="purple" 
+                        onClick={() => setActiveResource(l)} 
+                        className="w-100" 
+                        style={{ padding: '15px' }}
+                      >
                         {l.nombre_recurso} <ExternalLink size={14} style={{ marginLeft: '10px' }} />
                       </GlowButton>
                     ))}
@@ -815,26 +880,63 @@ function ProfileContent() {
                     </div>
                   </div>
 
-                  {/* Tip Ninja Box */}
+                  {/* Tip Ninja Box Dinámico */}
                   <div style={{ 
                     background: 'rgba(13, 207, 207, 0.05)', 
-                    padding: '12px 15px', 
-                    borderRadius: '12px', 
+                    padding: '20px', 
+                    borderRadius: '15px', 
                     border: '1px solid rgba(13, 207, 207, 0.1)',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
+                    flexDirection: 'column',
+                    gap: '12px',
                     marginBottom: '20px'
                   }}>
-                    <Zap size={14} color="#0dcfcf" fill="#0dcfcf" />
-                    <p style={{ fontSize: '0.7rem', color: '#1a1a2e', fontWeight: '600', margin: 0 }}>
-                      Tip Ninja: Regístrate e inicia sesión siempre para que tus proyectos se guarden correctamente.
-                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <Zap size={16} color="#0dcfcf" fill="#0dcfcf" />
+                      <h5 style={{ margin: 0, fontSize: '0.8rem', fontWeight: '900', color: '#0dcfcf', textTransform: 'uppercase' }}>Tips de Explorador</h5>
+                    </div>
+                    
+                    <ul style={{ margin: 0, padding: '0 0 0 15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {(planet?.tips || [
+                        "Regístrate e inicia sesión siempre para que tus proyectos se guarden correctamente.",
+                        "Explora la sección de recursos para encontrar guías paso a paso."
+                      ]).map((tip, i) => (
+                        <li key={i} style={{ fontSize: '0.75rem', color: '#1a1a2e', fontWeight: '600', lineHeight: '1.4' }}>
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} className="w-100" style={{ padding: '15px', fontWeight: '900' }}>
-                    <ExternalLink size={14} style={{ marginRight: '10px' }} /> {planet?.name.toUpperCase()} OFICIAL
-                  </GlowButton>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {planet?.buttons && planet.buttons.length > 0 ? (
+                      planet.buttons.map((btn, idx) => {
+                        const BtnIcon = btn.icon === 'Box' ? Box : ExternalLink;
+                        return (
+                          <GlowButton 
+                            key={idx}
+                            color={btn.color === 'pink' ? 'pink' : (btn.color === 'blue' ? 'blue' : 'teal')} 
+                            onClick={() => window.open(btn.url, '_blank')} 
+                            className="w-100" 
+                            style={{ 
+                              padding: '15px', 
+                              fontWeight: '900',
+                              background: btn.color === 'black-outline' ? 'white' : undefined,
+                              border: btn.color === 'black-outline' ? '2px solid #1a1a2e' : undefined,
+                              color: btn.color === 'black-outline' ? '#1a1a2e' : undefined,
+                              boxShadow: btn.color === 'black-outline' ? 'none' : undefined
+                            }}
+                          >
+                            <BtnIcon size={14} style={{ marginRight: '10px' }} /> {btn.label}
+                          </GlowButton>
+                        );
+                      })
+                    ) : (
+                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} className="w-100" style={{ padding: '15px', fontWeight: '900' }}>
+                        <ExternalLink size={14} style={{ marginRight: '10px' }} /> {planet?.name?.toUpperCase()} OFICIAL
+                      </GlowButton>
+                    )}
+                  </div>
                 </div>
               </GlassCard>
             </div>
@@ -919,9 +1021,77 @@ function ProfileContent() {
 
           {/* FILA 5: ITINERARIO NINJA (FULL WIDTH) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-              <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+                <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
+              </h3>
+
+              {/* Selector de Itinerario (Específico para Tinkercad y otros) */}
+              {activePlanet === 'tinkercad' && (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {[
+                    { id: null, label: '3D NORMAL' },
+                    { id: 'codeblocks', label: 'CÓDIGO (3D)' },
+                    { id: 'blockscad', label: 'BLOCKSCAD' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '6px 15px',
+                        borderRadius: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {activePlanet === 'python' && (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {[
+                    { id: null, label: 'ACADEMIA' },
+                    { id: 'raspberry', label: 'RETOS PI' },
+                    { id: 'codedex', label: 'CODEDEX' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '6px 15px',
+                        borderRadius: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: itinerary === opt.id ? (planet?.barColor || '#306998') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#306998') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <p style={{ fontSize: '0.75rem', color: '#8a8a9e', margin: '-10px 0 0 28px' }}>
               Supera los desafíos guiados para mejorar tus competencias técnicas y superar las validaciones de los Sensei de tu centro.
             </p>
@@ -929,6 +1099,7 @@ function ProfileContent() {
               planetId={activePlanet} 
               userId={session?.user?.id} 
               accentColor={planet?.barColor || '#6366f1'}
+              itinerary={itinerary}
             />
           </div>
 
@@ -942,6 +1113,76 @@ function ProfileContent() {
 
         </main>
 
+        {/* MODAL DE VISUALIZACIÓN DE RECURSOS */}
+        {activeResource && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(10, 10, 20, 0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            animation: 'fadeIn 0.3s ease-out',
+            padding: isFullscreenResource ? 0 : '40px'
+          }}>
+            {/* Cabecera del Modal */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '15px 30px',
+              background: 'white',
+              borderRadius: isFullscreenResource ? 0 : '15px 15px 0 0',
+              borderBottom: '1px solid #eee'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <Rocket size={20} color={planet?.barColor || '#6366f1'} />
+                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '900' }}>{activeResource.nombre_recurso}</h4>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  onClick={() => setIsFullscreenResource(!isFullscreenResource)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: '#64748b' }}
+                  title="Pantalla Completa"
+                >
+                  {isFullscreenResource ? <Minimize size={20} /> : <Maximize size={20} />}
+                </button>
+                <button 
+                  onClick={() => { setActiveResource(null); setIsFullscreenResource(false); }}
+                  style={{ background: '#fef2f2', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#ef4444' }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Contenido del Modal (Iframe) */}
+            <div style={{ 
+              flex: 1, 
+              background: 'black', 
+              borderRadius: isFullscreenResource ? 0 : '0 0 15px 15px',
+              overflow: 'hidden',
+              position: 'relative'
+            }}>
+              <iframe 
+                src={activeResource.contenido?.url || activeResource.contenido?.markdown} 
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+
+            {/* Link para salir si el iframe falla */}
+            {!isFullscreenResource && (
+              <div style={{ textAlign: 'center', padding: '15px', color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }}>
+                Si el contenido no se carga, puedes <a href={activeResource.contenido?.url} target="_blank" style={{ color: 'white', textDecoration: 'underline' }}>abrirlo en una nueva pestaña</a>.
+              </div>
+            )}
+          </div>
+        )}
 
       </div>
     );

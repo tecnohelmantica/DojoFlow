@@ -14,6 +14,11 @@ export const PLANETS = [
     recommendation: 'Elige entre los Cursos Modernos, la Hora del Código o explora retos avanzados de IA.',
     buttons: [
       { label: 'CODE.ORG OFICIAL', url: 'https://studio.code.org/', color: 'teal' }
+    ],
+    tips: [
+      "Lee siempre las instrucciones del puzzle antes de empezar a arrastrar bloques.",
+      "Usa el botón 'Paso' para depurar tu código y ver qué hace cada bloque.",
+      "Los bloques de color rosa suelen ser bucles que te ayudan a ahorrar código."
     ]
   },
   { 
@@ -35,6 +40,11 @@ export const PLANETS = [
     ],
     buttons: [
       { label: 'SCRATCH OFICIAL', url: 'https://scratch.mit.edu/projects/editor/', color: 'teal' }
+    ],
+    tips: [
+      "Nombra tus objetos (sprites) para que tu código sea más fácil de entender.",
+      "Usa mensajes (Enviar/Al recibir) para coordinar acciones entre distintos objetos.",
+      "Puedes usar la extensión 'Lápiz' para dibujar patrones geométricos increíbles."
     ]
   },
   { 
@@ -104,6 +114,12 @@ export const PLANETS = [
     buttons: [
       { label: 'TINKERCAD OFICIAL', url: 'https://www.tinkercad.com/dashboard', color: 'black-outline' },
       { label: 'BLOCKSCAD OFICIAL', url: 'https://www.blockscad3d.com/editor/?lang=es#', color: 'black-outline', icon: 'Box' }
+    ],
+    tips: [
+      "Usa el botón derecho del ratón para orbitar tu diseño y ver todos los ángulos.",
+      "La tecla 'W' activa el plano de trabajo auxiliar para colocar objetos en caras inclinadas.",
+      "Agrupa objetos (Ctrl+G) para crear formas complejas a partir de piezas simples.",
+      "Usa la regla (tecla 'R') para posicionar tus objetos con precisión milimétrica."
     ]
   },
   { 
