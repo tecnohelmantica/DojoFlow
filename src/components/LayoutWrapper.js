@@ -11,10 +11,15 @@ export default function LayoutWrapper({ children }) {
   const { session, role, loading } = useAuth();
   const pathname = usePathname();
   const [activeModal, setActiveModal] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Condición de visibilidad: usuario autenticado y NO en página de auth
   const isAuthPage = pathname === '/auth';
-  const showUI = !isAuthPage && !!session;
+  const showUI = mounted && !isAuthPage && !!session;
 
   return (
     <div className={`app-container ${!showUI ? 'no-sidebar' : ''}`}>

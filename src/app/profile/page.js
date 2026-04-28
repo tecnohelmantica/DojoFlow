@@ -59,7 +59,7 @@ function ProfileContent() {
   const activePlanet = searchParams.get('planet');
 
   const [socraticMessages, setSocraticMessages] = useState([
-    { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${getPlanetById(activePlanet)?.name || activePlanet?.toUpperCase() || 'GENERAL'}. ¿En qué puedo ayudarte hoy?` }
+    { role: 'tutor', text: `Saludos, Explorer. Iniciando sistemas de acompañamiento socrático...` }
   ]);
   const [socraticInputText, setSocraticInputText] = useState('');
   const [validationMessages, setValidationMessages] = useState([]);
@@ -174,6 +174,11 @@ function ProfileContent() {
     } else {
       setItinerary(null);
     }
+    // Actualizar mensaje inicial del tutor
+    const planetName = getPlanetById(activePlanet)?.name || activePlanet?.toUpperCase() || 'GENERAL';
+    setSocraticMessages([
+      { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${planetName}. ¿En qué puedo ayudarte hoy?` }
+    ]);
   }, [activePlanet]);
 
   useEffect(() => {
