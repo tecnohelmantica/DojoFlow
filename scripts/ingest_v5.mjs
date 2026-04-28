@@ -2,13 +2,30 @@ import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
 
-// Cargar variables de entorno
+// Cargar variables de entorno desde .env.local
+function loadEnv() {
+  const envPath = path.resolve(process.cwd(), '.env.local');
+  if (fs.existsSync(envPath)) {
+    const env = fs.readFileSync(envPath, 'utf8');
+    env.split(/\r?\n/).forEach(line => {
+      const parts = line.split('=');
+      if (parts.length >= 2) {
+        const key = parts[0].trim();
+        const value = parts.slice(1).join('=').trim();
+        process.env[key] = value;
+      }
+    });
+  }
+}
+loadEnv();
+
+// Cliente Supabase
 const supabase = createClient(
-  'https://chnrloeyckzfgjvazhpj.supabase.co', 
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobnJsb2V5Y2t6ZmdqdmF6aHBqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjM3NDk3NiwiZXhwIjoyMDkxOTUwOTc2fQ.yXqbZmf3BHlylMvPRDLbgsc1vg7Q9K1erXmkmD_nWjk'
+  process.env.NEXT_PUBLIC_SUPABASE_URL, 
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const KEY = 'AIzaSyDdphVwa8ZXyGx8hft0qI-Au9yihw12Wbs';
+const KEY = process.env.GEMINI_API_KEY;
 
 async function getEmbedding(text) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${KEY}`;
