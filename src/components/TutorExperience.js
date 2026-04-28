@@ -16,9 +16,9 @@ const TutorExperience = ({ technology, onComplete }) => {
   const [feedbackType, setFeedbackType] = useState(null);
   
   const planet = getPlanetById(technology);
-  const planetName = planet?.name || technology.toUpperCase();
-
-  let techKey = technology?.toLowerCase();
+  const planetName = planet?.name || technology?.toUpperCase() || 'SECTOR';
+  
+  let techKey = technology?.toLowerCase() || 'code';
   if (typeof diagnosticQuizzes[techKey] === 'string') {
     techKey = diagnosticQuizzes[techKey];
   }

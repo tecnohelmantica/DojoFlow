@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import GlassCard from './GlassCard';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthProvider';
@@ -152,9 +153,13 @@ function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
   return (
     <div style={{ background: 'rgba(255,255,255,0.75)', borderRadius: '12px', border: '1.5px solid rgba(255,255,255,0.8)', marginBottom: '10px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
-        <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
-          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'linear-gradient(135deg, var(--planet-theme, #9c27b0), #0dcfcf)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Outfit', fontWeight: '800', fontSize: '0.9rem' }}>
-            {(alumno.alias || alumno.real_name || '?')[0].toUpperCase()}
+        <div style={{ position: 'relative', width: '38px', height: '38px', flexShrink: 0 }}>
+          <div style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2px solid white', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', overflow: 'hidden', background: '#f5f5f5' }}>
+            <img 
+              src={alumno.avatar_url || "/alumno.png"} 
+              alt={alumno.alias} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
           </div>
           {m.en_revision > 0 && (
             <span style={{ position: 'absolute', top: '-1px', right: '-1px', width: '10px', height: '10px', background: '#ff4b2b', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 10px rgba(255,75,43,0.5)', animation: 'pulse 1.5s infinite' }} />
@@ -671,12 +676,13 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
       )}
     </>
   );
-};
+}
 
 // ══════════════════════════════════════════════════════════
-// COMPONENTE PRINCIPAL
+// COMPONENTE PRINCIPAL (INTERNO)
 // ══════════════════════════════════════════════════════════
-export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecursos }) {
+function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
+  const searchParams = useSearchParams();
   const [view, setView]         = useState('lista'); 
   const [clases, setClases]     = useState([]);
   const [claseActiva, setClaseActiva] = useState(null);
@@ -741,6 +747,14 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
 
   useEffect(() => { loadClases(); }, [loadClases]);
 
+  useEffect(() => {
+    const cid = searchParams.get('claseId');
+    if (cid && clases.length > 0 && (!claseActiva || claseActiva.id !== cid)) {
+      const c = clases.find(cl => cl.id === cid);
+      if (c) abrirDashboard(c);
+    }
+  }, [searchParams, clases, claseActiva]);
+
   const abrirDashboard = async (clase) => {
     setClaseActiva(clase);
     setView('dashboard');
@@ -752,10 +766,10 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
 
       if (ids.length > 0) {
         const [resP, resPr, resI, resN] = await Promise.all([
-          supabase.from('profiles').select('id, alias, real_name').in('id', ids),
+          supabase.from('profiles').select('id, alias, real_name, avatar_url').in('id', ids),
           supabase.from('explore_progress').select('student_id, planet_id, status').in('student_id', ids),
           supabase.from('badges').select('student_id, planet_id, badge_name, awarded_at').in('student_id', ids),
-          supabase.from('user_challenges').select('student_id, challenge_id, planet_id, status, evidence_url, evidence_file_url').in('student_id', ids)
+          supabase.from('user_challenges').select('student_id, challenge_id, planet_id, status, evidence_url, evidence_file_url, teacher_feedback').in('student_id', ids)
         ]);
 
         const perfiles = resP.data || [];
@@ -792,6 +806,7 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
 
       const { data: recs } = await supabase.from('clase_recursos').select('*, recursos_docentes(*)').eq('clase_id', clase.id);
       setClaseRecursos(recs || []);
+      setLoadingDash(false);
     } catch (err) {
       console.error("Dashboard Load Error:", err);
       msg('err', 'Error al cargar dashboard: ' + err.message);
@@ -1073,5 +1088,13 @@ export default function MisAulas({ currentUser, misRecursos = [], onRefreshRecur
         </div>
       )}
     </div>
+  );
+}
+
+export default function MisAulas(props) {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', padding: '40px' }}>Cargando sistema de aulas...</div>}>
+      <MisAulasContent {...props} />
+    </Suspense>
   );
 }

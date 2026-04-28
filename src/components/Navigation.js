@@ -1,12 +1,12 @@
 "use client";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Castle, Trophy, MessageSquare, BookOpen, Users, BrainCircuit, UserCircle } from 'lucide-react';
+import { Castle, Trophy, MessageSquare, BookOpen, Users, BrainCircuit, UserCircle, Bell } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { getPlanetById } from '@/lib/planets';
 
 export default function Navigation({ onOpenModal }) {
-  const { session, role, loading } = useAuth();
+  const { session, role, loading, notifications } = useAuth();
   const pathname = usePathname();
 
   if (pathname === '/auth' || loading) return null;
@@ -28,12 +28,14 @@ export default function Navigation({ onOpenModal }) {
 
   const navItems = isTeacher ? [
     { name: 'Dojo', href: '/', icon: Castle },
+    { name: 'Notificaciones', href: '/aulas', icon: Bell, badge: notifications.length },
     { name: 'Perfil', href: '/profile', icon: UserCircle },
   ] : [
     { name: 'Dojo', href: '/', icon: Castle },
     { name: 'Retos', icon: Trophy, isModal: true },
     { name: 'Tutor', icon: MessageSquare, isModal: true },
     { name: 'Pergamino', icon: BookOpen, isModal: true },
+    { name: 'Perfil', href: '/profile', icon: UserCircle },
   ];
 
   return (
@@ -63,7 +65,25 @@ export default function Navigation({ onOpenModal }) {
             className={`nav-item ${isActive ? 'active' : ''}`}
             style={isActive ? { color: 'var(--current-accent)' } : {}}
           >
-            <Icon className="nav-icon" />
+            <div style={{ position: 'relative' }}>
+              <Icon className="nav-icon" />
+              {item.badge > 0 && (
+                <span style={{ 
+                  position: 'absolute', 
+                  top: '-5px', 
+                  right: '-5px', 
+                  background: '#ff4b4b', 
+                  color: 'white', 
+                  fontSize: '0.6rem', 
+                  padding: '1px 5px', 
+                  borderRadius: '10px',
+                  fontWeight: '800',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                }}>
+                  {item.badge}
+                </span>
+              )}
+            </div>
             <span>{item.name}</span>
           </Link>
         );

@@ -5,7 +5,7 @@ import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
 import {
   Settings, User, Medal, BookOpen, Send, TrendingUp,
-  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones
+  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones, Castle, Camera, ShieldCheck, Target, Trash2, Globe, Eye
 } from 'lucide-react';
 import TutorExperience from '@/components/TutorExperience';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,6 +16,7 @@ import SenseiMissions from '../../components/SenseiMissions';
 import { getPlanetById } from '../../lib/planets';
 import ResourceUploader from '../../components/ResourceUploader';
 import CodeBadges from '../../components/CodeBadges';
+
 import './page.css';
 
 const MASTER_PROFESOR_ID = '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
@@ -55,10 +56,10 @@ function ProfileContent() {
   const [loading, setLoading] = useState(true);
 
   const searchParams = useSearchParams();
-  const activePlanet = searchParams.get('planet') || 'scratch';
+  const activePlanet = searchParams.get('planet');
 
   const [socraticMessages, setSocraticMessages] = useState([
-    { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${getPlanetById(activePlanet)?.name || activePlanet.toUpperCase()}. ¿En qué puedo ayudarte hoy?` }
+    { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${getPlanetById(activePlanet)?.name || activePlanet?.toUpperCase() || 'GENERAL'}. ¿En qué puedo ayudarte hoy?` }
   ]);
   const [socraticInputText, setSocraticInputText] = useState('');
   const [validationMessages, setValidationMessages] = useState([]);
@@ -99,6 +100,12 @@ function ProfileContent() {
     clases: 0,
     alumnos: 0,
     recursos: 0
+  });
+
+  const [studentStats, setStudentStats] = useState({
+    retos: 0,
+    medallas: 0,
+    progreso: 0
   });
 
   const handleFileUpload = async (event) => {
@@ -219,11 +226,23 @@ function ProfileContent() {
         // Cargar Progreso Real
         const { data: prog } = await supabase
           .from('explore_progress')
-          .select('status')
+          .select('*')
+          .eq('student_id', session.user.id);
+        
+        const { count: retosCount } = await supabase
+          .from('user_challenges')
+          .select('*', { count: 'exact', head: true })
           .eq('student_id', session.user.id)
-          .eq('planet_id', activePlanet)
-          .maybeSingle();
-        if (prog) setEvidenceStatus(prog.status);
+          .eq('status', 'Validado');
+
+        const activeProg = prog?.find(p => p.planet_id === activePlanet);
+        if (activeProg) setEvidenceStatus(activeProg.status);
+
+        setStudentStats({
+          retos: retosCount || 0,
+          medallas: Math.floor((prog || []).reduce((acc, p) => acc + (p.points || 0), 0) / 100),
+          progreso: (prog || []).filter(p => p.status === 'Validado').length
+        });
 
         // Buscar aulas del alumno
         const { data: memberships } = await supabase
@@ -234,43 +253,43 @@ function ProfileContent() {
         const claseIds = (memberships || []).map(m => m.clase_id);
         setIsAutodidact(claseIds.length === 0);
 
-        // 🗺️ 1. Fetch Global/Master Resources
+        // 🤝 3. Merge and De-duplicate
+        const allResourcesMap = new Map();
+
+        // Add global (all technologies)
         const { data: globalRes } = await supabase
           .from('recursos_docentes')
           .select('*')
-          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->meta->isGlobal.eq.true,contenido->isMaster.eq.true`)
-          .ilike('tecnologia', activePlanet);
+          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->meta->isGlobal.eq.true,contenido->isMaster.eq.true`);
+        
+        (globalRes || []).forEach(r => allResourcesMap.set(r.id, r));
 
-        let classResourcesCombined = [];
-
-        // 🏫 2. Fetch Class Specific Resources if any
+        // Add class specific (all technologies)
         if (claseIds.length > 0) {
           const { data: classResources } = await supabase
             .from('clase_recursos')
             .select(`recurso_id, recursos_docentes (*)`)
             .in('clase_id', claseIds);
 
-          classResourcesCombined = (classResources || [])
-            .map(r => r.recursos_docentes)
-            .filter(r => r && r.tecnologia?.toLowerCase() === activePlanet.toLowerCase());
+          (classResources || []).forEach(cr => {
+            if (cr.recursos_docentes) {
+              allResourcesMap.set(cr.recursos_docentes.id, cr.recursos_docentes);
+            }
+          });
         }
-
-        // 🤝 3. Merge and De-duplicate
-        const allResourcesMap = new Map();
-
-        // Add global first
-        (globalRes || []).forEach(r => allResourcesMap.set(r.id, r));
-
-        // Add class specific
-        classResourcesCombined.forEach(r => allResourcesMap.set(r.id, r));
 
         const resourcesList = Array.from(allResourcesMap.values());
         setTeacherResources(resourcesList);
 
-        // Auto-seleccionar infografía por defecto al cargar o cambiar de planeta
-        const defaultInfo = resourcesList.find(r => r.tipo_recurso?.toLowerCase().includes('info'));
+        // Auto-seleccionar infografía del planeta activo por defecto
+        const defaultInfo = resourcesList.find(r => 
+          r.tipo_recurso?.toLowerCase().includes('info') && 
+          r.tecnologia?.toLowerCase() === activePlanet?.toLowerCase()
+        ) || resourcesList.find(r => r.tipo_recurso?.toLowerCase().includes('info'));
+        
         if (defaultInfo) setSelectedScroll(defaultInfo);
         else if (resourcesList.length > 0) setSelectedScroll(resourcesList[0]);
+
       } catch (err) {
         console.error("Error al cargar datos de aula:", err);
       } finally {
@@ -317,6 +336,30 @@ function ProfileContent() {
     setAssessmentCompleted(true);
   };
 
+  const handleSocraticSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!socraticInputText.trim()) return;
+
+    const userMsg = { role: 'user', text: socraticInputText };
+    setSocraticMessages(prev => [...prev, userMsg]);
+    setSocraticInputText('');
+    setIsTyping(true);
+
+    try {
+      // Simulación de respuesta del Tutor NotebookLM
+      setTimeout(() => {
+        setSocraticMessages(prev => [...prev, { 
+          role: 'tutor', 
+          text: `¡Muy buena observación, Explorer! Como tu tutor socrático en ${activePlanet}, me gustaría que reflexionaras: ¿cómo crees que este concepto se conecta con lo que aprendimos sobre algoritmos?` 
+        }]);
+        setIsTyping(false);
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setIsTyping(false);
+    }
+  };
+
   if (authLoading || loading) return <div className="flex-center" style={{ minHeight: '60vh', color: '#8a8a9e' }}>Sincronizando parámetros...</div>;
 
   if (role === 'profesor') {
@@ -338,7 +381,7 @@ function ProfileContent() {
               }}>Identidad Digital del Orquestador</p>
 
               <div className="avatar-circle" style={{ borderColor: '#ff9d00', width: '120px', height: '120px', margin: '0 auto 20px' }}>
-                <img src={profile?.avatar_url || "https://i.pravatar.cc/150?u=docente"} alt="Avatar" className="avatar-img" />
+                <img src={profile?.avatar_url || "/profesor.png"} alt="Avatar" className="avatar-img" />
                 <div className="lvl-badge-pop" style={{ background: '#ff9d00', padding: '4px 12px', fontSize: '0.7rem' }}>ORQUESTADOR</div>
 
                 <button
@@ -406,7 +449,7 @@ function ProfileContent() {
               <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '5px' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#ff9d00', letterSpacing: '1px' }}>DOCENTE ESTRATEGA</span>
                 <span style={{ color: '#ccc' }}>•</span>
-                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--accent-purple)', letterSpacing: '1px' }}>{activePlanet.toUpperCase()} SECTOR</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--accent-purple)', letterSpacing: '1px' }}>{activePlanet?.toUpperCase() || 'GENERAL'} SECTOR</span>
               </div>
             </header>
 
@@ -535,9 +578,6 @@ function ProfileContent() {
                     <GlowButton color="purple" className="w-100" onClick={() => setIsUpdatingPassword(true)}>
                       <TrendingUp size={16} style={{ marginRight: '8px' }} /> Cambiar Contraseña
                     </GlowButton>
-                    <GlowButton color="teal" className="w-100" onClick={() => router.push('/aulas')}>
-                      <BookOpen size={16} style={{ marginRight: '8px' }} /> Ir a Mis Aulas
-                    </GlowButton>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -580,1117 +620,517 @@ function ProfileContent() {
     );
   }
 
-  if (!assessmentCompleted) {
+  // ── VISTA DE APRENDIZAJE (PLANETA) ──
+  if (role === 'alumno' && activePlanet) {
+    const planet = getPlanetById(activePlanet);
+    const planetLaunchers = teacherResources.filter(r => 
+      (r.tipo_recurso?.toLowerCase() === 'lanzadera' || r.tipo_recurso?.toLowerCase() === 'enlace') && 
+      (r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
+    );
+    
     return (
-      <div className="layout-container" style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        background: '#f0f5f7',
-        padding: '20px'
-      }}>
-        <TutorExperience
-          technology={activePlanet}
-          onComplete={handleAssessmentComplete}
-        />
+      <div className="layout-container" style={{ minHeight: '100vh', background: '#f8fafb' }}>
+        <TopHeader />
+        
+        <main style={{ padding: '40px 5% 80px', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
+          
+          {/* BOTÓN VOLVER */}
+          <div style={{ marginBottom: '30px' }}>
+            <GlowButton color="white" onClick={() => router.push('/profile')} style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '800', border: '1px solid #e2e8f0', color: '#64748b' }}>
+              <ArrowLeft size={16} style={{ marginRight: '8px' }} /> VOLVER AL DOJO
+            </GlowButton>
+          </div>
+
+          {/* FILA 1: IDENTIDAD + TUTOR SOCRÁTICO */}
+          <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '30px', marginBottom: '40px', alignItems: 'start' }}>
+            
+            {/* TARJETA DE IDENTIDAD */}
+            <GlassCard style={{ padding: '40px 30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div className="avatar-circle" style={{ width: '120px', height: '120px', marginBottom: '20px', position: 'relative' }}>
+                <div style={{ 
+                  position: 'absolute', inset: '-4px', borderRadius: '50%', 
+                  border: `3px solid ${planet?.barColor || '#6366f1'}`,
+                  opacity: 0.3
+                }}></div>
+                <img src={profile?.avatar_url || "/robotix.png"} alt="Avatar" className="avatar-img" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                <div style={{ 
+                  position: 'absolute', bottom: '-8px', left: '50%', transform: 'translateX(-50%)',
+                  background: planet?.barColor || '#6366f1', color: 'white', padding: '3px 12px', 
+                  borderRadius: '20px', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '0.5px',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.2)', whiteSpace: 'nowrap'
+                }}>
+                  EXPLORADOR NINJA
+                </div>
+              </div>
+              
+              <h2 style={{ fontFamily: 'Outfit', fontWeight: '900', fontSize: '2.2rem', margin: '0 0 5px', color: '#1a1a2e' }}>
+                {profile?.alias || 'Explorador'}
+              </h2>
+              
+              <p style={{ fontSize: '0.65rem', color: '#8a8a9e', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '25px' }}>
+                FASE: DESAFÍO {activePlanet.toUpperCase()}
+              </p>
+              
+              <div style={{ display: 'flex', gap: '15px', width: '100%', marginBottom: '20px' }}>
+                <div style={{ flex: 1, padding: '15px', background: '#f8fafc', borderRadius: '15px', border: '1px solid rgba(0,0,0,0.03)' }}>
+                  <p style={{ fontSize: '0.55rem', color: '#8a8a9e', fontWeight: '800', margin: '0 0 4px', textTransform: 'uppercase' }}>XP POINTS</p>
+                  <p style={{ fontSize: '1.4rem', fontWeight: '900', margin: 0, color: '#1a1a2e' }}>{studentStats.retos * 50}</p>
+                </div>
+                <div style={{ flex: 1, padding: '15px', background: '#f8fafc', borderRadius: '15px', border: '1px solid rgba(0,0,0,0.03)' }}>
+                  <p style={{ fontSize: '0.55rem', color: '#8a8a9e', fontWeight: '800', margin: '0 0 4px', textTransform: 'uppercase' }}>STAGE</p>
+                  <p style={{ fontSize: '1.2rem', fontWeight: '900', margin: 0, color: planet?.barColor || '#6366f1' }}>{studentStats.retos} Retos</p>
+                </div>
+              </div>
+            </GlassCard>
+
+            {/* TUTOR SOCRÁTICO (NotebookLM) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '30px', height: '30px', background: planet?.barColor || '#6366f1', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                  <Sparkles size={16} />
+                </div>
+                <h3 style={{ fontSize: '1rem', fontWeight: '900', color: '#1a1a2e', margin: 0 }}>NotebookLM Socratic Tutor</h3>
+              </div>
+              {!assessmentCompleted ? (
+                <TutorExperience 
+                  technology={activePlanet} 
+                  studentLevel={studentLevel} 
+                  isAutodidact={isAutodidact}
+                  onComplete={handleAssessmentComplete}
+                />
+              ) : (
+                <GlassCard style={{ padding: '25px', display: 'flex', flexDirection: 'column', gap: '20px', height: '400px', background: '#fcfdff', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', paddingRight: '10px' }}>
+                    {socraticMessages.map((msg, i) => (
+                      <div key={i} style={{ 
+                        alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                        maxWidth: '85%',
+                        padding: '12px 16px',
+                        borderRadius: msg.role === 'user' ? '18px 18px 0 18px' : '18px 18px 18px 0',
+                        background: msg.role === 'user' ? (planet?.barColor || '#6366f1') : '#f1f5f9',
+                        color: msg.role === 'user' ? 'white' : '#1a1a2e',
+                        fontSize: '0.85rem',
+                        lineHeight: '1.5',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                        border: msg.role === 'user' ? 'none' : '1px solid rgba(0,0,0,0.05)'
+                      }}>
+                        {msg.text}
+                      </div>
+                    ))}
+                    {isTyping && (
+                      <div style={{ alignSelf: 'flex-start', padding: '10px', color: '#8a8a9e', fontSize: '0.75rem', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Brain size={14} className="animate-pulse" /> El tutor está analizando tu lógica...
+                      </div>
+                    )}
+                  </div>
+                  <form onSubmit={handleSocraticSubmit} style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <input 
+                      type="text" 
+                      value={socraticInputText}
+                      onChange={(e) => setSocraticInputText(e.target.value)}
+                      placeholder="Haz una consulta socrática..."
+                      style={{ 
+                        flex: 1, 
+                        padding: '12px 20px', 
+                        borderRadius: '25px', 
+                        border: '1px solid #e2e8f0',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        background: 'white'
+                      }}
+                    />
+                    <GlowButton color="teal" type="submit" style={{ borderRadius: '50%', width: '45px', height: '45px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '45px' }}>
+                      <Send size={18} />
+                    </GlowButton>
+                  </form>
+                </GlassCard>
+              )}
+            </div>
+          </div>
+
+          {/* FILA 2: LANZADERAS Y PÁGINA OFICIAL */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' }}>
+            
+            {/* LANZADERAS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase' }}>
+                <Rocket size={16} /> LANZADERAS
+              </h3>
+              <GlassCard style={{ padding: '30px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,0,0,0.05)' }}>
+                {planetLaunchers.length > 0 ? (
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {planetLaunchers.map(l => (
+                      <GlowButton key={l.id} color="purple" onClick={() => window.open(l.contenido?.url || l.contenido?.markdown, '_blank')} className="w-100" style={{ padding: '15px' }}>
+                        {l.nombre_recurso} <ExternalLink size={14} style={{ marginLeft: '10px' }} />
+                      </GlowButton>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ fontSize: '0.85rem', color: '#cbd5e1', fontStyle: 'italic' }}>Sin lanzaderas activas en este sector.</p>
+                )}
+              </GlassCard>
+            </div>
+
+            {/* PÁGINA OFICIAL */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase' }}>
+                <Globe size={16} /> PÁGINA OFICIAL
+              </h3>
+              <GlassCard style={{ padding: 0, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ 
+                  height: '100px', 
+                  background: `linear-gradient(to bottom, ${planet?.color || '#f1f5f9'}, #ffffff)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <img src={planet?.image} alt="Logo" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                </div>
+                <div style={{ padding: '30px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                    <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '900' }}>{planet?.name}</h4>
+                    <span style={{ fontSize: '0.6rem', color: planet?.barColor || '#6366f1', fontWeight: '900', border: `1px solid ${planet?.barColor || '#6366f1'}`, padding: '2px 8px', borderRadius: '10px' }}>ONLINE</span>
+                  </div>
+                  
+                  <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: '1.6', marginBottom: '10px' }}>
+                    {planet?.description || 'Accede al entorno oficial de programación para este sector.'}
+                  </p>
+
+                  {planet?.recommendation && (
+                    <p style={{ fontSize: '0.75rem', color: '#1a1a2e', fontWeight: '700', lineHeight: '1.4', marginBottom: '20px' }}>
+                      <span style={{ color: planet?.barColor || '#6366f1' }}>Recomendación Ninja:</span> {planet.recommendation}
+                    </p>
+                  )}
+
+                  {/* Barra de Progreso */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                      <span style={{ fontSize: '0.65rem', fontWeight: '900', color: planet?.barColor || '#6366f1' }}>{Math.min(100, Math.round((studentStats.retos / 12) * 100))}% COMPLETO</span>
+                    </div>
+                    <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ 
+                        width: `${Math.min(100, (studentStats.retos / 12) * 100)}%`, 
+                        height: '100%', 
+                        background: planet?.barColor || '#6366f1',
+                        transition: 'width 0.5s ease'
+                      }}></div>
+                    </div>
+                  </div>
+
+                  {/* Tip Ninja Box */}
+                  <div style={{ 
+                    background: 'rgba(13, 207, 207, 0.05)', 
+                    padding: '12px 15px', 
+                    borderRadius: '12px', 
+                    border: '1px solid rgba(13, 207, 207, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    marginBottom: '20px'
+                  }}>
+                    <Zap size={14} color="#0dcfcf" fill="#0dcfcf" />
+                    <p style={{ fontSize: '0.7rem', color: '#1a1a2e', fontWeight: '600', margin: 0 }}>
+                      Tip Ninja: Regístrate e inicia sesión siempre para que tus proyectos se guarden correctamente.
+                    </p>
+                  </div>
+
+                  <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} className="w-100" style={{ padding: '15px', fontWeight: '900' }}>
+                    <ExternalLink size={14} style={{ marginRight: '10px' }} /> {planet?.name.toUpperCase()} OFICIAL
+                  </GlowButton>
+                </div>
+              </GlassCard>
+            </div>
+          </div>
+
+          {/* FILA 3: RECURSOS DE APOYO */}
+          <div style={{ marginBottom: '40px' }}>
+            <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', marginBottom: '15px' }}>
+              <BookOpen size={16} /> RECURSOS DE APOYO
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+              {teacherResources
+                .filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
+                .sort(sortRecursos)
+                .slice(0, 3)
+                .map(r => {
+                  const type = r.tipo_recurso?.toLowerCase() || '';
+                  const Icon = type.includes('video') ? Play : (type.includes('info') ? Camera : (type.includes('presen') || type.includes('slide') ? Presentation : FileText));
+                  return (
+                    <GlassCard 
+                      key={r.id}
+                      onClick={() => setSelectedScroll(r)}
+                      style={{ 
+                        padding: '25px', 
+                        cursor: 'pointer', 
+                        textAlign: 'center', 
+                        transition: 'all 0.3s',
+                        border: selectedScroll?.id === r.id ? `2px solid ${planet?.barColor || '#6366f1'}` : '1px solid rgba(0,0,0,0.05)',
+                        background: selectedScroll?.id === r.id ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.7)'
+                      }}
+                    >
+                      <div style={{ color: planet?.barColor || '#6366f1', marginBottom: '10px' }}><Icon size={24} /></div>
+                      <p style={{ fontSize: '0.8rem', fontWeight: '900', margin: '0 0 5px' }}>{r.nombre_recurso}</p>
+                      <p style={{ fontSize: '0.6rem', color: planet?.barColor || '#6366f1', fontWeight: '700' }}>{type.toUpperCase()}</p>
+                    </GlassCard>
+                  );
+                })}
+            </div>
+          </div>
+
+          {selectedScroll && (
+            <div style={{ marginBottom: '40px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
+                  <Eye size={16} /> {selectedScroll.nombre_recurso}
+                </h3>
+                <button 
+                  onClick={() => setSelectedScroll(null)}
+                  style={{ border: 'none', background: 'none', color: '#8a8a9e', cursor: 'pointer', fontSize: '0.7rem', fontWeight: '800' }}
+                >
+                  CERRAR VISTA
+                </button>
+              </div>
+              
+              <GlassCard style={{ padding: 0, boxShadow: '0 20px 50px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                <div style={{ width: '100%', minHeight: '400px', background: '#fff', position: 'relative' }}>
+                  {selectedScroll.tipo_recurso?.toLowerCase().includes('info') ? (
+                    <div style={{ padding: '10px' }}>
+                      <img 
+                        src={selectedScroll.contenido?.url} 
+                        alt={selectedScroll.nombre_recurso} 
+                        style={{ width: '100%', height: 'auto', borderRadius: '8px', display: 'block' }} 
+                      />
+                    </div>
+                  ) : (
+                    <iframe 
+                      src={selectedScroll.contenido?.url}
+                      style={{ width: '100%', height: '800px', border: 'none' }}
+                      title={selectedScroll.nombre_recurso}
+                    />
+                  )}
+                </div>
+                
+                <div style={{ padding: '15px', display: 'flex', justifyContent: 'center', borderTop: '1px solid #eee', background: '#fcfcfc' }}>
+                  <GlowButton color="white" onClick={() => window.open(selectedScroll.contenido?.url, '_blank')} style={{ fontSize: '0.7rem', padding: '8px 20px', border: '1px solid #e2e8f0', color: '#64748b' }}>
+                    <ExternalLink size={14} style={{ marginRight: '8px' }} /> ABRIR EN VENTANA COMPLETA
+                  </GlowButton>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* FILA 5: ITINERARIO NINJA (FULL WIDTH) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+              <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
+            </h3>
+            <p style={{ fontSize: '0.75rem', color: '#8a8a9e', margin: '-10px 0 0 28px' }}>
+              Supera los desafíos guiados para mejorar tus competencias técnicas y superar las validaciones de los Sensei de tu centro.
+            </p>
+            <NinjaChallenges 
+              planetId={activePlanet} 
+              userId={session?.user?.id} 
+              accentColor={planet?.barColor || '#6366f1'}
+            />
+          </div>
+
+          {/* MISIONES DEL SENSEI */}
+          <div style={{ marginTop: '40px' }}>
+            <SenseiMissions 
+              planetId={activePlanet} 
+              userId={session?.user?.id}
+            />
+          </div>
+
+        </main>
+
+
       </div>
     );
   }
 
-  const handleSendSocratic = async () => {
-    if (!socraticInputText.trim()) return;
-    const userMessage = socraticInputText;
-    setSocraticMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setSocraticInputText('');
-    setIsTyping(true);
-    try {
-      const res = await fetch('/api/tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          mode: 'tutor', 
-          message: userMessage, 
-          history: socraticMessages.map(m => ({ role: m.role === 'tutor' ? 'model' : 'user', content: m.text })),
-          planet: activePlanet,
-          userId: session.user.id,
-          level: studentLevel
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.text) {
-        setSocraticMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
-      } else {
-        setSocraticMessages(prev => [...prev, { 
-          role: 'tutor', 
-          text: `⚠️ **Sensei en Meditación**: ${data.error || 'No puedo responder ahora mismo.'} Inténtalo de nuevo en unos minutos.` 
-        }]);
-      }
-    } catch (err) {
-      console.error("Error en chat socrático:", err);
-      setSocraticMessages(prev => [...prev, { 
-        role: 'tutor', 
-        text: '⚠️ **Fallo Neural**: Mis sensores están bloqueados.' 
-      }]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
 
-  const handleSendValidation = async () => {
-    if (!validationInputText.trim()) return;
-    const userMessage = validationInputText;
-    setValidationMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setValidationInputText('');
-    setIsTyping(true);
-    try {
-      const res = await fetch('/api/tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          mode: 'validador', 
-          message: userMessage, 
-          history: validationMessages.map(m => ({ 
-            role: m.role === 'tutor' ? 'model' : 'user', 
-            content: m.text 
-          })),
-          planet: activePlanet,
-          userId: session.user.id,
-          level: studentLevel
-        })
-      });
-      const data = await res.json();
-      
-      if (data.success && data.text) {
-        setValidationMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
-        
-        if (data.text.includes('[VALIDADO]')) {
-          if (validatingBadge) {
-            const { error } = await supabase.from('badges').insert({
-              student_id: session.user.id,
-              planet_id: 'code',
-              badge_name: validatingBadge.id
-            });
-            if (!error) {
-              setBadgeRefreshTrigger(prev => prev + 1);
-              setValidationMessages(prev => [...prev, { role: 'tutor', text: `¡Felicidades! Has ganado la insignia de ${validatingBadge.name}. Ya brilla en tu perfil.` }]);
-              setTimeout(() => setIsChatModalOpen(false), 4500);
-            }
-            setValidatingBadge(null);
-          } else if (isNinjaValidator && validatingChallenge) {
-            const { error } = await supabase
-              .from('user_challenges')
-              .update({ status: 'Validado' })
-              .eq('student_id', session.user.id)
-              .eq('challenge_id', validatingChallenge.fullId);
-
-            if (!error) {
-              setIsNinjaValidator(false);
-              setValidatingChallenge(null);
-              setChallengeRefreshTrigger(prev => prev + 1);
-              setValidationMessages(prev => [...prev, { role: 'tutor', text: `¡Excelente explicación! He validado oficialmente tu reto. Tu progreso ha sido registrado en el Dojo.` }]);
-              setTimeout(() => setIsChatModalOpen(false), 4500);
-            }
-          } else if (validatingSenseiMission) {
-            const { error } = await supabase
-              .from('sensei_missions')
-              .update({ status: 'completed', completed_at: new Date().toISOString() })
-              .eq('id', validatingSenseiMission.id);
-
-            if (!error) {
-              setValidatingSenseiMission(null);
-              setSenseiRefreshTrigger(prev => prev + 1);
-              setValidationMessages(prev => [...prev, { role: 'tutor', text: `¡Misión Cumplida! Has demostrado maestría en este desafío especial. ¡Eres una leyenda del Dojo!` }]);
-              setTimeout(() => setIsChatModalOpen(false), 4500);
-            }
-          }
-        }
-      } else {
-        setValidationMessages(prev => [...prev, { 
-          role: 'tutor', 
-          text: `⚠️ **Sensei en Meditación**: ${data.error || 'No puedo responder ahora mismo.'}` 
-        }]);
-      }
-    } catch (err) {
-      console.error("Error en validación:", err);
-      setValidationMessages(prev => [...prev, { 
-        role: 'tutor', 
-        text: '⚠️ **Fallo Neural**: Los servidores de validación no responden.' 
-      }]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const handleStartBadgeValidation = async (badge) => {
-    setValidatingBadge(badge);
-    setIsChatModalOpen(true); 
-    
-    // 🤖 Mensaje de inicio limpio
-    const startMsg = `¡Hola Sensei! He completado la sección de ${badge.name} en la Academia Digital (Code.org) y quiero demostrar lo que he aprendido para ganar mi insignia.`;
-    
-    if (!isAutodidact) {
-      // 🏫 CASO: Con Profesor
-      try {
-        const { error } = await supabase.from('badges').upsert({
-          student_id: session.user.id,
-          planet_id: 'code',
-          badge_name: badge.id,
-          status: 'En revisión'
-        }, { onConflict: 'student_id, badge_name' });
-
-        if (error) throw error;
-
-        const initialMessages = [
-          { role: 'user', text: `¡Hola! He completado la sección de **${badge.name}** en Code.org. He enviado una solicitud de validación a mi profesor.` },
-          { role: 'tutor', text: `¡Entendido, Explorer! He enviado tu solicitud de validación de **${badge.name}** a tu profesor. En cuanto la revise, tu insignia se iluminará en el perfil. ¡Buen trabajo!` }
-        ];
-        setValidationMessages(initialMessages);
-        setBadgeRefreshTrigger(prev => prev + 1);
-      } catch (err) {
-        console.error("Error al enviar badge a revisión:", err);
-        setValidationMessages([
-          { role: 'tutor', text: `⚠️ **Error de Comunicación**: No he podido enviar la solicitud a tu profesor. Por favor, inténtalo de nuevo.` }
-        ]);
-      }
-      return;
-    }
-
-    // 🤖 CASO: Autodidacta (Mentor IA)
-    // Definimos la secuencia exacta solicitada por el usuario para el arranque
-    const initialMessages = [
-      { 
-        role: 'tutor', 
-        text: `¡Hola, Explorer! Veo que has terminado la sección de ${badge.name}. ¡Excelente progreso!` 
-      },
-      { 
-        role: 'user', 
-        text: startMsg 
-      },
-      { 
-        role: 'tutor', 
-        text: `¿podrías explicarme brevemente qué es lo más importante que has aprendido en esta parte?` 
-      }
-    ];
-    
-    setValidationMessages(initialMessages);
-  };
-
-  const handleStartSenseiMissionValidation = (mission) => {
-    setValidatingSenseiMission(mission);
-    setIsChatModalOpen(true);
-    
-    const startMsg = `¡Sensei! He completado la Misión Especial: **${mission.title}**. Estoy listo para demostrar que he cumplido el objetivo: ${mission.objective}.`;
-    
-    setValidationMessages([
-      { role: 'user', text: startMsg },
-      { role: 'tutor', text: `¡Excelente, Explorer! Me alegra ver que has aceptado el desafío. Para validar esta misión, explícame: ¿cómo has logrado resolver el objetivo y qué obstáculos encontraste en el camino?` }
-    ]);
-  };
-
-  const handleStartChallengeValidation = (challenge, evidenceUrl, challengeId, evidenceFileUrl) => {
-    setValidatingChallenge({ ...challenge, fullId: challengeId });
-    setIsNinjaValidator(true);
-    setIsChatModalOpen(true);
-    
-    const title = challenge.titulo || challenge.title || challenge.name || "Reto Ninja";
-    const evidenceTxt = [
-      evidenceUrl ? `Enlace: ${evidenceUrl}` : null,
-      evidenceFileUrl ? `Archivo adjunto: ${evidenceFileUrl.split('/').pop()}` : null
-    ].filter(Boolean).join(' y ');
-
-    const startMsg = `¡Hola Sensei! He completado el reto **${title}** en ${getPlanetById(activePlanet)?.name}. Aquí está mi evidencia (${evidenceTxt || 'No adjunta'}). Quiero demostrar lo que he aprendido para validar este reto.`;
-
-    if (!isAutodidact) {
-      // 🏫 CASO: Con Profesor
-      setValidationMessages([
-        { role: 'user', text: `¡Hola! He completado el reto **${title}**. He enviado la evidencia (${evidenceTxt}) a mi profesor.` },
-        { role: 'tutor', text: `¡Excelente trabajo, Explorer! He recibido tu entrega para **${title}**. Tu profesor la revisará pronto y verás el estado actualizado en tu itinerario. ¡Sigue así!` }
-      ]);
-      return;
-    }
-
-    // 🤖 CASO: Autodidacta
-    setValidationMessages([
-      { role: 'user', text: startMsg },
-      { role: 'tutor', text: `¡Felicidades por terminar **${title}**! Veo que has enviado tu evidencia. Para validarla oficialmente, ¿podrías explicarme brevemente qué lógica has usado para resolver la parte más difícil del reto?` }
-    ]);
-  };
-
+  // ── VISTA DE DASHBOARD / AJUSTES ──
   return (
-    <div className="layout-container" style={{ padding: '20px 5%' }}>
+    <div className="layout-container" style={{
+      minHeight: '100vh',
+      background: '#f8fafb',
+      padding: '40px 20px'
+    }}>
       <TopHeader />
+      
+      <div style={{ maxWidth: '1000px', margin: '40px auto' }}>
+        {/* Header con estadísticas del alumno */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '20px',
+          marginBottom: '40px'
+        }}>
+          <GlassCard style={{ padding: '24px', textAlign: 'center' }}>
+            <div style={{ color: '#6366f1', marginBottom: '8px' }}><Zap size={24} /></div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#1a1a1a' }}>{studentStats.retos}</div>
+            <div style={{ fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '1px' }}>Retos Superados</div>
+          </GlassCard>
+          <GlassCard style={{ padding: '24px', textAlign: 'center' }}>
+            <div style={{ color: '#f59e0b', marginBottom: '8px' }}><Award size={24} /></div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#1a1a1a' }}>{studentStats.medallas}</div>
+            <div style={{ fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '1px' }}>Medallas Dojo</div>
+          </GlassCard>
+          <GlassCard style={{ padding: '24px', textAlign: 'center' }}>
+            <div style={{ color: '#10b981', marginBottom: '8px' }}><Target size={24} /></div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#1a1a1a' }}>{studentStats.progreso}</div>
+            <div style={{ fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '1px' }}>Planetas Dominados</div>
+          </GlassCard>
+        </div>
 
-      {/* 🔙 BOTÓN VOLVER AL DOJO */}
-      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-start' }}>
-        <button
-          onClick={() => router.push('/')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '10px 20px',
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(13, 207, 207, 0.2)',
-            borderRadius: '12px',
-            color: '#1a1a2e',
-            fontSize: '0.8rem',
-            fontWeight: '800',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateX(-5px)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
-            e.currentTarget.style.borderColor = 'var(--accent-teal)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateX(0)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.7)';
-            e.currentTarget.style.borderColor = 'rgba(13, 207, 207, 0.2)';
-          }}
-        >
-          <ArrowLeft size={18} color="var(--accent-teal)" />
-          Volver al Dojo
-        </button>
-      </div>
-
-      <div className="profile-dashboard-grid">
-        <div className="profile-col-left">
-          <div className="avatar-hero">
-            <div className="avatar-circle" style={{ position: 'relative' }}>
-              <img src={profile?.avatar_url || "https://i.pravatar.cc/150?img=11"} alt="Avatar" className="avatar-img" />
-              <div className="lvl-badge-pop">LVL 0</div>
-
-              <button
-                onClick={() => setIsChangingAvatar(!isChangingAvatar)}
-                style={{
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
+          {/* Columna Izquierda: Identidad */}
+          <GlassCard style={{ padding: '40px', height: 'fit-content' }}>
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <div style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '3rem',
+                  color: 'white',
+                  fontWeight: '800',
+                  margin: '0 auto 20px',
+                  boxShadow: '0 10px 25px rgba(99, 102, 241, 0.3)',
+                  overflow: 'hidden'
+                }}>
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    profile.alias?.charAt(0).toUpperCase() || 'E'
+                  )}
+                </div>
+                <label style={{
                   position: 'absolute',
-                  bottom: '0',
+                  bottom: '20px',
                   right: '0',
                   background: 'white',
-                  border: '2px solid var(--accent-purple)',
+                  padding: '8px',
                   borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}
-              >
-                <Settings size={14} className="text-muted" />
-              </button>
-            </div>
-
-            {isChangingAvatar && (
-              <div style={{ marginTop: '15px' }}>
-                <label
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '10px 15px',
-                    background: 'rgba(156, 39, 176, 0.05)',
-                    borderRadius: '8px',
-                    border: '2px dashed var(--accent-purple)',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    color: 'var(--accent-purple)',
-                    fontWeight: '700'
-                  }}
-                >
-                  <Upload size={16} />
-                  {isUploading ? 'Subiendo...' : 'Seleccionar archivo'}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    disabled={isUploading}
-                    style={{ display: 'none' }}
-                  />
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                }}>
+                  <Camera size={18} color="#6366f1" />
+                  <input type="file" hidden accept="image/*" onChange={handleFileUpload} />
                 </label>
               </div>
-            )}
-
-            <h1 style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '2.5rem',
-              fontWeight: '900',
-              color: '#1a1a2e',
-              marginBottom: '4px',
-              textAlign: 'center'
-            }}>{profile?.alias || 'Explorer_Kai'}</h1>
-            <p className="hero-rank" style={{ textAlign: 'center' }}>RANK: GRAND ARCHITECT OF THE VOID</p>
-          </div>
-
-          <div className="stats-row">
-            <GlassCard className="stat-card">
-              <p>XP POINTS</p>
-              <h2 className="text-teal">0</h2>
-            </GlassCard>
-            <GlassCard className="stat-card">
-              <p>STREAK</p>
-              <h2 className="text-purple">0 Days</h2>
-            </GlassCard>
-          </div>
-        </div>
-
-        <div className="profile-col-right">
-          <div className="section-title" style={{ marginTop: '16px' }}>
-            <div className="medal-icon bg-teal text-white chat-logo"><MessageSquare size={16} /></div>
-            <h2 style={{ fontFamily: '"Outfit", sans-serif', fontSize: '1.2rem' }}>NotebookLM Socratic Tutor</h2>
-          </div>
-          <GlassCard className="tutor-card">
-            <div className="chat-thread" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-              {socraticMessages.map((msg, index) => (
-                <div key={index} className={`chat-bubble ${msg.role === 'tutor' ? 'tutor-bubble' : 'user-bubble'}`}>
-                  <p>{msg.text}</p>
-                </div>
-              ))}
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '800', margin: '0 0 5px' }}>{profile.alias || 'Explorador'}</h2>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>{session.user.email}</p>
             </div>
-            <div className="chat-input-row">
-              <input 
-                type="text" 
-                placeholder="Haz una consulta socrática..." 
-                className="tutor-input" 
-                value={socraticInputText} 
-                onChange={(e) => setSocraticInputText(e.target.value)} 
-                onKeyDown={(e) => e.key === 'Enter' && handleSendSocratic()} 
-              />
-              <button className="tutor-send-btn" onClick={handleSendSocratic}><Send size={18} /></button>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <GlowButton color="purple" onClick={() => setIsUpdatingPassword(!isUpdatingPassword)}>
+                <ShieldCheck size={18} style={{ marginRight: '10px' }} /> Seguridad
+              </GlowButton>
+              <GlowButton color="teal" onClick={() => router.push('/')}>
+                <Castle size={18} style={{ marginRight: '10px' }} /> Mi Dojo
+              </GlowButton>
+              <div onClick={signOut} style={{
+                marginTop: '20px',
+                padding: '15px',
+                textAlign: 'center',
+                color: '#ef4444',
+                fontWeight: '700',
+                cursor: 'pointer',
+                borderRadius: '12px',
+                transition: 'all 0.2s'
+              }} onMouseOver={e => e.target.style.background = '#fee2e2' } onMouseOut={e => e.target.style.background = 'transparent'}>
+                Cerrar Sesión
+              </div>
             </div>
           </GlassCard>
-        </div>
-      </div>
 
-      <div className="full-width-profile-content" style={{ animation: 'fadeIn 0.8s ease-out' }}>
-        <div className="action-grid-2col">
-          {/* LANZADERAS ESTELARES */}
-          <div className="launchpads-section">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '12px', fontFamily: 'Outfit', fontSize: '0.8rem', fontWeight: '800' }}>
-              <Rocket size={14} color="var(--accent-purple)" /> LANZADERAS
+          {/* Columna Derecha: Configuración */}
+          <GlassCard style={{ padding: '40px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Settings size={20} color="#6366f1" /> Ajustes de Cuenta
             </h3>
-            <GlassCard style={{ padding: '12px', height: '100%', minHeight: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {teacherResources.filter(r => r.tipo_recurso === 'lanzadera').length > 0 ? (
-                  teacherResources.filter(r => r.tipo_recurso === 'lanzadera').map((launch, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => window.open(launch.contenido.url, '_blank')}
-                      style={{
-                        padding: '10px 14px',
-                        background: 'rgba(156, 39, 176, 0.05)',
-                        border: '1px solid rgba(156, 39, 176, 0.1)',
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(156, 39, 176, 0.12)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(156, 39, 176, 0.05)'}
-                    >
-                      <span className="truncate-text" style={{ fontSize: '0.75rem', fontWeight: '700', color: '#1a1a2e' }}>{launch.nombre_recurso}</span>
-                      <ExternalLink size={14} color="#888" />
-                    </div>
-                  ))
-                ) : (
-                  <p style={{ fontSize: '0.75rem', color: '#888', textAlign: 'center', fontStyle: 'italic', margin: 'auto' }}>
-                    Sin lanzaderas activas en este sector.
-                  </p>
-                )}
-              </div>
-            </GlassCard>
-          </div>
 
-          {/* PÁGINA OFICIAL (Notebook Style) */}
-          <div className="official-page-section">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '12px', fontFamily: 'Outfit', fontSize: '0.8rem', fontWeight: '800' }}>
-              <Cpu size={14} color="var(--accent-teal)" /> PÁGINA OFICIAL
-            </h3>
-            <GlassCard 
-              className="notebook-card official-page-card"
-              style={{ padding: '0', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-            >
-              {/* Notebook Header */}
-              <div 
-                className="notebook-header" 
-                style={{ 
-                  position: 'relative', 
-                  height: '140px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  padding: '10px',
-                  background: 'rgba(255,255,255,0.5)'
-                }}
-              >
-                <div className="notebook-planet-logo-wrapper">
-                  <img 
-                    src={getPlanetById(activePlanet)?.image} 
-                    alt={getPlanetById(activePlanet)?.name} 
-                    className="notebook-planet-img"
-                  />
-                </div>
-                <div 
-                  className="notebook-status-overlay" 
-                  style={{ 
-                    position: 'absolute', 
-                    bottom: 0, 
-                    left: 0, 
-                    width: '100%', 
-                    height: '60%', 
-                    background: `linear-gradient(0deg, ${getPlanetById(activePlanet)?.barColor || '#0dcfcf'}CC 0%, transparent 100%)` 
-                  }} 
-                />
-                <div className="lvl-badge-notebook" style={{ background: getPlanetById(activePlanet)?.color || '#e0f5f5', color: getPlanetById(activePlanet)?.barColor || '#0dcfcf' }}>
-                  LVL 04
-                </div>
-              </div>
-
-              {/* Notebook Body */}
-              <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0' }}>
-                  {getPlanetById(activePlanet)?.name === 'Code.org' 
-                    ? 'Code.org: Academia Digital' 
-                    : getPlanetById(activePlanet)?.name}
-                </h3>
-                
-                <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0, flex: 1 }}>
-                  {getPlanetById(activePlanet)?.description || getPlanetById(activePlanet)?.subtitle || 'Explora y construye en este sector.'}
-                  <br /><br />
-                  {getPlanetById(activePlanet)?.recommendation && (
-                    <>
-                      <strong>Recomendación Ninja:</strong> {getPlanetById(activePlanet)?.recommendation}
-                    </>
-                  )}
-                </p>
-
-                {/* Progress Mini Bar */}
-                <div style={{ marginTop: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '0.6rem', fontWeight: '800', color: getPlanetById(activePlanet)?.barColor || '#0dcfcf' }}>32% COMPLETO</span>
-                  </div>
-                  <div style={{ height: '4px', background: '#f0f5f7', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{ width: '32%', height: '100%', background: getPlanetById(activePlanet)?.barColor || '#0dcfcf' }} />
-                  </div>
-                </div>
-
-                {/* Ninja Tip */}
-                <div style={{ 
-                  marginTop: '16px', 
-                  padding: '10px', 
-                  background: `${getPlanetById(activePlanet)?.barColor || '#ffc107'}10`, 
-                  borderRadius: '12px', 
-                  borderLeft: `4px solid ${getPlanetById(activePlanet)?.barColor || '#ff9800'}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <Sparkles size={14} color={getPlanetById(activePlanet)?.barColor || "#ff9800"} />
-                  <p style={{ fontSize: '0.65rem', color: '#1a1a2e', margin: 0, fontWeight: '600', lineHeight: '1.4' }}>
-                    <strong>Tip Ninja:</strong> Regístrate e inicia sesión siempre para que tus proyectos se guarden correctamente.
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                  {getPlanetById(activePlanet)?.buttons ? (
-                    getPlanetById(activePlanet).buttons.map((btn, bidx) => (
-                      <GlowButton
-                        key={bidx}
-                        color={btn.color || 'teal'}
-                        className="w-100"
-                        style={{ padding: '10px', fontSize: '0.75rem' }}
-                        onClick={() => window.open(btn.url, '_blank')}
-                      >
-                        {btn.icon === 'Sparkles' && <Sparkles size={14} style={{ marginRight: '6px' }} />}
-                        {btn.icon === 'Play' && <Play size={14} style={{ marginRight: '6px' }} />}
-                        {!['Sparkles', 'Play'].includes(btn.icon) && <ExternalLink size={14} style={{ marginRight: '6px' }} />}
-                        {btn.label}
-                      </GlowButton>
-                    ))
-                  ) : (
-                    <GlowButton
-                      color="teal"
-                      className="w-100"
-                      style={{ padding: '10px', fontSize: '0.75rem' }}
-                      onClick={() => window.open(getPlanetById(activePlanet)?.url, '_blank')}
-                    >
-                      <ExternalLink size={14} style={{ marginRight: '6px' }} /> ENTRAR AL PLANETA
-                    </GlowButton>
-                  )}
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-        </div>
-
-
-        <div className="scrolls-section" style={{ marginTop: '30px' }}>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '15px', fontFamily: 'Outfit', fontSize: '0.8rem', fontWeight: '800' }}>
-            <TrendingUp size={14} className="text-purple" /> ⛩️ RECURSOS DE APOYO
-          </h3>
-          
-          <div className="scrolls-grid-3col" style={{ marginTop: '10px' }}>
-            {teacherResources
-                .filter(r => ['infografia', 'video', 'presentacion', 'Infografia', 'Quiz', 'Podcast', 'Mapa Mental', 'Slide', 'Explicación', 'Documento'].includes(r.tipo_recurso))
-                .length > 0 ? (
-                teacherResources
-                  .filter(r => ['infografia', 'video', 'presentacion', 'Infografia', 'Quiz', 'Podcast', 'Mapa Mental', 'Slide', 'Explicación', 'Documento'].includes(r.tipo_recurso))
-                  .sort(sortRecursos)
-                  .slice(0, 8).map((scroll, idx) => (
-                <div 
-                  key={idx} 
-                  onClick={() => setSelectedScroll(scroll)}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <GlassCard 
-                    style={{ padding: '10px', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s', border: selectedScroll?.id === scroll.id ? `2px solid ${getPlanetById(activePlanet)?.barColor}` : '1px solid rgba(13,207,207,0.1)', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: selectedScroll?.id === scroll.id ? 'rgba(13,207,207,0.05)' : 'rgba(255,255,255,0.7)' }}
-                  >
-                    <div style={{ background: 'rgba(13, 207, 207, 0.05)', width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
-                      {scroll.tipo_recurso?.toLowerCase().includes('info') && <FileText size={16} color="#0dcfcf" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('video') && <Play size={16} color="#9c27b0" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('presen') && <Presentation size={16} color="#ff9800" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('slide') && <Layout size={16} color="#ff9800" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('quiz') && <Award size={16} color="#0097e6" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('cuest') && <Award size={16} color="#0097e6" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('mapa') && <Brain size={16} color="#9c27b0" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('pod') && <Headphones size={16} color="#5c6ac4" />}
-                      {scroll.tipo_recurso?.toLowerCase().includes('explic') && <MessageSquare size={16} color="#4cd137" />}
-                    </div>
-                    <span className="truncate-text" style={{ fontSize: '0.65rem', color: '#1a1a2e', fontWeight: '700' }}>
-                      {scroll.nombre_recurso || scroll.tipo_recurso}
-                    </span>
-                    {scroll.contenido?.meta?.isGlobal || scroll.contenido?.isMaster || scroll.profesor_id === MASTER_PROFESOR_ID ? (
-                      <span style={{ fontSize: '0.5rem', color: '#0dcfcf', fontWeight: '800', marginTop: '2px' }}>✦ MAESTRO</span>
-                    ) : (
-                      <span style={{ fontSize: '0.5rem', color: '#9c27b0', fontWeight: '800', marginTop: '2px' }}>✦ RECURSO</span>
-                    )}
-                  </GlassCard>
-                </div>
-              ))
-            ) : (
-              <div style={{ gridColumn: '1 / -1', padding: '15px', textAlign: 'center', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', border: '1px dashed #ccc' }}>
-                <p style={{ margin: 0, fontSize: '0.7rem', color: '#888' }}>Aún no hay recursos de apoyo disponibles.</p>
-              </div>
-            )}
-          </div>
-
-          {/* 📜 VISOR INTEGRADO (VISTA DIRECTA) */}
-          {selectedScroll ? (
-            <div className="integrated-scroll-viewer" style={{ marginTop: '20px', animation: 'slideDownIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-              <GlassCard style={{ padding: '0', overflow: 'hidden', border: `2px solid ${getPlanetById(activePlanet)?.barColor}33`, position: 'relative' }}>
-                <div style={{ padding: '15px 25px', background: `${getPlanetById(activePlanet)?.barColor}11`, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <BookOpen size={16} color={getPlanetById(activePlanet)?.barColor} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: '800', fontFamily: 'Outfit' }}>{selectedScroll.nombre_recurso || selectedScroll.tipo_recurso}</span>
-                   </div>
-                    {/* Botón de cerrar eliminado para mantener visibilidad constante según petición */}
-                </div>
-                
-                <div style={{ background: 'white', minHeight: '400px' }}>
-                  {selectedScroll.contenido?.markdown ? (
-                    <div style={{ padding: '40px', color: '#1a1a2e', fontSize: '1.05rem', lineHeight: '1.7', background: 'white' }} 
-                      dangerouslySetInnerHTML={{ 
-                        __html: selectedScroll.contenido.markdown
-                          .replace(/^# (.*)/gm, '<h1 style="font-family:Outfit; font-weight:900; color:#1a1a2e; margin-bottom:20px; font-size:2.2rem; border-left:8px solid var(--accent-purple); padding-left:15px; background:rgba(156,39,176,0.03); padding-top:10px; padding-bottom:10px;">$1</h1>')
-                          .replace(/^## (.*)/gm, '<h2 style="font-family:Outfit; font-weight:800; color:#1a1a2e; margin-top:35px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px; display:flex; align-items:center; gap:10px;"><span style="color:var(--accent-purple)">✦</span> $1</h2>')
-                          .replace(/^### (.*)/gm, '<h3 style="font-family:Outfit; font-weight:700; color:var(--accent-teal); margin-top:20px; margin-bottom:10px;">$1</h3>')
-                          .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--accent-purple); font-weight:800;">$1</strong>')
-                          .replace(/^- (.*)/gm, '<li style="margin-left:20px; margin-bottom:10px; list-style-type:square; color:#444;">$1</li>')
-                          .replace(/\n\n/g, '<p style="margin-bottom:15px;"></p>')
-                          .replace(/\n/g, '<br/>')
-                      }} />
-                  ) : (selectedScroll.contenido?.url && (selectedScroll.contenido.url.match(/\.(jpeg|jpg|gif|png|webp)$/i) !== null)) ? (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                       <img src={selectedScroll.contenido.url} alt="Recurso Maestro" style={{ maxWidth: '100%', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }} />
-                    </div>
-                  ) : selectedScroll.contenido?.url ? (
-                    <div style={{ height: '75vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative', background: '#f0f2f5' }}>
-                      <div className="iframe-loader" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
-                         <div className="spinner" style={{ borderTopColor: 'var(--accent-purple)' }} />
-                         <p style={{ fontSize: '0.7rem', marginTop: '10px', color: '#888' }}>Inyectando conocimiento...</p>
-                      </div>
-                      <iframe 
-                        src={selectedScroll.contenido.url.includes('drive.google.com') ? selectedScroll.contenido.url.replace('/view', '/preview').replace('/edit', '/preview') : selectedScroll.contenido.url} 
-                        style={{ width: '100%', flex: 1, border: 'none', position: 'relative', zIndex: 2, background: 'transparent' }}
-                        title="Visor de Recurso"
-                        onLoad={(e) => {
-                          const loader = e.currentTarget.previousSibling;
-                          if (loader) loader.style.display = 'none';
-                        }}
-                      />
-                      <div style={{ padding: '15px', textAlign: 'center', borderTop: '1px solid #eee', background: '#f8f9fa', zIndex: 3 }}>
-                        <GlowButton color="teal" onClick={() => window.open(selectedScroll.contenido.url, '_blank')} style={{ padding: '8px 20px', fontSize: '0.8rem' }}>
-                          <ExternalLink size={14} style={{ marginRight: '8px' }} /> ABRIR EN VENTANA COMPLETA
-                        </GlowButton>
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ padding: '60px', textAlign: 'center', color: '#8a8a9e' }}>
-                      <Zap size={32} style={{ marginBottom: '15px', opacity: 0.3 }} />
-                      <p>Este pergamino no contiene datos legibles en este momento.</p>
-                    </div>
-                  )}
-                </div>
-              </GlassCard>
-            </div>
-          ) : (
-            <div style={{ padding: '20px', textAlign: 'center', background: 'rgba(255,255,255,0.4)', borderRadius: '16px', border: '1px dashed rgba(13,207,207,0.2)', marginTop: '10px' }}>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: '#8a8a9e', fontWeight: '500' }}>
-                Haz clic en una ficha para desplegar su conocimiento directamente aquí.
-              </p>
-            </div>
-          )}
-        </div>
-        
-        {/* 📘 CURSO RECOMENDADO: ARDUINO DESDE CERO (LUIS LLAMAS) */}
-        {activePlanet === 'arduino' && (
-          <div style={{ marginTop: '30px', animation: 'fadeIn 0.6s ease-out' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '15px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-              <BookOpen size={18} color="#0097e6" /> RECURSO EXTERNO RECOMENDADO
-            </h3>
-            
-            <div style={{ 
-              background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-              borderRadius: '24px',
-              padding: '30px',
-              border: '1px solid rgba(0, 151, 230, 0.1)',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '30px',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Decoración de fondo */}
-              <div style={{ 
-                position: 'absolute', 
-                top: '-20px', 
-                right: '-20px', 
-                width: '150px', 
-                height: '150px', 
-                background: 'rgba(0, 151, 230, 0.05)', 
-                borderRadius: '50%',
-                zIndex: 0
-              }} />
-
-              <div style={{ 
-                width: '100px', 
-                height: '100px', 
-                background: 'white', 
-                borderRadius: '20px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                boxShadow: '0 10px 20px rgba(0,151,230,0.1)',
-                flexShrink: 0,
-                zIndex: 1
-              }}>
-                <Cpu size={48} color="#0097e6" />
-              </div>
-
-              <div style={{ flex: 1, zIndex: 1 }}>
-                <h4 style={{ fontFamily: 'Outfit', fontSize: '1.4rem', fontWeight: '900', color: '#1a1a2e', marginBottom: '8px' }}>
-                  Arduino desde Cero (Luis Llamas)
-                </h4>
-                <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: '1.5', maxWidth: '600px', marginBottom: '20px' }}>
-                  Aprende la electrónica y programación textual de Arduino con uno de los mejores cursos en español. Ideal para dar el salto definitivo de los bloques al código real C++.
-                </p>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <GlowButton 
-                    color="blue" 
-                    onClick={() => window.open('https://www.luisllamas.es/arduino-desde-cero/', '_blank')}
-                    style={{ padding: '12px 25px', borderRadius: '12px' }}
-                  >
-                    <ExternalLink size={18} style={{ marginRight: '10px' }} /> EMPEZAR CURSO AHORA
-                  </GlowButton>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 🥷 RETOS NINJA DEL DOJO (Solo si no es Code.org, Tinkercad o Python) */}
-        {activePlanet !== 'code' && activePlanet !== 'tinkercad' && activePlanet !== 'python' && !getPlanetById(activePlanet)?.noChallenges && (
-          <div className="challenges-section" style={{ marginTop: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-              <Zap size={18} color={getPlanetById(activePlanet)?.barColor || '#0dcfcf'} /> {activePlanet === 'makecode-arcade' ? 'ITINERARIO WE TEACH ROBOTICS' : `ITINERARIO NINJA ${getPlanetById(activePlanet)?.name?.toUpperCase()}`}
-            </h3>
-            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-              Solicita tu insignia galáctica cuando hayas completado los retos de cada nivel y superado la validación del Sensei o de tu profesor.
-            </p>
-
-            <NinjaChallenges
-              planetId={activePlanet}
-              userId={session?.user?.id}
-              accentColor={getPlanetById(activePlanet)?.barColor || '#0dcfcf'}
-              targetLevel={studentLevel}
-              onValidateChallenge={handleStartChallengeValidation}
-              isAutodidact={isAutodidact}
-              refreshTrigger={challengeRefreshTrigger}
-            />
-
-            <SenseiMissions 
-              planetId={activePlanet}
-              userId={session?.user?.id}
-              studentLevel={studentLevel}
-              accentColor={getPlanetById(activePlanet)?.barColor || '#0dcfcf'}
-              onValidateMission={handleStartSenseiMissionValidation}
-              refreshTrigger={senseiRefreshTrigger}
-            />
-          </div>
-        )}
-
-        {/* 🧩 ESPECIAL CODE.ORG (INSIGNIAS DE CURSOS) */}
-        {activePlanet === 'code' && (
-          <div className="challenges-section" style={{ marginTop: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-              <Medal size={18} color="#128989" /> INSIGNIAS DE LA ACADEMIA DIGITAL
-            </h3>
-            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-              Al completar cada bloque en Code.org, solicita tu insignia para que brille en tu perfil ninja.
-            </p>
-            <CodeBadges
-              userId={session?.user?.id}
-              onValidateBadge={handleStartBadgeValidation}
-              isAutodidact={isAutodidact}
-              refreshTrigger={badgeRefreshTrigger}
-            />
-          </div>
-        )}
-
-        {/* 🏢 ESPECIAL TINKERCAD (ITINERARIOS 3D Y CÓDIGO) */}
-        {activePlanet === 'tinkercad' && (
-          <>
-            <div className="challenges-section" style={{ marginTop: '30px' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#ff9800" /> ITINERARIO NINJA DISEÑO 3D
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de Diseño 3D al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="tinkercad"
-                itinerary="3d"
-                userId={session?.user?.id}
-                accentColor="#ff9800"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-            </div>
-
-            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#0dcfcf" /> ITINERARIO NINJA BLOQUES DE CÓDIGO
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de Bloques de Código al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="tinkercad"
-                itinerary="codeblocks"
-                userId={session?.user?.id}
-                accentColor="#0dcfcf"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-            </div>
-            
-            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#ff9800" /> ITINERARIO NINJA BLOCKSCAD
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de BlocksCAD al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="tinkercad"
-                itinerary="blockscad"
-                userId={session?.user?.id}
-                accentColor="#ff9800"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-
-              <SenseiMissions 
-                planetId="tinkercad"
-                userId={session?.user?.id}
-                studentLevel={studentLevel}
-                accentColor="#ff9800"
-                onValidateMission={handleStartSenseiMissionValidation}
-                refreshTrigger={senseiRefreshTrigger}
-              />
-            </div>
-          </>
-        )}
-
-        {/* 🐍 ESPECIAL PYTHON (ITINERARIOS ACADEMIA, KIDS, CODEDEX, FCC) */}
-        {activePlanet === 'python' && (
-          <>
-            <div className="challenges-section" style={{ marginTop: '30px' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#3776ab" /> ITINERARIO ACADEMIA & RASPBERRY
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de Academia Python al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="python"
-                itinerary="academia-raspberry"
-                userId={session?.user?.id}
-                accentColor="#3776ab"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-            </div>
-
-            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#ffd43b" /> ITINERARIO CODING FOR KIDS
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de Coding for Kids al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="python"
-                itinerary="coding-kids"
-                userId={session?.user?.id}
-                accentColor="#ffd43b"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-            </div>
-
-            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#a29bfe" /> ITINERARIO CODEDEX PROJECTS
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de Codedex al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="python"
-                itinerary="codedex"
-                userId={session?.user?.id}
-                accentColor="#a29bfe"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-            </div>
-
-            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
-                <Zap size={18} color="#0a0a23" /> ITINERARIO FREECODECAMP
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Solicita tu insignia galáctica de FreeCodeCamp al completar tu itinerario y superar la validación.
-              </p>
-              <NinjaChallenges
-                planetId="python"
-                itinerary="freecodecamp"
-                userId={session?.user?.id}
-                accentColor="#0a0a23"
-                targetLevel={studentLevel}
-                onValidateChallenge={handleStartChallengeValidation}
-                isAutodidact={isAutodidact}
-                refreshTrigger={challengeRefreshTrigger}
-              />
-
-              <SenseiMissions 
-                planetId="python"
-                userId={session?.user?.id}
-                studentLevel={studentLevel}
-                accentColor="#306998"
-                onValidateMission={handleStartSenseiMissionValidation}
-                refreshTrigger={senseiRefreshTrigger}
-              />
-            </div>
-          </>
-        )}
-
-
-      </div>
-
-      {showUploader && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(26, 26, 46, 0.9)',
-          backdropFilter: 'blur(10px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }} onClick={() => setShowUploader(false)}>
-          <div style={{ width: '100%', maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
-            <ResourceUploader
-              currentUser={session?.user}
-              role={role}
-              planet={activePlanet}
-              onUploadSuccess={() => {
-                setShowUploader(false);
-                setEvidenceStatus('En Revisión');
-              }}
-            />
-            <button
-              onClick={() => setShowUploader(false)}
-              style={{
-                width: '100%',
-                marginTop: '10px',
-                padding: '10px',
-                background: 'rgba(255,255,255,0.1)',
-                border: 'none',
-                borderRadius: '10px',
-                color: '#fff',
-                cursor: 'pointer'
-              }}
-            >
-              CERRAR
-            </button>
-          </div>
-        </div>
-      )}
-      {/* 🤖 SENSEI FLOTANTE (MODAL DE VALIDACIÓN) */}
-      {isChatModalOpen && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          bottom: '20px',
-          width: '400px',
-          zIndex: 2000,
-          animation: 'slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-          pointerEvents: 'none' // Permitir clics detrás si no es en el modal
-        }}>
-          <GlassCard 
-            style={{ 
-              width: '100%', 
-              height: '100%',
-              display: 'flex', 
-              flexDirection: 'column', 
-              padding: 0,
-              overflow: 'hidden',
-              boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.3)',
-              border: `2px solid ${getPlanetById(activePlanet)?.barColor}88`,
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(15px)',
-              pointerEvents: 'auto' // Reactivar clics para el modal
-            }} 
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header del Modal */}
-            <div style={{ 
-              padding: '16px 20px', 
-              background: `linear-gradient(135deg, ${getPlanetById(activePlanet)?.barColor}22, rgba(255,255,255,0.5))`,
-              borderBottom: '1px solid rgba(0,0,0,0.05)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ 
-                  width: '32px', 
-                  height: '32px', 
-                  borderRadius: '50%', 
-                  background: getPlanetById(activePlanet)?.barColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}>
-                  <Brain size={18} />
+            {isUpdatingPassword ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ background: '#fef3c7', padding: '15px', borderRadius: '12px', color: '#92400e', fontSize: '0.9rem' }}>
+                  Asegúrate de usar una contraseña que puedas recordar pero sea difícil de adivinar.
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', fontFamily: 'Outfit' }}>Validación del Sensei</h4>
-                  <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: '600' }}>DEMUESTRA TU LÓGICA NINJA</p>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px', fontWeight: '600' }}>Nueva Contraseña</label>
+                  <input
+                    type="password"
+                    placeholder="Mínimo 6 caracteres"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '12px',
+                      border: '1px solid #e2e8f0',
+                      fontSize: '1rem'
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <GlowButton color="purple" className="flex-1" onClick={handleUpdatePassword}>Actualizar</GlowButton>
+                  <button onClick={() => setIsUpdatingPassword(false)} style={{
+                    padding: '14px 24px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: '#f1f5f9',
+                    color: '#475569',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}>Cancelar</button>
                 </div>
               </div>
-              <button 
-                onClick={() => setIsChatModalOpen(false)}
-                style={{ background: 'white', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-              >
-                <X size={16} color="#8a8a9e" />
-              </button>
-            </div>
-
-            {/* Cuerpo del Chat */}
-            <div style={{ 
-              flex: 1, 
-              padding: '20px', 
-              overflowY: 'auto', 
-              background: 'rgba(255,255,255,0.3)',
-              minHeight: '300px'
-            }}>
-              {validatingBadge && (
-                <div style={{ textAlign: 'center', marginBottom: '20px', padding: '15px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: '1px dashed #ddd' }}>
-                  <Award size={24} color="#FFD700" style={{ marginBottom: '8px' }} />
-                  <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: '700', color: '#1a1a2e' }}>Validando Insignia: {validatingBadge.name}</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px', fontWeight: '600' }}>Alias en el Dojo</label>
+                  <div style={{
+                    display: 'flex',
+                    gap: '10px'
+                  }}>
+                    <input
+                      type="text"
+                      value={profile.alias || ''}
+                      onChange={(e) => setProfile({ ...profile, alias: e.target.value })}
+                      style={{
+                        flex: 1,
+                        padding: '14px',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        fontSize: '1rem'
+                      }}
+                    />
+                    <GlowButton color="teal" onClick={async () => {
+                      const { error } = await supabase.from('profiles').update({ alias: profile.alias }).eq('id', session.user.id);
+                      if (!error) alert("¡Alias actualizado!");
+                    }}>Guardar</GlowButton>
+                  </div>
                 </div>
-              )}
-              
-              <div className="chat-thread-modal">
-                {validationMessages.map((msg, index) => (
-                  <div key={index} className={`chat-bubble ${msg.role === 'tutor' ? 'tutor-bubble' : 'user-bubble'}`} style={{ marginBottom: '12px' }}>
-                    <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: '1.5' }}>{msg.text}</p>
-                  </div>
-                ))}
-                {isTyping && (
-                  <div className="chat-bubble tutor-bubble" style={{ width: '40px', textAlign: 'center' }}>
-                    <span className="typing-dots">...</span>
-                  </div>
-                )}
-                <div ref={(el) => el?.scrollIntoView({ behavior: 'smooth' })} />
-              </div>
-            </div>
 
-            {/* Input del Chat */}
-            <div style={{ padding: '15px', background: 'white', borderTop: '1px solid #eee' }}>
-              <div className="chat-input-row" style={{ display: 'flex', gap: '10px' }}>
-                <input 
-                  type="text" 
-                  placeholder="Escribe tu explicación técnica aquí..." 
-                  className="tutor-input" 
-                  value={validationInputText} 
-                  onChange={(e) => setValidationInputText(e.target.value)} 
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendValidation()}
-                  style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid #eee', fontSize: '0.85rem', background: '#f8f9fa' }}
-                />
-                <button 
-                  className="tutor-send-btn" 
-                  onClick={handleSendValidation}
-                  style={{ background: getPlanetById(activePlanet)?.barColor, color: 'white', border: 'none', borderRadius: '10px', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                >
-                  <Send size={18} />
-                </button>
+                <div style={{ padding: '20px', borderRadius: '15px', background: '#f8fafb', border: '1px dashed #cbd5e1' }}>
+                  <h4 style={{ margin: '0 0 10px', fontSize: '1rem', fontWeight: '700' }}>Estado de Explorador</h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#64748b' }}>
+                    <span>Email verificado</span>
+                    <span style={{ color: '#10b981', fontWeight: '600' }}>SÍ</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#64748b', marginTop: '5px' }}>
+                    <span>Tipo de cuenta</span>
+                    <span style={{ fontWeight: '600' }}>{isAutodidact ? 'Autodidacta' : 'Alumno de Aula'}</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </GlassCard>
         </div>
-      )}
+      </div>
     </div>
   );
 }

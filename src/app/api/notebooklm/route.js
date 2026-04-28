@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// --- Supabase Client ---
-const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
-const anonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
-const serviceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+export const dynamic = "force-dynamic";
 
-// El service_role actual en .env.local parece inválido (da "Invalid API key" en Supabase).
-// Usamos el anonKey para GET, que ya sabemos que funciona en el frontend.
-const supabase = createClient(supabaseUrl, anonKey);
+// Helper para crear cliente de Supabase bajo demanda
+function getSupabaseClient(useServiceKey = false) {
+    const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+    const anonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+    const serviceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+    
+    return createClient(supabaseUrl, useServiceKey ? serviceKey : anonKey);
+}
 
 // --- UUID Extractor ---
 function extractUuid(val) {
@@ -88,6 +90,7 @@ export async function POST(req) {
             if (dbType.toLowerCase().includes('podcast')) dbType = 'Podcast';
             if (dbType.toLowerCase().includes('infografia')) dbType = 'Infografia';
 
+            const supabase = getSupabaseClient(true);
             await supabase.from('recursos_docentes').insert({
                 profesor_id: userId, 
                 tecnologia: planetId, 
@@ -121,6 +124,7 @@ export async function GET(req) {
             return NextResponse.json({ success: false, error: 'UserId missing' }, { status: 400 });
         }
 
+        const supabase = getSupabaseClient();
         let query = supabase
             .from('recursos_docentes')
             .select('*')

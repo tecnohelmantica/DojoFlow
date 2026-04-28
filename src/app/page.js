@@ -4,7 +4,7 @@ import GlassCard from '../components/GlassCard';
 import GlowButton from '../components/GlowButton';
 import MisAulas from '../components/MisAulas';
 import { useAuth } from '../components/AuthProvider';
-import { Bell, User, Code, Puzzle, Cpu as OriginalCpu, MonitorPlay, Zap, Gamepad2, Box, Smartphone, Brain, Globe, Eye, EyeOff, LogOut, UserPlus, ExternalLink } from 'lucide-react';
+import { Bell, User, Code, Puzzle, Cpu as OriginalCpu, MonitorPlay, Zap, Gamepad2, Box, Smartphone, Brain, Globe, Eye, EyeOff, LogOut, UserPlus, ExternalLink, Castle } from 'lucide-react';
 const Cpu = OriginalCpu;
 const ArduinoIcon = OriginalCpu;
 
@@ -82,16 +82,18 @@ export default function HomePage() {
   const fetchStudentData = async () => {
     if (!session?.user?.id || role !== 'alumno') return;
 
-    // 1. Obtener IDs de las clases en las que está el alumno
+    // 1. Obtener IDs y Nombres de las clases en las que está el alumno
     const { data: vincs } = await supabase
       .from('clase_alumnos')
-      .select('clase_id')
+      .select('clase_id, clases(id, nombre_clase)')
       .eq('alumno_id', session.user.id);
     
-    const claseIds = (vincs || []).map(v => v.clase_id);
-    setStudentAulas(claseIds);
+    const aulas = (vincs || []).map(v => v.clases).filter(Boolean);
+    setStudentAulas(aulas);
 
-    if (claseIds.length === 0) return;
+    if (aulas.length === 0) return;
+
+    const claseIds = aulas.map(a => a.id);
 
     // 2. Obtener recursos vinculados a esas clases que sean enlaces
     const { data: recs } = await supabase
@@ -266,12 +268,50 @@ export default function HomePage() {
         </p>
         
         {!isProfesor && (
-          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
-            <GlowButton color="teal" onClick={() => setIsJoinModalOpen(true)} style={{ padding: '14px 28px', fontSize: '1rem' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Zap size={20} fill="currentColor" /> INGRESAR A UN AULA
-              </span>
-            </GlowButton>
+          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            {studentAulas.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
+                  {studentAulas.map(aula => (
+                    <div key={aula.id} style={{ 
+                      background: 'rgba(20, 184, 166, 0.1)', 
+                      border: '1px solid rgba(20, 184, 166, 0.2)',
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#128989',
+                      fontSize: '0.8rem',
+                      fontWeight: '800'
+                    }}>
+                      <Castle size={14} /> AULA ACTIVA: {aula.nombre_clase.toUpperCase()}
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setIsJoinModalOpen(true)}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: '#64748b', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '800', 
+                    textDecoration: 'underline', 
+                    cursor: 'pointer',
+                    marginTop: '5px'
+                  }}
+                >
+                  INGRESAR A OTRA CLASE
+                </button>
+              </div>
+            ) : (
+              <GlowButton color="teal" onClick={() => setIsJoinModalOpen(true)} style={{ padding: '14px 28px', fontSize: '1rem' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Zap size={20} fill="currentColor" /> INGRESAR A UN AULA
+                </span>
+              </GlowButton>
+            )}
           </div>
         )}
       </div>

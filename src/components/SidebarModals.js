@@ -219,52 +219,119 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
         );
 
       case 'Pergamino':
+        // Agrupar recursos por tecnología
+        const groupedResources = data.reduce((acc, item) => {
+          const tech = item.tecnologia || 'general';
+          if (!acc[tech]) acc[tech] = [];
+          acc[tech].push(item);
+          return acc;
+        }, {});
+
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {data.map((item) => {
-              const planet = getPlanetById(item.tecnologia);
-              const isMaster = item.profesor_id === '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
-              const isLink = item.tipo_recurso === 'enlace';
-              const content = item.contenido.markdown || '';
-              
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {Object.entries(groupedResources).map(([tech, resources]) => {
+              const planet = getPlanetById(tech);
               return (
-                <div key={item.id} style={{ 
-                  background: 'white', 
-                  borderRadius: '16px', 
-                  overflow: 'hidden',
-                  border: '1px solid rgba(0,0,0,0.05)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
-                }}>
-                  <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f8fafc' }}>
-                    <div style={{ background: planet?.barColor || '#0dcfcf', padding: '8px', borderRadius: '8px', color: 'white' }}>
-                      {isLink ? <ExternalLink size={16} /> : <FileText size={16} />}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '700' }}>{item.nombre_recurso}</h4>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px' }}>
-                        <span style={{ fontSize: '0.65rem', fontWeight: '800', color: isMaster ? '#f59e0b' : '#3b82f6' }}>
-                          {isMaster ? 'MAESTRO' : 'CLASE'}
-                        </span>
-                        <span style={{ color: '#cbd5e1' }}>•</span>
-                        <span style={{ fontSize: '0.65rem', color: '#64748b' }}>{item.tipo_recurso.toUpperCase()}</span>
-                      </div>
-                    </div>
-                    {isLink ? (
-                      <a href={content} target="_blank" rel="noreferrer" style={{ background: '#f0f5f7', color: '#0dcfcf', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700' }}>
-                        ABRIR
-                      </a>
-                    ) : (
-                      <button 
-                        onClick={() => setSelectedItem(item)}
-                        style={{ background: '#f0f5f7', color: '#0dcfcf', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
-                      >
-                        LEER
-                      </button>
-                    )}
+                <div key={tech} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px', 
+                    padding: '8px 12px', 
+                    background: planet?.barColor ? `${planet.barColor}15` : 'rgba(13, 207, 207, 0.1)',
+                    borderRadius: '10px',
+                    border: `1px solid ${planet?.barColor ? `${planet.barColor}33` : 'rgba(13, 207, 207, 0.2)'}`
+                  }}>
+                    <div style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      borderRadius: '50%', 
+                      background: planet?.barColor || '#0dcfcf' 
+                    }} />
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      fontWeight: '800', 
+                      color: planet?.barColor || '#0dcfcf',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      {planet?.name || tech.toUpperCase()}
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {resources.map((item) => {
+                      const isMaster = item.profesor_id === '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
+                      const isLink = item.tipo_recurso === 'enlace';
+                      const content = item.contenido.markdown || '';
+                      
+                      return (
+                        <div key={item.id} style={{ 
+                          background: 'white', 
+                          borderRadius: '12px', 
+                          overflow: 'hidden',
+                          border: '1px solid rgba(0,0,0,0.05)',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                          transition: 'all 0.2s ease'
+                        }} className="history-item">
+                          <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ 
+                              background: isLink ? 'rgba(13, 207, 207, 0.1)' : 'rgba(156, 39, 176, 0.1)', 
+                              padding: '8px', 
+                              borderRadius: '8px', 
+                              color: isLink ? '#0dcfcf' : '#9c27b0' 
+                            }}>
+                              {isLink ? <ExternalLink size={14} /> : <FileText size={14} />}
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <h4 style={{ margin: 0, fontSize: '0.85rem', fontWeight: '700', color: '#1e293b' }}>{item.nombre_recurso}</h4>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px' }}>
+                                <span style={{ fontSize: '0.6rem', fontWeight: '800', color: isMaster ? '#f59e0b' : '#3b82f6' }}>
+                                  {isMaster ? 'MAESTRO' : 'CLASE'}
+                                </span>
+                                <span style={{ color: '#cbd5e1', fontSize: '0.6rem' }}>•</span>
+                                <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: '600' }}>{item.tipo_recurso.toUpperCase()}</span>
+                              </div>
+                            </div>
+                            {isLink ? (
+                              <a href={content} target="_blank" rel="noreferrer" style={{ 
+                                background: 'linear-gradient(135deg, #0dcfcf, #0ba9a9)', 
+                                color: 'white', 
+                                padding: '6px 12px', 
+                                borderRadius: '6px', 
+                                fontSize: '0.7rem', 
+                                fontWeight: '800',
+                                textDecoration: 'none',
+                                boxShadow: '0 2px 4px rgba(13, 207, 207, 0.2)'
+                              }}>
+                                ABRIR
+                              </a>
+                            ) : (
+                              <button 
+                                onClick={() => setSelectedItem(item)}
+                                style={{ 
+                                  background: '#f1f5f9', 
+                                  color: '#475569', 
+                                  border: 'none', 
+                                  padding: '6px 12px', 
+                                  borderRadius: '6px', 
+                                  fontSize: '0.7rem', 
+                                  fontWeight: '800', 
+                                  cursor: 'pointer' 
+                                }}
+                              >
+                                LEER
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
             })}
+
             
             {/* Modal de Lectura para Pergamino */}
             {selectedItem && activeModal === 'Pergamino' && (

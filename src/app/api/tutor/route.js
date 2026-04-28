@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+
+export const dynamic = "force-dynamic";
 import { supabase } from '../../../lib/supabaseClient';
 import { PLANETS } from '../../../lib/planets';
 import { fetchResource } from '../notebooklm/fetcher';

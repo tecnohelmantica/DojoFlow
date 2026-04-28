@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
+import { getPlanetById } from '../lib/planets';
+
 const AuthContext = createContext({
   session: undefined,
   profile: null,
@@ -24,47 +26,143 @@ export default function AuthProvider({ children }) {
 
   // Sistema de Notificaciones Reales
   const fetchNotifications = async (userId, userRole) => {
-    if (!userId || userRole !== 'profesor') return;
+    if (!userId) return;
 
     try {
-      // 1. Obtener IDs de las clases del profesor
-      const { data: clases } = await supabase
-        .from('clases')
-        .select('id, nombre_clase')
-        .eq('profesor_id', userId);
-      
-      if (!clases || clases.length === 0) return;
-      const claseIds = clases.map(c => c.id);
+      if (userRole === 'profesor') {
+        // 1. Obtener IDs de las clases del profesor
+        const { data: clases } = await supabase
+          .from('clases')
+          .select('id, nombre_clase')
+          .eq('profesor_id', userId);
+        
+        if (!clases || clases.length === 0) {
+          setNotifications([]);
+          return;
+        }
+        const claseIds = clases.map(c => c.id);
 
-      // 2. Obtener IDs de todos los alumnos en esas clases
-      const { data: vincs } = await supabase
-        .from('clase_alumnos')
-        .select('alumno_id, clase_id')
-        .in('clase_id', claseIds);
-      
-      if (!vincs || vincs.length === 0) return;
-      const studentIds = [...new Set(vincs.map(v => v.alumno_id))];
+        // 2. Obtener IDs de todos los alumnos en esas clases
+        const { data: vincs } = await supabase
+          .from('clase_alumnos')
+          .select('alumno_id, clase_id')
+          .in('clase_id', claseIds);
+        
+        if (!vincs || vincs.length === 0) {
+          setNotifications([]);
+          return;
+        }
+        const studentIds = [...new Set(vincs.map(v => v.alumno_id))];
 
-      // 3. Contar retos pendientes de revisión (Regular + Ninja)
-      const [resRegular, resNinja] = await Promise.all([
-        supabase.from('explore_progress').select('student_id, planet_id').in('student_id', studentIds).eq('status', 'En revisión'),
-        supabase.from('user_challenges').select('student_id, challenge_id').in('student_id', studentIds).eq('status', 'En revisión')
-      ]);
+        // 3. Obtener retos pendientes con detalles (Joins con profiles)
+        const [resRegular, resNinja] = await Promise.all([
+          supabase.from('explore_progress')
+            .select('student_id, planet_id, status, profiles(alias, real_name)')
+            .in('student_id', studentIds)
+            .eq('status', 'En revisión')
+            .order('id', { ascending: false })
+            .limit(10),
+          supabase.from('user_challenges')
+            .select('student_id, challenge_id, planet_id, status, profiles(alias, real_name)')
+            .in('student_id', studentIds)
+            .eq('status', 'En revisión')
+            .order('id', { ascending: false })
+            .limit(10)
+        ]);
 
-      const totalPending = (resRegular.data?.length || 0) + (resNinja.data?.length || 0);
-      
-      const newNotifs = [];
-      if (totalPending > 0) {
-        newNotifs.push({
-          id: 'pending-reviews',
-          type: 'pending',
-          text: `Tienes ${totalPending} reto${totalPending > 1 ? 's' : ''} esperando tu validación.`,
-          time: 'Ahora',
-          count: totalPending
+        const newNotifs = [];
+
+        // Procesar retos regulares
+        (resRegular.data || []).forEach(r => {
+          const studentName = r.profiles?.alias || r.profiles?.real_name || 'Ninja';
+          const planet = getPlanetById(r.planet_id);
+          const planetName = planet?.name || r.planet_id;
+          
+          const studentVinc = vincs.find(v => v.alumno_id === r.student_id);
+          
+          newNotifs.push({
+            id: `reg-${r.student_id}-${r.planet_id}`,
+            type: 'pending',
+            text: `${studentName} solicita validación`,
+            subtext: `Completó hito en ${planetName}`,
+            href: studentVinc ? `/aulas?claseId=${studentVinc.clase_id}` : '/aulas',
+            time: 'Reciente'
+          });
         });
-      }
 
-      setNotifications(newNotifs);
+        // Procesar Retos Ninja
+        (resNinja.data || []).forEach(rn => {
+          const studentName = rn.profiles?.alias || rn.profiles?.real_name || 'Ninja';
+          const planet = getPlanetById(rn.planet_id);
+          const planetName = planet?.name || rn.planet_id;
+          const challengeName = rn.challenge_id?.split('_').pop()?.toUpperCase() || 'NINJA';
+          
+          const studentVinc = vincs.find(v => v.alumno_id === rn.student_id);
+          
+          newNotifs.push({
+            id: `ninja-${rn.student_id}-${rn.challenge_id}`,
+            type: 'pending',
+            text: `${studentName} envió Reto ${challengeName}`,
+            subtext: `Evidencia lista en ${planetName}`,
+            href: studentVinc ? `/aulas?claseId=${studentVinc.clase_id}` : '/aulas',
+            time: 'Ahora'
+          });
+        });
+
+        setNotifications(newNotifs);
+      } else {
+        // ROL ALUMNO: Ver feedback y validaciones de sus propios retos
+        const [resRegular, resNinja] = await Promise.all([
+          supabase.from('explore_progress')
+            .select('planet_id, status, teacher_feedback, updated_at')
+            .eq('student_id', userId)
+            .neq('status', 'No iniciado')
+            .neq('status', 'En revisión')
+            .order('updated_at', { ascending: false })
+            .limit(5),
+          supabase.from('user_challenges')
+            .select('challenge_id, planet_id, status, teacher_feedback, updated_at')
+            .eq('student_id', userId)
+            .neq('status', 'En revisión')
+            .order('updated_at', { ascending: false })
+            .limit(5)
+        ]);
+
+        const studentNotifs = [];
+
+        // Notificaciones de hitos de planeta
+        (resRegular.data || []).forEach(r => {
+          const planet = getPlanetById(r.planet_id);
+          if (r.status === 'Completado' || r.status === 'Validado') {
+            studentNotifs.push({
+              id: `st-reg-${r.planet_id}-${r.updated_at}`,
+              type: 'success',
+              text: `¡Hito validado en ${planet?.name || r.planet_id}!`,
+              subtext: r.teacher_feedback || 'Sigue explorando nuevas galaxias.',
+              href: `/profile?planet=${r.planet_id}`,
+              time: 'Reciente'
+            });
+          }
+        });
+
+        // Notificaciones de Retos Ninja
+        (resNinja.data || []).forEach(rn => {
+          const planet = getPlanetById(rn.planet_id);
+          const challengeName = rn.challenge_id.split('-').pop()?.replace('reto-', '').toUpperCase() || 'NINJA';
+          const isSuccess = rn.status === 'Validado';
+
+          studentNotifs.push({
+            id: `st-ninja-${rn.challenge_id}-${rn.updated_at}`,
+            type: isSuccess ? 'success' : (rn.status === 'Corregir' ? 'pending' : 'pending'),
+            text: isSuccess ? `¡Reto ${challengeName} Validado!` : (rn.status === 'Corregir' ? `Necesita Mejora: Reto ${challengeName}` : `Revisión: Reto ${challengeName}`),
+            subtext: rn.teacher_feedback || (isSuccess ? '¡Excelente trabajo, Ninja!' : 'El profesor ha dejado un comentario.'),
+            href: `/profile?planet=${rn.planet_id}&challengeId=${rn.challenge_id}`,
+            time: 'Ahora'
+          });
+        });
+
+        setNotifications(studentNotifs);
+      }
     } catch (err) {
       console.error('[AuthProvider] Error fetching notifications:', err);
     }
@@ -74,13 +172,13 @@ export default function AuthProvider({ children }) {
     if (profile) {
       fetchNotifications(profile.id, profile.role);
       
-      // Polling suave cada 5 minutos
-      const interval = setInterval(() => fetchNotifications(profile.id, profile.role), 1000 * 60 * 5);
+      const interval = setInterval(() => fetchNotifications(profile.id, profile.role), 1000 * 60 * 3);
       return () => clearInterval(interval);
     } else {
       setNotifications([]);
     }
   }, [profile]);
+
 
   const markNotificationsAsRead = () => {
     // Por ahora solo limpiamos visualmente

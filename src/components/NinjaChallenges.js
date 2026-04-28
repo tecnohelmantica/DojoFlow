@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import GlassCard from './GlassCard';
 import GlowButton from './GlowButton';
 import { supabase } from '../lib/supabaseClient';
@@ -43,6 +44,7 @@ import {
 import { getPlanetById } from '../lib/planets';
 
 export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcfcf', targetLevel = 'Junior', onValidateChallenge, isAutodidact = true, itinerary, refreshTrigger }) {
+  const searchParams = useSearchParams();
   const [challenges, setChallenges] = useState([]);
   const [expertChallenges, setExpertChallenges] = useState([]);
   const [raspberryL1, setRaspberryL1] = useState([]);
@@ -76,7 +78,75 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     if (planetId === 'tinkercad' && itinerary === 'codeblocks' && activeTab === 'tutorials') {
       setActiveTab('challenges');
     }
-  }, [planetId, userId, difficultyLevel, activeTab, itinerary, refreshTrigger]);
+  }, [planetId, userId, difficultyLevel, activeTab, itinerary, refreshTrigger, searchParams]);
+
+  // DEEP LINKING: Abrir reto desde notificación
+  useEffect(() => {
+    const targetId = searchParams.get('challengeId');
+    
+    if (targetId && !loading && Object.keys(userProgress).length > 0) {
+      // Función para buscar en una lista
+      const findAndOpen = (list, isTutorial = false) => {
+        const item = list.find(it => {
+          let cidWithId = isTutorial ? `${planetId}${itinerary ? '-' + itinerary : ''}-tutorial-${it.id}` : `${planetId}${itinerary ? '-' + itinerary : ''}-reto-${it.id || it.numero}`;
+          let cidWithNum = !isTutorial && it.id ? `${planetId}${itinerary ? '-' + itinerary : ''}-reto-${it.numero}` : null;
+          
+          if (planetId === 'code') {
+            if (activeTab === 'cursos_modernos') {
+              cidWithId = `${planetId}-reto-modern-${it.id}`;
+              cidWithNum = `${planetId}-reto-modern-${it.numero}`;
+            }
+            if (activeTab === 'hora_codigo') {
+              cidWithId = `${planetId}-reto-hoc-${it.id}`;
+              cidWithNum = `${planetId}-reto-hoc-${it.numero}`;
+            }
+            if (activeTab === 'hour_of_ai') {
+              cidWithId = `${planetId}-reto-ai-${it.id}`;
+              cidWithNum = `${planetId}-reto-ai-${it.numero}`;
+            }
+          }
+          if (planetId === 'python') {
+            if (itinerary === 'codedex') {
+              const levelCode = activeTab === 'codedex_beginner' ? 'beg' : (activeTab === 'codedex_intermediate' ? 'int' : 'adv');
+              cidWithId = `${planetId}-reto-codedex-${levelCode}-${it.id}`;
+              cidWithNum = `${planetId}-reto-codedex-${levelCode}-${it.numero}`;
+            } else {
+              cidWithId = `${planetId}-${itinerary}-reto-${it.id}`;
+              cidWithNum = `${planetId}-${itinerary}-reto-${it.numero}`;
+            }
+          }
+
+          return cidWithId === targetId || (cidWithNum && cidWithNum === targetId);
+        });
+        
+        if (item) {
+          setSelectedTutorial(item);
+          return true;
+        }
+        return false;
+      };
+
+      // Buscar en todas las listas posibles
+      const found = findAndOpen(challenges) || 
+                    findAndOpen(expertChallenges) || 
+                    findAndOpen(tutorialsList, true) ||
+                    findAndOpen(raspberryL1) ||
+                    findAndOpen(raspberryL2) ||
+                    findAndOpen(codeModern) ||
+                    findAndOpen(codeHourOfCode) ||
+                    findAndOpen(codeHourOfAI) ||
+                    findAndOpen(pythonCodedexBeginner) ||
+                    findAndOpen(pythonCodedexIntermediate) ||
+                    findAndOpen(pythonCodedexAdvanced) ||
+                    findAndOpen(arduinoTutorials, true);
+
+      if (found) {
+        // Limpiar el parámetro para no re-abrirlo si el usuario cierra el modal y navega
+        const newUrl = window.location.pathname + (window.location.search.replace(/&?challengeId=[^&]*/, '').replace(/^\?$/, ''));
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [loading, userProgress, challenges]);
 
   const loadData = async () => {
     setLoading(true);
@@ -244,7 +314,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   };
 
   const handleAction = async (challenge, type = 'challenge') => {
-    const idSuffix = type === 'tutorial' ? `tutorial-${challenge.id}` : `reto-${challenge.numero}`;
+    const idSuffix = type === 'tutorial' ? `tutorial-${challenge.id}` : `reto-${challenge.id || challenge.numero}`;
     const challengeId = `${planetId}${itinerary ? '-' + itinerary : ''}-${idSuffix}`;
     const currentStatus = userProgress[challengeId]?.status || 'No iniciado';
 
@@ -352,15 +422,15 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   // Calculate total challenges for this planet/itinerary
   const totalChallengesCount = planetId === 'scratch' ? 78 : (difficultyChallenges ? (Object.values(difficultyChallenges).flat().length) : challenges.length);
   const difficultyProgress = difficultyChallenges ? {
-    beginner: difficultyChallenges.beginner.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.numero || c.id}`]?.status === 'Validado').length,
-    intermediate: difficultyChallenges.intermediate.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.numero || c.id}`]?.status === 'Validado').length,
-    advanced: difficultyChallenges.advanced.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.numero || c.id}`]?.status === 'Validado').length
+    beginner: difficultyChallenges.beginner.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.id || c.numero}`]?.status === 'Validado').length,
+    intermediate: difficultyChallenges.intermediate.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.id || c.numero}`]?.status === 'Validado').length,
+    advanced: difficultyChallenges.advanced.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.id || c.numero}`]?.status === 'Validado').length
   } : null;
 
-  const challengesCompleted = challenges.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.numero || c.id}`]?.status === 'Validado').length;
-  const expertChallengesCompleted = expertChallenges.filter(c => userProgress[`${planetId}-reto-${c.numero || c.id}`]?.status === 'Validado').length;
-  const l1Completed = raspberryL1.filter(c => userProgress[`${planetId}-reto-${c.id}`]?.status === 'Validado').length;
-  const l2Completed = raspberryL2.filter(c => userProgress[`${planetId}-reto-${c.id}`]?.status === 'Validado').length;
+  const challengesCompleted = challenges.filter(c => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-reto-${c.id || c.numero}`]?.status === 'Validado').length;
+  const expertChallengesCompleted = expertChallenges.filter(c => userProgress[`${planetId}-reto-${c.id || c.numero}`]?.status === 'Validado').length;
+  const l1Completed = raspberryL1.filter(c => userProgress[`${planetId}-reto-${c.id || c.numero}`]?.status === 'Validado').length;
+  const l2Completed = raspberryL2.filter(c => userProgress[`${planetId}-reto-${c.id || c.numero}`]?.status === 'Validado').length;
   
   const codeModernCompleted = codeModern.filter(c => userProgress[`${planetId}-reto-modern-${c.id}`]?.status === 'Validado').length;
   const codeHourOfCodeCompleted = codeHourOfCode.filter(c => userProgress[`${planetId}-reto-hoc-${c.id}`]?.status === 'Validado').length;
@@ -482,7 +552,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
 
   const renderChallengeCard = (item, isTutorialTab) => {
     const num = item.numero || item.id;
-    let challengeId = isTutorialTab ? `${planetId}${itinerary ? '-' + itinerary : ''}-tutorial-${item.id}` : `${planetId}${itinerary ? '-' + itinerary : ''}-reto-${item.id || item.numero}`;
+    const idSuffix = isTutorialTab ? `tutorial-${item.id}` : `reto-${item.id || item.numero}`;
+    let challengeId = `${planetId}${itinerary ? '-' + itinerary : ''}-${idSuffix}`;
+    let fallbackId = !isTutorialTab && item.id ? `${planetId}${itinerary ? '-' + itinerary : ''}-reto-${item.numero}` : null;
     
     // Especial para code.org
     if (planetId === 'code') {
@@ -500,7 +572,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       }
     }
 
-    const status = userProgress[challengeId]?.status || 'No iniciado';
+    const currentProgress = userProgress[challengeId] || (fallbackId ? userProgress[fallbackId] : null);
+    const status = currentProgress?.status || 'No iniciado';
     const isSelected = selectedTutorial ? (isTutorialTab ? selectedTutorial.id === item.id : selectedTutorial.numero === item.numero) : false;
     
     return (
@@ -868,6 +941,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
               const currentItem = selectedTutorial;
               const isTutorial = activeTab === 'tutorials' || activeTab === 'tutorials_3d' || activeTab === 'tutorials_codeblocks';
               let progressKey = isTutorial ? `${planetId}${itinerary ? '-' + itinerary : ''}-tutorial-${currentItem.id}` : `${planetId}${itinerary ? '-' + itinerary : ''}-reto-${currentItem.id || currentItem.numero}`;
+              let fallbackKey = !isTutorial && currentItem.id ? `${planetId}${itinerary ? '-' + itinerary : ''}-reto-${currentItem.numero}` : null;
               
               if (planetId === 'code') {
                 if (activeTab === 'cursos_modernos') progressKey = `${planetId}-reto-modern-${currentItem.id}`;
@@ -880,7 +954,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                 progressKey = `${planetId}-reto-codedex-${levelCode}-${currentItem.id}`;
               }
 
-              const currentProgress = userProgress[progressKey];
+              const currentProgress = userProgress[progressKey] || (fallbackKey ? userProgress[fallbackKey] : null);
 
               return (
                 <div style={{ margin: '-30px -30px 0 -30px' }}>

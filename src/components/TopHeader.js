@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { LogOut, Bell, User, CheckCircle, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { LogOut, Bell, User, CheckCircle, Clock, Trophy } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 
 const TopHeader = () => {
@@ -38,7 +39,11 @@ const TopHeader = () => {
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
-            <User size={18} color="#666" />
+            <img 
+              src={isProfesor ? "/profesor.png" : "/alumno.png"} 
+              alt="Profile" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -117,13 +122,23 @@ const TopHeader = () => {
                 <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                   {notifications.length > 0 ? (
                     notifications.map(notif => (
-                      <div key={notif.id} style={{ 
-                        padding: '12px 15px', 
-                        borderBottom: '1px solid #f8f8f8',
-                        display: 'flex',
-                        gap: '12px',
-                        cursor: 'pointer'
-                      }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f9f9ff'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}>
+                      <Link 
+                        key={notif.id} 
+                        href={notif.href || '#'}
+                        style={{ 
+                          padding: '12px 15px', 
+                          borderBottom: '1px solid #f8f8f8',
+                          display: 'flex',
+                          gap: '12px',
+                          cursor: 'pointer',
+                          textDecoration: 'none',
+                          color: 'inherit',
+                          transition: 'background 0.2s'
+                        }} 
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f9f9ff'} 
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                        onClick={() => setShowNotifications(false)}
+                      >
                         <div style={{ 
                           width: '32px', 
                           height: '32px', 
@@ -134,13 +149,14 @@ const TopHeader = () => {
                           justifyContent: 'center',
                           flexShrink: 0
                         }}>
-                          {notif.type === 'pending' ? <Clock size={16} color="#ff922b" /> : <CheckCircle size={16} color="#40c057" />}
+                          {notif.type === 'pending' ? <Trophy size={16} color="#ff922b" /> : <CheckCircle size={16} color="#40c057" />}
                         </div>
-                        <div>
-                          <p style={{ fontSize: '0.8rem', margin: 0, color: '#333', lineHeight: '1.4' }}>{notif.text}</p>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: '0.8rem', margin: 0, color: '#1a1a2e', lineHeight: '1.4', fontWeight: '600' }}>{notif.text}</p>
+                          {notif.subtext && <p style={{ fontSize: '0.7rem', margin: '2px 0', color: '#666' }}>{notif.subtext}</p>}
                           <span style={{ fontSize: '0.7rem', color: '#999' }}>{notif.time}</span>
                         </div>
-                      </div>
+                      </Link>
                     ))
                   ) : (
                     <div style={{ padding: '40px 20px', textAlign: 'center', color: '#8a8a9e' }}>
@@ -149,9 +165,37 @@ const TopHeader = () => {
                     </div>
                   )}
                 </div>
-                <div style={{ padding: '12px', textAlign: 'center', background: '#fcfcfc' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#666', fontWeight: '600' }}>Ver todo el historial</span>
-                </div>
+                {isProfesor ? (
+                  <Link 
+                    href="/aulas" 
+                    onClick={() => setShowNotifications(false)}
+                    style={{ 
+                      padding: '12px', 
+                      textAlign: 'center', 
+                      background: '#fcfcfc', 
+                      display: 'block', 
+                      textDecoration: 'none',
+                      borderTop: '1px solid #f0f0f0'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: '700' }}>Ir al Centro de Aulas</span>
+                  </Link>
+                ) : (
+                  <Link 
+                    href="/profile" 
+                    onClick={() => setShowNotifications(false)}
+                    style={{ 
+                      padding: '12px', 
+                      textAlign: 'center', 
+                      background: '#fcfcfc', 
+                      display: 'block', 
+                      textDecoration: 'none',
+                      borderTop: '1px solid #f0f0f0'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: '700' }}>Ver mi Perfil y Progreso</span>
+                  </Link>
+                )}
               </div>
             )}
           </div>
