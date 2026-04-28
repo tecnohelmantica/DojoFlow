@@ -8,7 +8,7 @@ export const PLANETS = [
     color: '#e8fffc', 
     barColor: '#128989', 
     url: 'https://studio.code.org/courses/express-2025/units/1?redirect_warning=true', 
-    notebook: 'd681005a-3511-4091-a589-98008552431d', 
+    notebook: '77fcaf3a-3696-44b7-9e9e-d972df69c5c6', 
     subtitle: 'Fundamentos del pensamiento computacional.',
     description: 'Academia Digital: Fundamentos del pensamiento computacional y proyectos avanzados.',
     recommendation: 'Elige entre los Cursos Modernos, la Hora del Código o explora retos avanzados de IA.',
@@ -113,11 +113,16 @@ export const PLANETS = [
     icon: 'Cpu',
     color: '#e6f7ff', 
     barColor: '#0097e6', 
-    url: 'https://www.tinkercad.com/circuits', 
-    notebook: '5b497042-3e3c-42cc-a006-25ccdf5c938d', 
+    url: 'https://www.tinkercad.com/dashboard?type=circuits', 
+    notebook: '967f99ef-b072-4163-95d2-a9a7d2d982f6', 
     subtitle: 'Robótica y electrónica textual.',
     description: 'Programación de microcontroladores y circuitos electrónicos.',
-    recommendation: 'En este sector usamos C++ textual. Prueba el circuito de Blink Leds.'
+    recommendation: 'En este sector usamos C++ textual. Puedes programar en línea con Tinkercad o Wokwi, o usar el IDE de Arduino oficial instalado en tu ordenador para proyectos físicos.',
+    buttons: [
+      { label: 'TINKERCAD CIRCUITS', url: 'https://www.tinkercad.com/dashboard?type=circuits', color: 'teal' },
+      { label: 'WOKWI SIMULATOR', url: 'https://wokwi.com/arduino', color: 'blue' }
+    ],
+    attribution: "Contenidos y retos adaptados de: Angel Micelti (angelmicelti.github.io), Luis Llamas (luisllamas.es), Makinando (makinando.github.io), Lope González (lopegonzalez.es) y Autodesk Tinkercad Circuits."
   },
   { 
     id: 'appinventor', 
@@ -127,7 +132,7 @@ export const PLANETS = [
     color: '#e6ffec', 
     barColor: '#00cc55', 
     url: 'https://ai2.appinventor.mit.edu/', 
-    notebook: '6638006e-827c-4734-9ca9-26d9c8828065', 
+    notebook: '0140cffe-b3f5-4b83-bec3-f3639c156757', 
     subtitle: 'Creación de aplicaciones móviles.',
     description: 'Desarrolla aplicaciones para Android y iOS usando bloques.',
     recommendation: 'Necesitarás un dispositivo real o el emulador para ver tus apps funcionar.'
@@ -140,7 +145,7 @@ export const PLANETS = [
     color: '#f5e6ff', 
     barColor: '#9c27b0', 
     url: 'https://www.learningml.org/editor/', 
-    notebook: 'c829007e-855a-449e-b989-53685552425d', 
+    notebook: '468cee10-db1f-43b9-b063-bad9f37bcf45', 
     subtitle: 'Entrenamiento de modelos de IA.',
     description: 'Descubre cómo las máquinas aprenden entrenando tus propios modelos.',
     recommendation: 'Empieza con el reconocimiento de imágenes: es lo más visual y divertido.'
@@ -155,10 +160,14 @@ export const PLANETS = [
     textStroke: '0.5px #306998', 
     titleGradient: 'linear-gradient(90deg, #306998, #ffd43b)',
     url: 'https://replit.com', 
-    notebook: '6458204b-707d-411a-8217-099a805c6012', 
+    notebook: '107d8e9a-01c2-4b96-8a45-2b77e63e213b', 
     subtitle: 'Scripting planetario y backend.',
     description: 'Lenguaje de programación profesional para ciencia de datos y web.',
-    recommendation: 'Domina los tipos de datos básicos antes de saltar a las funciones.'
+    recommendation: 'Domina los tipos de datos básicos antes de saltar a las funciones.',
+    buttons: [
+      { label: 'TRINKET OFICIAL', url: 'https://trinket.io/python3', color: 'teal' },
+      { label: 'REPLIT OFICIAL', url: 'https://replit.com', color: 'blue' }
+    ]
   },
   { 
     id: 'html', 
@@ -168,7 +177,7 @@ export const PLANETS = [
     color: '#fff5f2', 
     barColor: '#e44d26', 
     url: 'https://codepen.io/pen/', 
-    notebook: '9468007a-855c-449e-b989-53685552425d', 
+    notebook: '6007d3b0-a4c5-4785-8310-8b259f04b28a', 
     subtitle: 'Construcción de Front-end.',
     description: 'Crea la estructura y el estilo de la web moderna.',
     recommendation: 'CSS es la clave para que tu web se vea profesional. ¡No le tengas miedo!'

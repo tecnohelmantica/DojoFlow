@@ -1,0 +1,8 @@
+Code.org es una plataforma líder para aprender programación de forma visual.
+Se basa en el lenguaje Blockly, que permite arrastrar bloques de código para construir algoritmos.
+
+Sus cursos están diseñados para alumnos de todas las edades, desde primaria hasta bachillerato.
+En DojoFlow, usamos Code.org para enseñar conceptos fundamentales como bucles, condicionales y funciones de una manera lúdica.
+
+El objetivo del planeta Code.org en nuestra plataforma es que los alumnos completen retos y obtengan insignias de "Ninja de Código".
+Cada insignia representa un nivel de maestría alcanzado en la programación visual.

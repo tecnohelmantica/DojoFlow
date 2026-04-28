@@ -1,0 +1,7 @@
+[0428/054443.461:INFO:CONSOLE:469] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.8tJAv8mZf9w.es5.O/am=Kf8GAABCEUgGwP___zcAIACCaOB6FoAmEBkAAAAAAAAAALBCAAAaAQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlFWL3WyKsIrFVf0YeRriayoTukHQQ/dti=1/m=_b,_tp (469)
+[0428/054443.464:INFO:CONSOLE:469] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
+Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.8tJAv8mZf9w.es5.O/am=Kf8GAABCEUgGwP___zcAIACCaOB6FoAmEBkAAAAAAAAAALBCAAAaAQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlFWL3WyKsIrFVf0YeRriayoTukHQQ/dti=1/m=_b,_tp (469)
+[0428/054443.958:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0428/054443.958:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0428/054444.141:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0428/054444.142:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.

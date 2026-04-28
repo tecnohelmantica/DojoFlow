@@ -5,7 +5,7 @@ import { Castle, Trophy, MessageSquare, BookOpen, Users, BrainCircuit, UserCircl
 import { useAuth } from './AuthProvider';
 import { getPlanetById } from '@/lib/planets';
 
-export default function Navigation() {
+export default function Navigation({ onOpenModal }) {
   const { session, role, loading } = useAuth();
   const pathname = usePathname();
 
@@ -31,17 +31,31 @@ export default function Navigation() {
     { name: 'Perfil', href: '/profile', icon: UserCircle },
   ] : [
     { name: 'Dojo', href: '/', icon: Castle },
-    { name: 'Retos', href: '/retos', icon: Trophy },
-    { name: 'Tutor', href: '/tutor', icon: MessageSquare },
-    { name: 'Pergamino', href: '/pergamino', icon: BookOpen },
+    { name: 'Retos', icon: Trophy, isModal: true },
+    { name: 'Tutor', icon: MessageSquare, isModal: true },
+    { name: 'Pergamino', icon: BookOpen, isModal: true },
   ];
 
   return (
     <nav className="global-navbar" style={{ '--current-accent': themeColor }}>
       {navItems.map((item) => {
         const Icon = item.icon;
-        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+        const isActive = !item.isModal && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
         
+        if (item.isModal) {
+          return (
+            <button 
+              key={item.name} 
+              onClick={() => onOpenModal(item.name)}
+              className="nav-item"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <Icon className="nav-icon" />
+              <span>{item.name}</span>
+            </button>
+          );
+        }
+
         return (
           <Link 
             key={item.name} 

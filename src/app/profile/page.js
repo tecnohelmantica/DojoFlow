@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../components/AuthProvider';
 import TopHeader from '../../components/TopHeader';
 import NinjaChallenges from '../../components/NinjaChallenges';
+import SenseiMissions from '../../components/SenseiMissions';
 import { getPlanetById } from '../../lib/planets';
 import ResourceUploader from '../../components/ResourceUploader';
 import CodeBadges from '../../components/CodeBadges';
@@ -56,10 +57,12 @@ function ProfileContent() {
   const searchParams = useSearchParams();
   const activePlanet = searchParams.get('planet') || 'scratch';
 
-  const [messages, setMessages] = useState([
+  const [socraticMessages, setSocraticMessages] = useState([
     { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${getPlanetById(activePlanet)?.name || activePlanet.toUpperCase()}. ¿En qué puedo ayudarte hoy?` }
   ]);
-  const [inputText, setInputText] = useState('');
+  const [socraticInputText, setSocraticInputText] = useState('');
+  const [validationMessages, setValidationMessages] = useState([]);
+  const [validationInputText, setValidationInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isNinjaValidator, setIsNinjaValidator] = useState(false);
   const [evidenceStatus, setEvidenceStatus] = useState('No Iniciado');
@@ -78,7 +81,10 @@ function ProfileContent() {
   const [tempEmail, setTempEmail] = useState('');
   const [validatingBadge, setValidatingBadge] = useState(null);
   const [validatingChallenge, setValidatingChallenge] = useState(null);
+  const [validatingSenseiMission, setValidatingSenseiMission] = useState(null);
   const [badgeRefreshTrigger, setBadgeRefreshTrigger] = useState(0);
+  const [challengeRefreshTrigger, setChallengeRefreshTrigger] = useState(0);
+  const [senseiRefreshTrigger, setSenseiRefreshTrigger] = useState(0);
 
   const [assessmentCompleted, setAssessmentCompleted] = useState(false);
   const [studentLevel, setStudentLevel] = useState('Junior');
@@ -592,49 +598,86 @@ function ProfileContent() {
     );
   }
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
-    const userMessage = inputText;
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setInputText('');
+  const handleSendSocratic = async () => {
+    if (!socraticInputText.trim()) return;
+    const userMessage = socraticInputText;
+    setSocraticMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setSocraticInputText('');
     setIsTyping(true);
     try {
       const res = await fetch('/api/tutor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          mode: (isNinjaValidator || validatingBadge) ? 'validador' : 'tutor', 
+          mode: 'tutor', 
           message: userMessage, 
-          history: [...messages, { role: 'user', text: userMessage }],
-          planet: activePlanet 
+          history: socraticMessages.map(m => ({ role: m.role === 'tutor' ? 'model' : 'user', content: m.text })),
+          planet: activePlanet,
+          userId: session.user.id,
+          level: studentLevel
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.text) {
+        setSocraticMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
+      } else {
+        setSocraticMessages(prev => [...prev, { 
+          role: 'tutor', 
+          text: `⚠️ **Sensei en Meditación**: ${data.error || 'No puedo responder ahora mismo.'} Inténtalo de nuevo en unos minutos.` 
+        }]);
+      }
+    } catch (err) {
+      console.error("Error en chat socrático:", err);
+      setSocraticMessages(prev => [...prev, { 
+        role: 'tutor', 
+        text: '⚠️ **Fallo Neural**: Mis sensores están bloqueados.' 
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleSendValidation = async () => {
+    if (!validationInputText.trim()) return;
+    const userMessage = validationInputText;
+    setValidationMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setValidationInputText('');
+    setIsTyping(true);
+    try {
+      const res = await fetch('/api/tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          mode: 'validador', 
+          message: userMessage, 
+          history: validationMessages.map(m => ({ 
+            role: m.role === 'tutor' ? 'model' : 'user', 
+            content: m.text 
+          })),
+          planet: activePlanet,
+          userId: session.user.id,
+          level: studentLevel
         })
       });
       const data = await res.json();
       
       if (data.success && data.text) {
-        setMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
+        setValidationMessages(prev => [...prev, { role: 'tutor', text: data.text }]);
         
-        // Lógica de Validación (Solo si la respuesta fue exitosa)
         if (data.text.includes('[VALIDADO]')) {
           if (validatingBadge) {
-            // Guardar Insignia en Supabase
             const { error } = await supabase.from('badges').insert({
               student_id: session.user.id,
               planet_id: 'code',
               badge_name: validatingBadge.id
             });
-            
             if (!error) {
               setBadgeRefreshTrigger(prev => prev + 1);
-              setMessages(prev => [...prev, { role: 'tutor', text: `¡Felicidades! Has ganado la insignia de ${validatingBadge.name}. Ya brilla en tu perfil.` }]);
-              
-              setTimeout(() => {
-                setIsChatModalOpen(false);
-              }, 4500);
+              setValidationMessages(prev => [...prev, { role: 'tutor', text: `¡Felicidades! Has ganado la insignia de ${validatingBadge.name}. Ya brilla en tu perfil.` }]);
+              setTimeout(() => setIsChatModalOpen(false), 4500);
             }
             setValidatingBadge(null);
           } else if (isNinjaValidator && validatingChallenge) {
-            // Guardar Validación de Reto en Supabase
             const { error } = await supabase
               .from('user_challenges')
               .update({ status: 'Validado' })
@@ -644,33 +687,42 @@ function ProfileContent() {
             if (!error) {
               setIsNinjaValidator(false);
               setValidatingChallenge(null);
-              setMessages(prev => [...prev, { role: 'tutor', text: `¡Excelente explicación! He validado oficialmente tu reto. Tu progreso ha sido registrado en el Dojo.` }]);
-              
-              setTimeout(() => {
-                setIsChatModalOpen(false);
-              }, 4500);
+              setChallengeRefreshTrigger(prev => prev + 1);
+              setValidationMessages(prev => [...prev, { role: 'tutor', text: `¡Excelente explicación! He validado oficialmente tu reto. Tu progreso ha sido registrado en el Dojo.` }]);
+              setTimeout(() => setIsChatModalOpen(false), 4500);
+            }
+          } else if (validatingSenseiMission) {
+            const { error } = await supabase
+              .from('sensei_missions')
+              .update({ status: 'completed', completed_at: new Date().toISOString() })
+              .eq('id', validatingSenseiMission.id);
+
+            if (!error) {
+              setValidatingSenseiMission(null);
+              setSenseiRefreshTrigger(prev => prev + 1);
+              setValidationMessages(prev => [...prev, { role: 'tutor', text: `¡Misión Cumplida! Has demostrado maestría en este desafío especial. ¡Eres una leyenda del Dojo!` }]);
+              setTimeout(() => setIsChatModalOpen(false), 4500);
             }
           }
         }
       } else {
-        // Error controlado desde la API (ej: cuota agotada)
-        setMessages(prev => [...prev, { 
+        setValidationMessages(prev => [...prev, { 
           role: 'tutor', 
-          text: `⚠️ **Sensei en Meditación**: ${data.error || 'No puedo responder ahora mismo.'} Inténtalo de nuevo en unos minutos.` 
+          text: `⚠️ **Sensei en Meditación**: ${data.error || 'No puedo responder ahora mismo.'}` 
         }]);
       }
     } catch (err) {
-      console.error("Error en chat:", err);
-      setMessages(prev => [...prev, { 
+      console.error("Error en validación:", err);
+      setValidationMessages(prev => [...prev, { 
         role: 'tutor', 
-        text: '⚠️ **Fallo Neural**: Mis sensores están bloqueados. Verifica tu conexión o la API Key.' 
+        text: '⚠️ **Fallo Neural**: Los servidores de validación no responden.' 
       }]);
     } finally {
       setIsTyping(false);
     }
   };
 
-  const handleStartBadgeValidation = (badge) => {
+  const handleStartBadgeValidation = async (badge) => {
     setValidatingBadge(badge);
     setIsChatModalOpen(true); 
     
@@ -679,12 +731,28 @@ function ProfileContent() {
     
     if (!isAutodidact) {
       // 🏫 CASO: Con Profesor
-      const initialMessages = [
-        { role: 'user', text: `¡Hola! He completado la sección de **${badge.name}** en Code.org. He enviado una solicitud de validación a mi profesor.` },
-        { role: 'tutor', text: `¡Entendido, Explorer! He enviado tu solicitud de validación de **${badge.name}** a tu profesor. En cuanto la revise, tu insignia se iluminará en el perfil. ¡Buen trabajo!` }
-      ];
-      setMessages(initialMessages);
-      console.log("Enviando solicitud al profesor para el badge:", badge.id);
+      try {
+        const { error } = await supabase.from('badges').upsert({
+          student_id: session.user.id,
+          planet_id: 'code',
+          badge_name: badge.id,
+          status: 'En revisión'
+        }, { onConflict: 'student_id, badge_name' });
+
+        if (error) throw error;
+
+        const initialMessages = [
+          { role: 'user', text: `¡Hola! He completado la sección de **${badge.name}** en Code.org. He enviado una solicitud de validación a mi profesor.` },
+          { role: 'tutor', text: `¡Entendido, Explorer! He enviado tu solicitud de validación de **${badge.name}** a tu profesor. En cuanto la revise, tu insignia se iluminará en el perfil. ¡Buen trabajo!` }
+        ];
+        setValidationMessages(initialMessages);
+        setBadgeRefreshTrigger(prev => prev + 1);
+      } catch (err) {
+        console.error("Error al enviar badge a revisión:", err);
+        setValidationMessages([
+          { role: 'tutor', text: `⚠️ **Error de Comunicación**: No he podido enviar la solicitud a tu profesor. Por favor, inténtalo de nuevo.` }
+        ]);
+      }
       return;
     }
 
@@ -705,28 +773,45 @@ function ProfileContent() {
       }
     ];
     
-    setMessages(initialMessages);
+    setValidationMessages(initialMessages);
   };
 
-  const handleStartChallengeValidation = (challenge, evidenceUrl, challengeId) => {
+  const handleStartSenseiMissionValidation = (mission) => {
+    setValidatingSenseiMission(mission);
+    setIsChatModalOpen(true);
+    
+    const startMsg = `¡Sensei! He completado la Misión Especial: **${mission.title}**. Estoy listo para demostrar que he cumplido el objetivo: ${mission.objective}.`;
+    
+    setValidationMessages([
+      { role: 'user', text: startMsg },
+      { role: 'tutor', text: `¡Excelente, Explorer! Me alegra ver que has aceptado el desafío. Para validar esta misión, explícame: ¿cómo has logrado resolver el objetivo y qué obstáculos encontraste en el camino?` }
+    ]);
+  };
+
+  const handleStartChallengeValidation = (challenge, evidenceUrl, challengeId, evidenceFileUrl) => {
     setValidatingChallenge({ ...challenge, fullId: challengeId });
     setIsNinjaValidator(true);
     setIsChatModalOpen(true);
     
     const title = challenge.titulo || challenge.title || challenge.name || "Reto Ninja";
-    const startMsg = `¡Hola Sensei! He completado el reto **${title}** en ${getPlanetById(activePlanet)?.name}. Aquí está mi evidencia: ${evidenceUrl || 'No adjunta'}. Quiero demostrar lo que he aprendido para validar este reto.`;
+    const evidenceTxt = [
+      evidenceUrl ? `Enlace: ${evidenceUrl}` : null,
+      evidenceFileUrl ? `Archivo adjunto: ${evidenceFileUrl.split('/').pop()}` : null
+    ].filter(Boolean).join(' y ');
+
+    const startMsg = `¡Hola Sensei! He completado el reto **${title}** en ${getPlanetById(activePlanet)?.name}. Aquí está mi evidencia (${evidenceTxt || 'No adjunta'}). Quiero demostrar lo que he aprendido para validar este reto.`;
 
     if (!isAutodidact) {
       // 🏫 CASO: Con Profesor
-      setMessages([
-        { role: 'user', text: `¡Hola! He completado el reto **${title}**. He enviado la evidencia a mi profesor.` },
+      setValidationMessages([
+        { role: 'user', text: `¡Hola! He completado el reto **${title}**. He enviado la evidencia (${evidenceTxt}) a mi profesor.` },
         { role: 'tutor', text: `¡Excelente trabajo, Explorer! He recibido tu entrega para **${title}**. Tu profesor la revisará pronto y verás el estado actualizado en tu itinerario. ¡Sigue así!` }
       ]);
       return;
     }
 
     // 🤖 CASO: Autodidacta
-    setMessages([
+    setValidationMessages([
       { role: 'user', text: startMsg },
       { role: 'tutor', text: `¡Felicidades por terminar **${title}**! Veo que has enviado tu evidencia. Para validarla oficialmente, ¿podrías explicarme brevemente qué lógica has usado para resolver la parte más difícil del reto?` }
     ]);
@@ -863,15 +948,22 @@ function ProfileContent() {
           </div>
           <GlassCard className="tutor-card">
             <div className="chat-thread" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-              {messages.map((msg, index) => (
+              {socraticMessages.map((msg, index) => (
                 <div key={index} className={`chat-bubble ${msg.role === 'tutor' ? 'tutor-bubble' : 'user-bubble'}`}>
                   <p>{msg.text}</p>
                 </div>
               ))}
             </div>
             <div className="chat-input-row">
-              <input type="text" placeholder="Haz una consulta socrática..." className="tutor-input" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} />
-              <button className="tutor-send-btn" onClick={handleSendMessage}><Send size={18} /></button>
+              <input 
+                type="text" 
+                placeholder="Haz una consulta socrática..." 
+                className="tutor-input" 
+                value={socraticInputText} 
+                onChange={(e) => setSocraticInputText(e.target.value)} 
+                onKeyDown={(e) => e.key === 'Enter' && handleSendSocratic()} 
+              />
+              <button className="tutor-send-btn" onClick={handleSendSocratic}><Send size={18} /></button>
             </div>
           </GlassCard>
         </div>
@@ -1158,16 +1250,84 @@ function ProfileContent() {
             </div>
           )}
         </div>
+        
+        {/* 📘 CURSO RECOMENDADO: ARDUINO DESDE CERO (LUIS LLAMAS) */}
+        {activePlanet === 'arduino' && (
+          <div style={{ marginTop: '30px', animation: 'fadeIn 0.6s ease-out' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '15px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+              <BookOpen size={18} color="#0097e6" /> RECURSO EXTERNO RECOMENDADO
+            </h3>
+            
+            <div style={{ 
+              background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+              borderRadius: '24px',
+              padding: '30px',
+              border: '1px solid rgba(0, 151, 230, 0.1)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '30px',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Decoración de fondo */}
+              <div style={{ 
+                position: 'absolute', 
+                top: '-20px', 
+                right: '-20px', 
+                width: '150px', 
+                height: '150px', 
+                background: 'rgba(0, 151, 230, 0.05)', 
+                borderRadius: '50%',
+                zIndex: 0
+              }} />
 
-        {/* 🥷 RETOS NINJA DEL DOJO (Solo si no es Code.org) */}
-        {activePlanet !== 'tinkercad' && !getPlanetById(activePlanet)?.noChallenges && (
+              <div style={{ 
+                width: '100px', 
+                height: '100px', 
+                background: 'white', 
+                borderRadius: '20px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                boxShadow: '0 10px 20px rgba(0,151,230,0.1)',
+                flexShrink: 0,
+                zIndex: 1
+              }}>
+                <Cpu size={48} color="#0097e6" />
+              </div>
+
+              <div style={{ flex: 1, zIndex: 1 }}>
+                <h4 style={{ fontFamily: 'Outfit', fontSize: '1.4rem', fontWeight: '900', color: '#1a1a2e', marginBottom: '8px' }}>
+                  Arduino desde Cero (Luis Llamas)
+                </h4>
+                <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: '1.5', maxWidth: '600px', marginBottom: '20px' }}>
+                  Aprende la electrónica y programación textual de Arduino con uno de los mejores cursos en español. Ideal para dar el salto definitivo de los bloques al código real C++.
+                </p>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <GlowButton 
+                    color="blue" 
+                    onClick={() => window.open('https://www.luisllamas.es/arduino-desde-cero/', '_blank')}
+                    style={{ padding: '12px 25px', borderRadius: '12px' }}
+                  >
+                    <ExternalLink size={18} style={{ marginRight: '10px' }} /> EMPEZAR CURSO AHORA
+                  </GlowButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 🥷 RETOS NINJA DEL DOJO (Solo si no es Code.org, Tinkercad o Python) */}
+        {activePlanet !== 'code' && activePlanet !== 'tinkercad' && activePlanet !== 'python' && !getPlanetById(activePlanet)?.noChallenges && (
           <div className="challenges-section" style={{ marginTop: '30px' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
               <Zap size={18} color={getPlanetById(activePlanet)?.barColor || '#0dcfcf'} /> {activePlanet === 'makecode-arcade' ? 'ITINERARIO WE TEACH ROBOTICS' : `ITINERARIO NINJA ${getPlanetById(activePlanet)?.name?.toUpperCase()}`}
             </h3>
             <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-              Consigue una insignia galáctica por cada {activePlanet === 'makecode-arcade' ? '3 retos We Teach Robotics' : '10 retos ninja'} completados (los tutoriales de la academia no cuentan para las insignias).
+              Solicita tu insignia galáctica cuando hayas completado los retos de cada nivel y superado la validación del Sensei o de tu profesor.
             </p>
+
             <NinjaChallenges
               planetId={activePlanet}
               userId={session?.user?.id}
@@ -1175,6 +1335,34 @@ function ProfileContent() {
               targetLevel={studentLevel}
               onValidateChallenge={handleStartChallengeValidation}
               isAutodidact={isAutodidact}
+              refreshTrigger={challengeRefreshTrigger}
+            />
+
+            <SenseiMissions 
+              planetId={activePlanet}
+              userId={session?.user?.id}
+              studentLevel={studentLevel}
+              accentColor={getPlanetById(activePlanet)?.barColor || '#0dcfcf'}
+              onValidateMission={handleStartSenseiMissionValidation}
+              refreshTrigger={senseiRefreshTrigger}
+            />
+          </div>
+        )}
+
+        {/* 🧩 ESPECIAL CODE.ORG (INSIGNIAS DE CURSOS) */}
+        {activePlanet === 'code' && (
+          <div className="challenges-section" style={{ marginTop: '30px' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+              <Medal size={18} color="#128989" /> INSIGNIAS DE LA ACADEMIA DIGITAL
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+              Al completar cada bloque en Code.org, solicita tu insignia para que brille en tu perfil ninja.
+            </p>
+            <CodeBadges
+              userId={session?.user?.id}
+              onValidateBadge={handleStartBadgeValidation}
+              isAutodidact={isAutodidact}
+              refreshTrigger={badgeRefreshTrigger}
             />
           </div>
         )}
@@ -1187,7 +1375,7 @@ function ProfileContent() {
                 <Zap size={18} color="#ff9800" /> ITINERARIO NINJA DISEÑO 3D
               </h3>
               <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Consigue una insignia galáctica por cada 10 retos ninja de Diseño 3D completados.
+                Solicita tu insignia galáctica de Diseño 3D al completar tu itinerario y superar la validación.
               </p>
               <NinjaChallenges
                 planetId="tinkercad"
@@ -1197,6 +1385,7 @@ function ProfileContent() {
                 targetLevel={studentLevel}
                 onValidateChallenge={handleStartChallengeValidation}
                 isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
               />
             </div>
 
@@ -1205,7 +1394,7 @@ function ProfileContent() {
                 <Zap size={18} color="#0dcfcf" /> ITINERARIO NINJA BLOQUES DE CÓDIGO
               </h3>
               <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Consigue una insignia galáctica por cada 5 retos ninja de Bloques de Código completados.
+                Solicita tu insignia galáctica de Bloques de Código al completar tu itinerario y superar la validación.
               </p>
               <NinjaChallenges
                 planetId="tinkercad"
@@ -1215,6 +1404,7 @@ function ProfileContent() {
                 targetLevel={studentLevel}
                 onValidateChallenge={handleStartChallengeValidation}
                 isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
               />
             </div>
             
@@ -1223,7 +1413,7 @@ function ProfileContent() {
                 <Zap size={18} color="#ff9800" /> ITINERARIO NINJA BLOCKSCAD
               </h3>
               <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
-                Consigue una insignia galáctica por cada 10 retos ninja de BlocksCAD completados.
+                Solicita tu insignia galáctica de BlocksCAD al completar tu itinerario y superar la validación.
               </p>
               <NinjaChallenges
                 planetId="tinkercad"
@@ -1233,6 +1423,106 @@ function ProfileContent() {
                 targetLevel={studentLevel}
                 onValidateChallenge={handleStartChallengeValidation}
                 isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
+              />
+
+              <SenseiMissions 
+                planetId="tinkercad"
+                userId={session?.user?.id}
+                studentLevel={studentLevel}
+                accentColor="#ff9800"
+                onValidateMission={handleStartSenseiMissionValidation}
+                refreshTrigger={senseiRefreshTrigger}
+              />
+            </div>
+          </>
+        )}
+
+        {/* 🐍 ESPECIAL PYTHON (ITINERARIOS ACADEMIA, KIDS, CODEDEX, FCC) */}
+        {activePlanet === 'python' && (
+          <>
+            <div className="challenges-section" style={{ marginTop: '30px' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#3776ab" /> ITINERARIO ACADEMIA & RASPBERRY
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Solicita tu insignia galáctica de Academia Python al completar tu itinerario y superar la validación.
+              </p>
+              <NinjaChallenges
+                planetId="python"
+                itinerary="academia-raspberry"
+                userId={session?.user?.id}
+                accentColor="#3776ab"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
+              />
+            </div>
+
+            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#ffd43b" /> ITINERARIO CODING FOR KIDS
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Solicita tu insignia galáctica de Coding for Kids al completar tu itinerario y superar la validación.
+              </p>
+              <NinjaChallenges
+                planetId="python"
+                itinerary="coding-kids"
+                userId={session?.user?.id}
+                accentColor="#ffd43b"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
+              />
+            </div>
+
+            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#a29bfe" /> ITINERARIO CODEDEX PROJECTS
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Solicita tu insignia galáctica de Codedex al completar tu itinerario y superar la validación.
+              </p>
+              <NinjaChallenges
+                planetId="python"
+                itinerary="codedex"
+                userId={session?.user?.id}
+                accentColor="#a29bfe"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
+              />
+            </div>
+
+            <div className="challenges-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1a1a2e', marginBottom: '8px', fontFamily: 'Outfit', fontSize: '1rem', fontWeight: '800' }}>
+                <Zap size={18} color="#0a0a23" /> ITINERARIO FREECODECAMP
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '-5px', marginBottom: '20px', fontStyle: 'italic', opacity: 0.8 }}>
+                Solicita tu insignia galáctica de FreeCodeCamp al completar tu itinerario y superar la validación.
+              </p>
+              <NinjaChallenges
+                planetId="python"
+                itinerary="freecodecamp"
+                userId={session?.user?.id}
+                accentColor="#0a0a23"
+                targetLevel={studentLevel}
+                onValidateChallenge={handleStartChallengeValidation}
+                isAutodidact={isAutodidact}
+                refreshTrigger={challengeRefreshTrigger}
+              />
+
+              <SenseiMissions 
+                planetId="python"
+                userId={session?.user?.id}
+                studentLevel={studentLevel}
+                accentColor="#306998"
+                onValidateMission={handleStartSenseiMissionValidation}
+                refreshTrigger={senseiRefreshTrigger}
               />
             </div>
           </>
@@ -1363,7 +1653,7 @@ function ProfileContent() {
               )}
               
               <div className="chat-thread-modal">
-                {messages.map((msg, index) => (
+                {validationMessages.map((msg, index) => (
                   <div key={index} className={`chat-bubble ${msg.role === 'tutor' ? 'tutor-bubble' : 'user-bubble'}`} style={{ marginBottom: '12px' }}>
                     <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: '1.5' }}>{msg.text}</p>
                   </div>
@@ -1384,14 +1674,14 @@ function ProfileContent() {
                   type="text" 
                   placeholder="Escribe tu explicación técnica aquí..." 
                   className="tutor-input" 
-                  value={inputText} 
-                  onChange={(e) => setInputText(e.target.value)} 
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  value={validationInputText} 
+                  onChange={(e) => setValidationInputText(e.target.value)} 
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendValidation()}
                   style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid #eee', fontSize: '0.85rem', background: '#f8f9fa' }}
                 />
                 <button 
                   className="tutor-send-btn" 
-                  onClick={handleSendMessage}
+                  onClick={handleSendValidation}
                   style={{ background: getPlanetById(activePlanet)?.barColor, color: 'white', border: 'none', borderRadius: '10px', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                 >
                   <Send size={18} />
