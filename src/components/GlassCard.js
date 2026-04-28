@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function GlassCard({ children, className = '', style = {} }) {
+export default function GlassCard({ children, className = '', style = {}, ...props }) {
   const cardStyle = {
     background: 'var(--color-card)',
     borderRadius: 'var(--border-radius)',
@@ -11,7 +11,7 @@ export default function GlassCard({ children, className = '', style = {} }) {
   };
 
   return (
-    <div className={`card-component ${className}`} style={cardStyle}>
+    <div className={`card-component ${className}`} style={cardStyle} {...props}>
       {children}
     </div>
   );

@@ -6,6 +6,8 @@ export const PYTHON_ACADEMIA = [
     url: 'https://silentteacher.toxicode.fr/',
     externalUrl: 'https://silentteacher.toxicode.fr/',
     description: 'Aprende Python adivinando qué hace el código. ¡Sin explicaciones aburridas!',
+    nivel: 'todos',
+    categoria: 'Academia'
   }
 ];
 
@@ -94,4 +96,42 @@ export const PYTHON_FREECODECAMP = [
     externalUrl: 'https://www.freecodecamp.org/espanol/learn/python-v9/',
     description: 'Curso completo de Python de freeCodeCamp, desde lo básico hasta ciencia de datos.'
   }
+];
+
+export const PYTHON_PICUINO = [
+  { id: 1, numero: 1, titulo: 'Introducción al lenguaje Python', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-intro.html', description: 'Conceptos básicos y filosofía de Python.' },
+  { id: 2, numero: 2, titulo: 'Datos numéricos', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-numbers.html', description: 'Trabajando con enteros y flotantes.' },
+  { id: 3, numero: 3, titulo: 'Las variables', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-variables.html', description: 'Asignación y nombres de variables.' },
+  { id: 4, numero: 4, titulo: 'Palabras reservadas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-keywords.html', description: 'Palabras que Python usa para su propia sintaxis.' },
+  { id: 5, numero: 5, titulo: 'Los comentarios', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-comments.html', description: 'Cómo documentar tu código.' },
+  { id: 6, numero: 6, titulo: 'La función print()', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-print.html', description: 'Mostrando información por pantalla.' },
+  { id: 7, numero: 7, titulo: 'La función input()', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-input.html', description: 'Pidiendo datos al usuario.' },
+  { id: 8, numero: 8, titulo: 'El tipo Booleano', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-boolean.html', description: 'Valores Verdadero y Falso.' },
+  { id: 9, numero: 9, titulo: 'Sentencia if, else', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-if-else.html', description: 'Toma de decisiones básica.' },
+  { id: 10, numero: 10, titulo: 'Operadores and, or, not', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-operators.html', description: 'Lógica booleana avanzada.' },
+  { id: 11, numero: 11, titulo: 'Sentencias if anidadas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-nested-if.html', description: 'Condicionales dentro de condicionales.' },
+  { id: 12, numero: 12, titulo: 'Sentencia elif', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-elif.html', description: 'Múltiples opciones condicionales.' },
+  { id: 13, numero: 13, titulo: 'Sentencia for', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-for.html', description: 'Bucles definidos.' },
+  { id: 14, numero: 14, titulo: 'La función range()', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-range.html', description: 'Generando secuencias numéricas.' },
+  { id: 15, numero: 15, titulo: 'Sentencia continue', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-continue.html', description: 'Saltar a la siguiente iteración.' },
+  { id: 16, numero: 16, titulo: 'Sentencia break', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-break.html', description: 'Salir de un bucle prematuramente.' },
+  { id: 17, numero: 17, titulo: 'Sentencias for anidadas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-nested-for.html', description: 'Bucles dentro de bucles.' },
+  { id: 18, numero: 18, titulo: 'Sentencia while', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-while.html', description: 'Bucles condicionales.' },
+  { id: 19, numero: 19, titulo: 'Definición de funciones', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-def.html', description: 'Creando tus propios bloques de código.' },
+  { id: 20, numero: 20, titulo: 'Parámetros con valores por omisión', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-default-params.html', description: 'Funciones flexibles con argumentos opcionales.' },
+  { id: 21, numero: 21, titulo: 'Cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-strings.html', description: 'Trabajando con texto (strings).' },
+  { id: 22, numero: 22, titulo: 'Índices de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-string-index.html', description: 'Accediendo a caracteres individuales.' },
+  { id: 23, numero: 23, titulo: 'Métodos de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-string-methods.html', description: 'Transformaciones de texto útiles.' },
+  { id: 24, numero: 24, titulo: 'Formateo de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-string-format.html', description: 'Personalizando la salida de texto.' },
+  { id: 25, numero: 25, titulo: 'Listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-lists.html', description: 'Colecciones de datos ordenadas.' },
+  { id: 26, numero: 26, titulo: 'Índices de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-list-index.html', description: 'Accediendo a elementos de la lista.' },
+  { id: 27, numero: 27, titulo: 'Iteración de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-list-iteration.html', description: 'Recorriendo listas con bucles.' },
+  { id: 28, numero: 28, titulo: 'Métodos de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-list-methods.html', description: 'Operaciones avanzadas con listas.' },
+  { id: 29, numero: 29, titulo: 'Búsqueda de datos', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-search.html', description: 'Encontrando elementos en colecciones.' },
+  { id: 30, numero: 30, titulo: 'Búsqueda binaria', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-binary-search.html', description: 'Algoritmo de búsqueda eficiente.' },
+  { id: 31, numero: 31, titulo: 'Desplazamiento de datos', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-data-shift.html', description: 'Manipulando posiciones en listas.' },
+  { id: 32, numero: 32, titulo: 'Ordenación por selección', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-selection-sort.html', description: 'Tu primer algoritmo de ordenación.' },
+  { id: 33, numero: 33, titulo: 'Ordenación por inserción', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-insertion-sort.html', description: 'Ordenando elementos uno a uno.' },
+  { id: 34, numero: 34, titulo: 'Recursividad', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-recursion.html', description: 'Funciones que se llaman a sí mismas.' },
+  { id: 35, numero: 35, titulo: 'Ordenación por mezcla', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-merge-sort.html', description: 'Algoritmo de ordenación "divide y vencerás".' }
 ];

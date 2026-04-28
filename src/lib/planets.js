@@ -112,7 +112,7 @@ export const PLANETS = [
       { type: 'video', title: 'Diseño 3D con Tinkercad', url: 'https://notebooklm.google.com/notebook/ce0d46b5-6ece-42fd-bead-11b1868bf5a8?artifactId=96946ba4-72a8-468a-a6e1-98c21b6788bc' }
     ],
     buttons: [
-      { label: 'TINKERCAD OFICIAL', url: 'https://www.tinkercad.com/dashboard', color: 'black-outline' },
+      { label: 'TINKERCAD (3D)', url: 'https://www.tinkercad.com/dashboard', color: 'yellow' },
       { label: 'BLOCKSCAD OFICIAL', url: 'https://www.blockscad3d.com/editor/?lang=es#', color: 'black-outline', icon: 'Box' }
     ],
     tips: [
@@ -181,9 +181,12 @@ export const PLANETS = [
     description: 'Lenguaje de programación profesional para ciencia de datos y web.',
     recommendation: 'Domina los tipos de datos básicos antes de saltar a las funciones.',
     buttons: [
-      { label: 'TRINKET OFICIAL', url: 'https://trinket.io/python3', color: 'teal' },
-      { label: 'REPLIT OFICIAL', url: 'https://replit.com', color: 'blue' }
-    ]
+      { label: 'TRINKET (EDITOR)', url: 'https://trinket.io/python3', color: 'teal' },
+      { label: 'REPLIT (PRO)', url: 'https://replit.com', color: 'blue' },
+      { label: 'CODING FOR KIDS', url: 'https://codingforkids.io/es', color: 'pink' },
+      { label: 'FREECODECAMP', url: 'https://www.freecodecamp.org/espanol/learn/python-v9/', color: 'teal' }
+    ],
+    attribution: "Contenidos y retos adaptados de: Picuino (picuino.com), Luis Llamas (luisllamas.es), Silent Teacher, Raspberry Pi Foundation, Coding for Kids, Codedex y FreeCodeCamp."
   },
   { 
     id: 'html', 
@@ -196,7 +199,11 @@ export const PLANETS = [
     notebook: '6007d3b0-a4c5-4785-8310-8b259f04b28a', 
     subtitle: 'Construcción de Front-end.',
     description: 'Crea la estructura y el estilo de la web moderna.',
-    recommendation: 'CSS es la clave para que tu web se vea profesional. ¡No le tengas miedo!'
+    recommendation: 'CSS es la clave para que tu web se vea profesional. ¡No le tengas miedo!',
+    buttons: [
+      { label: 'CodePen', url: 'https://codepen.io/pen/', color: 'teal', icon: 'ExternalLink' }
+    ],
+    attribution: "Contenidos y retos adaptados de: Luis Llamas (luisllamas.es), CodePen y MDN Web Docs."
   },
 ];
 

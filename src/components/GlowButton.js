@@ -23,6 +23,8 @@ export default function GlowButton({ children, color = 'teal', className = '', o
     return '#ffffff';
   };
 
+  const [isHovered, setIsHovered] = React.useState(false);
+
   const btnStyle = {
     background: getBackgroundColor(),
     color: getTextColor(),
@@ -32,8 +34,13 @@ export default function GlowButton({ children, color = 'teal', className = '', o
     fontWeight: '600',
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.7 : 1,
-    boxShadow: (color === 'gray' || color === 'black-outline') ? 'none' : '0 4px 10px rgba(0,0,0,0.1)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
+    boxShadow: (color === 'gray' || color === 'black-outline') 
+      ? 'none' 
+      : isHovered 
+        ? `0 8px 25px ${getBackgroundColor()}88` 
+        : '0 4px 10px rgba(0,0,0,0.1)',
+    transform: isHovered ? 'translateY(-2px)' : 'none',
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -49,6 +56,8 @@ export default function GlowButton({ children, color = 'teal', className = '', o
       onClick={onClick}
       disabled={disabled}
       style={btnStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {children}
     </button>

@@ -39,7 +39,8 @@ import {
   PYTHON_CODEDEX_BEGINNER,
   PYTHON_CODEDEX_INTERMEDIATE,
   PYTHON_CODEDEX_ADVANCED,
-  PYTHON_FREECODECAMP 
+  PYTHON_FREECODECAMP,
+  PYTHON_PICUINO
 } from '../lib/python';
 import { getPlanetById } from '../lib/planets';
 
@@ -58,6 +59,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [pythonCodedexIntermediate, setPythonCodedexIntermediate] = useState([]);
   const [pythonCodedexAdvanced, setPythonCodedexAdvanced] = useState([]);
   const [pythonFreeCodeCamp, setPythonFreeCodeCamp] = useState([]);
+  const [pythonPicuino, setPythonPicuino] = useState([]);
   const [arduinoTutorials, setArduinoTutorials] = useState([]);
   const [userProgress, setUserProgress] = useState({});
   const [loading, setLoading] = useState(true);
@@ -78,7 +80,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     if (planetId === 'tinkercad' && itinerary === 'codeblocks' && activeTab === 'tutorials') {
       setActiveTab('challenges');
     }
-  }, [planetId, userId, difficultyLevel, activeTab, itinerary, refreshTrigger, searchParams]);
+  }, [planetId, userId, difficultyLevel, itinerary, refreshTrigger, searchParams]);
 
   // DEEP LINKING: Abrir reto desde notificación
   useEffect(() => {
@@ -211,22 +213,34 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         setCodeHourOfAI(CODE_HOUR_OF_AI);
         if (activeTab === 'challenges' || activeTab === 'tutorials') setActiveTab('cursos_modernos');
       } else if (planetId?.toLowerCase() === 'python') {
-        if (itinerary === 'academia-raspberry' || !itinerary) {
+        setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER);
+        setPythonCodedexIntermediate(PYTHON_CODEDEX_INTERMEDIATE);
+        setPythonCodedexAdvanced(PYTHON_CODEDEX_ADVANCED);
+        setPythonCodingKids(PYTHON_CODING_KIDS);
+        setPythonFreeCodeCamp(PYTHON_FREECODECAMP);
+        setPythonPicuino(PYTHON_PICUINO);
+
+        if (itinerary === 'raspberry') {
           setChallenges(PYTHON_RASPBERRY);
-          // Set activeTab to 'tutorials' if academia-raspberry to show Academia first
-          if (activeTab !== 'tutorials' && activeTab !== 'challenges') setActiveTab('tutorials');
-        } else if (itinerary === 'coding-kids') {
+          // Forzar la pestaña de retos si no estamos en ella
+          setTimeout(() => setActiveTab('challenges'), 0);
+        } else if (itinerary === 'kids') {
           setChallenges(PYTHON_CODING_KIDS);
-          setActiveTab('challenges');
+          setTimeout(() => setActiveTab('challenges'), 0);
+        } else if (!itinerary) {
+          setChallenges([]);
+          setTimeout(() => setActiveTab('tutorials'), 0);
         } else if (itinerary === 'codedex') {
           setDifficultyChallenges(null);
-          setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER);
-          setPythonCodedexIntermediate(PYTHON_CODEDEX_INTERMEDIATE);
-          setPythonCodedexAdvanced(PYTHON_CODEDEX_ADVANCED);
-          setActiveTab('codedex_beginner');
+          if (!activeTab.startsWith('codedex_')) {
+            setTimeout(() => setActiveTab('codedex_beginner'), 0);
+          }
         } else if (itinerary === 'freecodecamp') {
           setChallenges(PYTHON_FREECODECAMP);
-          setActiveTab('challenges');
+          setTimeout(() => setActiveTab('challenges'), 0);
+        } else if (itinerary === 'picuino') {
+          setChallenges(PYTHON_PICUINO);
+          setTimeout(() => setActiveTab('challenges'), 0);
         }
       } else {
         // Load API challenges for other planets
@@ -414,7 +428,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const tutorialsList = planetId?.toLowerCase() === 'makecode-arcade' ? ARCADE_TUTORIALS : 
                         (planetId?.toLowerCase() === 'arduino' ? ARDUINO_TUTORIALS :
                         (planetId?.toLowerCase() === 'tinkercad' ? (itinerary === 'codeblocks' ? TINKERCAD_CODEBLOCKS_TUTORIALS : (itinerary === 'blockscad' ? [] : TINKERCAD_3D_TUTORIALS)) : 
-                        (planetId?.toLowerCase().includes('microbit') ? MICROBIT_TUTORIALS : (planetId === 'code' ? [] : (planetId === 'python' ? (itinerary === 'academia-raspberry' ? PYTHON_ACADEMIA : []) : SCRATCH_TUTORIALS)))));
+                        (planetId?.toLowerCase().includes('microbit') ? MICROBIT_TUTORIALS : (planetId === 'code' ? [] : (planetId === 'python' ? PYTHON_ACADEMIA : SCRATCH_TUTORIALS)))));
   const tutorialsCompleted = tutorialsList.filter(t => userProgress[`${planetId}${itinerary ? '-' + itinerary : ''}-tutorial-${t.id}`]?.status === 'Validado').length;
   
   // difficultyChallenges is now a state variable set in loadData()
@@ -499,18 +513,23 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         { reached: pythonCodedexIntermediateCompleted >= 5, label: 'INTERMEDIO', total: 5, type: 'big' },
         { reached: pythonCodedexAdvancedCompleted >= 2, label: 'AVANZADO', total: 2, type: 'big' }
       ];
-    } else if (itinerary === 'academia-raspberry') {
+    } else if (itinerary === 'raspberry') {
       activeMilestones = [
         { reached: tutorialsCompleted >= 1, label: 'ACADEMIA', total: 1, type: 'big' },
         { reached: challengesCompleted >= 5, label: 'RASPBERRY PI', total: 5, type: 'big' }
       ];
-    } else if (itinerary === 'coding-kids') {
+    } else if (itinerary === 'kids') {
       activeMilestones = [
         { reached: pythonCodingKidsCompleted >= 1, label: 'COMPLETO', total: 1, type: 'big' }
       ];
     } else if (itinerary === 'freecodecamp') {
       activeMilestones = [
         { reached: pythonFreeCodeCampCompleted >= 1, label: 'COMPLETO', total: 1, type: 'big' }
+      ];
+    } else if (itinerary === 'picuino') {
+      const pythonPicuinoCompleted = pythonPicuino.filter(c => userProgress[`${planetId}-${itinerary}-reto-${c.id}`]?.status === 'Validado').length;
+      activeMilestones = [
+        { reached: pythonPicuinoCompleted >= 35, label: 'PICUINO PRO', total: 35, type: 'big' }
       ];
     }
   } else {
@@ -522,7 +541,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   }
   const isAdvanced = targetLevel && targetLevel.toLowerCase() !== 'novato' && targetLevel.toLowerCase() !== 'junior';
 
-  const tutorialsByCategory = (planetId === 'python' && itinerary === 'academia-raspberry' ? challenges : tutorialsList).reduce((acc, t) => {
+  const tutorialsByCategory = tutorialsList.reduce((acc, t) => {
     const cat = t.categoria || t.category || 'General';
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(t);
@@ -785,47 +804,84 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                   IA EXPLORER
                 </button>
               </>
-            ) : planetId === 'python' && itinerary === 'codedex' ? (
+            ) : planetId === 'python' ? (
               <>
-                <button 
-                  onClick={() => { setActiveTab('codedex_beginner'); setSelectedTutorial(null); }}
-                  style={{ 
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'codedex_beginner' ? 'white' : 'transparent',
-                    color: activeTab === 'codedex_beginner' ? accentColor : '#666',
-                    boxShadow: activeTab === 'codedex_beginner' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  PRINCIPIANTE ({pythonCodedexBeginnerCompleted}/{pythonCodedexBeginner.length})
-                </button>
-                <button 
-                  onClick={() => { setActiveTab('codedex_intermediate'); setSelectedTutorial(null); }}
-                  style={{ 
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'codedex_intermediate' ? 'white' : 'transparent',
-                    color: activeTab === 'codedex_intermediate' ? accentColor : '#666',
-                    boxShadow: activeTab === 'codedex_intermediate' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  INTERMEDIO ({pythonCodedexIntermediateCompleted}/{pythonCodedexIntermediate.length})
-                </button>
-                <button 
-                  onClick={() => { setActiveTab('codedex_advanced'); setSelectedTutorial(null); }}
-                  style={{ 
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'codedex_advanced' ? 'white' : 'transparent',
-                    color: activeTab === 'codedex_advanced' ? accentColor : '#666',
-                    boxShadow: activeTab === 'codedex_advanced' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  AVANZADO ({pythonCodedexAdvancedCompleted}/{pythonCodedexAdvanced.length})
-                </button>
+                {/* Academia Python solo visible si el itinerario es null (Academia) */}
+                {(tutorialsList.length > 0 && !itinerary) && (
+                  <button 
+                    onClick={() => { setActiveTab('tutorials'); setSelectedTutorial(null); }}
+                    style={{ 
+                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                      background: activeTab === 'tutorials' ? 'white' : 'transparent',
+                      color: activeTab === 'tutorials' ? accentColor : '#666',
+                      boxShadow: activeTab === 'tutorials' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s', minWidth: 'fit-content'
+                    }}
+                  >
+                    ACADEMIA ({tutorialsCompleted}/{tutorialsList.length})
+                  </button>
+                )}
+
+                {itinerary === 'codedex' ? (
+                  <>
+                    <button 
+                      onClick={() => { setActiveTab('codedex_beginner'); setSelectedTutorial(null); }}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'codedex_beginner' ? 'white' : 'transparent',
+                        color: activeTab === 'codedex_beginner' ? accentColor : '#666',
+                        boxShadow: activeTab === 'codedex_beginner' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      PRINCIPIANTE ({pythonCodedexBeginnerCompleted}/{pythonCodedexBeginner.length})
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab('codedex_intermediate'); setSelectedTutorial(null); }}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'codedex_intermediate' ? 'white' : 'transparent',
+                        color: activeTab === 'codedex_intermediate' ? accentColor : '#666',
+                        boxShadow: activeTab === 'codedex_intermediate' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      INTERMEDIO ({pythonCodedexIntermediateCompleted}/{pythonCodedexIntermediate.length})
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab('codedex_advanced'); setSelectedTutorial(null); }}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'codedex_advanced' ? 'white' : 'transparent',
+                        color: activeTab === 'codedex_advanced' ? accentColor : '#666',
+                        boxShadow: activeTab === 'codedex_advanced' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      AVANZADO ({pythonCodedexAdvancedCompleted}/{pythonCodedexAdvanced.length})
+                    </button>
+                  </>
+                ) : (
+                  challenges.length > 0 && (
+                    <button 
+                      onClick={() => setActiveTab('challenges')}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'challenges' ? 'white' : 'transparent',
+                        color: activeTab === 'challenges' ? accentColor : '#666',
+                        boxShadow: activeTab === 'challenges' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      {itinerary === 'kids' ? 'CODING FOR KIDS' : (itinerary === 'freecodecamp' ? 'FREECODECAMP' : (itinerary === 'picuino' ? 'RETOS PICUINO' : 'RETOS RASPBERRY'))} ({challengesCompleted}/{challenges.length})
+                    </button>
+                  )
+                )}
               </>
             ) : (
               <>
@@ -1106,7 +1162,13 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                               <div style={{ display: 'flex', gap: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Sigue el tutorial interactivo de {itinerary === 'codedex' ? <a href="https://www.codedex.io/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Codedex</a> : (itinerary === 'academia-raspberry' ? <a href="https://projects.raspberrypi.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Raspberry Pi Foundation</a> : 'la plataforma oficial')} para completar este proyecto de Python.
+                                  Sigue el tutorial interactivo de {
+                                    itinerary === 'codedex' ? <a href={currentItem.externalUrl || "https://www.codedex.io/"} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Codedex</a> : 
+                                    itinerary === 'freecodecamp' ? <a href={currentItem.externalUrl || "https://www.freecodecamp.org/"} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>FreeCodeCamp</a> :
+                                    itinerary === 'kids' ? <a href={currentItem.externalUrl || "https://codingforkids.io/es"} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Coding for Kids</a> :
+                                    itinerary === 'raspberry' || itinerary === 'academia-raspberry' ? <a href={currentItem.externalUrl || "https://projects.raspberrypi.org/"} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Raspberry Pi Foundation</a> : 
+                                    'la plataforma oficial'
+                                  } para completar este proyecto de Python.
                                 </p>
                               </div>
                               <div style={{ display: 'flex', gap: '15px' }}>
@@ -1391,12 +1453,17 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
               ) :
               planetId === 'python' ? (
                 <>
-                  <a href="https://silentteacher.toxicode.fr/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Silent Teacher</a>, <a href="https://projects.raspberrypi.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Raspberry Pi Foundation</a>, <a href="https://codingforkids.io/es" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Coding for Kids</a>, <a href="https://www.codedex.io/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Codedex</a> y <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>FreeCodeCamp</a>
+                  <a href="https://www.picuino.com/es/python-index.html" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Picuino</a>, <a href="https://www.luisllamas.es/aprende-python-desde-cero/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Luis Llamas</a>, <a href="https://silentteacher.toxicode.fr/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Silent Teacher</a>, <a href="https://projects.raspberrypi.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Raspberry Pi Foundation</a>, <a href="https://codingforkids.io/es" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Coding for Kids</a>, <a href="https://www.codedex.io/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Codedex</a> y <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>FreeCodeCamp</a>
                 </>
               ) :
               planetId === 'arduino' ? (
                 <>
                   <a href="https://angelmicelti.github.io/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Angel Micelti</a>, <a href="https://www.luisllamas.es/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Luis Llamas</a>, <a href="https://makinando.github.io/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Makinando</a>, <a href="https://lopegonzalez.es/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Lope González</a> y <a href="https://www.tinkercad.com/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Autodesk Tinkercad</a>
+                </>
+              ) :
+              planetId === 'html' ? (
+                <>
+                  <a href="https://www.luisllamas.es/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Luis Llamas</a>, <a href="https://codepen.io/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>CodePen</a> y recursos de MDN Web Docs.
                 </>
               ) :
               planetId?.startsWith('tinkercad') ? <a href="https://www.tinkercad.com/learn" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Fuente: Autodesk Tinkercad</a> : 'Fuentes educativas oficiales'

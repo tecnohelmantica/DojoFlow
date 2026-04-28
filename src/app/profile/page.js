@@ -5,7 +5,7 @@ import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
 import {
   Settings, User, Medal, BookOpen, Send, TrendingUp,
-  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones, Castle, Camera, ShieldCheck, Target, Trash2, Globe, Eye
+  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones, Castle, Camera, ShieldCheck, Target, Trash2, Globe, Eye, Box, Minimize, Maximize, Code
 } from 'lucide-react';
 import TutorExperience from '@/components/TutorExperience';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -913,7 +913,12 @@ function ProfileContent() {
                     </ul>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(2, 1fr)', 
+                    gap: '12px',
+                    marginTop: '5px'
+                  }}>
                     {planet?.buttons && planet.buttons.length > 0 ? (
                       planet.buttons.map((btn, idx) => {
                         const BtnIcon = btn.icon === 'Box' ? Box : ExternalLink;
@@ -922,22 +927,26 @@ function ProfileContent() {
                             key={idx}
                             color={btn.color === 'pink' ? 'pink' : (btn.color === 'blue' ? 'blue' : 'teal')} 
                             onClick={() => window.open(btn.url, '_blank')} 
-                            className="w-100" 
                             style={{ 
-                              padding: '15px', 
+                              padding: '12px 10px', 
                               fontWeight: '900',
+                              fontSize: '0.75rem',
                               background: btn.color === 'black-outline' ? 'white' : undefined,
                               border: btn.color === 'black-outline' ? '2px solid #1a1a2e' : undefined,
                               color: btn.color === 'black-outline' ? '#1a1a2e' : undefined,
-                              boxShadow: btn.color === 'black-outline' ? 'none' : undefined
+                              boxShadow: btn.color === 'black-outline' ? 'none' : undefined,
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              width: '100%'
                             }}
                           >
-                            <BtnIcon size={14} style={{ marginRight: '10px' }} /> {btn.label}
+                            <BtnIcon size={14} style={{ marginRight: '8px' }} /> {btn.label}
                           </GlowButton>
                         );
                       })
                     ) : (
-                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} className="w-100" style={{ padding: '15px', fontWeight: '900' }}>
+                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} style={{ gridColumn: 'span 2', padding: '15px', fontWeight: '900' }}>
                         <ExternalLink size={14} style={{ marginRight: '10px' }} /> {planet?.name?.toUpperCase()} OFICIAL
                       </GlowButton>
                     )}
@@ -1024,6 +1033,295 @@ function ProfileContent() {
             </div>
           )}
 
+          {/* CURSO LUIS LLAMAS (Solo para Arduino) */}
+          {activePlanet === 'arduino' && (
+            <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
+                  <Globe size={16} /> ENCICLOPEDIA EXPERTA: LUIS LLAMAS
+                </h3>
+                <span style={{ fontSize: '0.6rem', color: '#6366f1', fontWeight: '900', background: 'rgba(99, 102, 241, 0.1)', padding: '4px 12px', borderRadius: '15px' }}>RECOMENDADO</span>
+              </div>
+
+              <GlassCard style={{ padding: 0, overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px' }}>
+                <div style={{ position: 'relative', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
+                  {/* Imagen de fondo generada */}
+                  <img 
+                    src="/planets/arduino_banner.png" 
+                    alt="Arduino Course" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} 
+                  />
+                  
+                  {/* Overlay Gradiente */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: 0, left: 0, width: '100%', height: '100%', 
+                    background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '60px'
+                  }}>
+                    <div style={{ maxWidth: '500px' }}>
+                      <div style={{ background: '#6366f1', color: 'white', padding: '8px 16px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: '900', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+                        <Brain size={14} /> CURSO EXTERNO PREMIUM
+                      </div>
+                      <h2 style={{ color: 'white', fontSize: '2.4rem', fontWeight: '900', margin: '0 0 15px 0', lineHeight: '1.1' }}>
+                        Arduino desde Cero
+                      </h2>
+                      <p style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '500', lineHeight: '1.6', marginBottom: '30px' }}>
+                        Accede a la guía más completa y estructurada del mundo hispano. Luis Llamas te enseña electrónica y programación con un rigor técnico excepcional.
+                      </p>
+                      
+                      <div style={{ display: 'flex', gap: '15px' }}>
+                        <GlowButton 
+                          color="purple" 
+                          onClick={() => window.open("https://www.luisllamas.es/arduino-desde-cero/", '_blank')} 
+                          style={{ 
+                            padding: '22px 60px', 
+                            fontSize: '1.3rem', 
+                            fontWeight: '900',
+                            background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                            border: '3px solid white',
+                            boxShadow: '0 15px 50px rgba(255, 215, 0, 0.7), 0 0 30px rgba(255, 255, 255, 0.5)',
+                            color: '#1a1a2e',
+                            textTransform: 'uppercase',
+                            letterSpacing: '2px',
+                            animation: 'pulse 2s infinite',
+                            scale: '1.1'
+                          }}
+                        >
+                          <ExternalLink size={24} style={{ marginRight: '15px' }} /> EMPEZAR CURSO AHORA
+                        </GlowButton>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Logo de Luis Llamas o Badge */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    bottom: '30px', 
+                    right: '30px', 
+                    background: 'rgba(255,255,255,0.1)', 
+                    backdropFilter: 'blur(10px)', 
+                    padding: '10px 20px', 
+                    borderRadius: '15px', 
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <Globe size={16} color="white" />
+                    <span style={{ color: 'white', fontSize: '0.7rem', fontWeight: '700' }}>WWW.LUISLLAMAS.ES</span>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* CURSO LUIS LLAMAS (Solo para Python) */}
+          {activePlanet === 'python' && (
+            <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
+                  <Globe size={16} /> ENCICLOPEDIA EXPERTA: LUIS LLAMAS
+                </h3>
+                <span style={{ fontSize: '0.6rem', color: '#3776ab', fontWeight: '900', background: 'rgba(55, 118, 171, 0.1)', padding: '4px 12px', borderRadius: '15px' }}>RECOMENDADO</span>
+              </div>
+
+              <GlassCard style={{ padding: 0, overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px' }}>
+                <div style={{ position: 'relative', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a192f' }}>
+                  {/* Imagen de fondo generada */}
+                  <img 
+                    src="/planets/python_banner.png" 
+                    alt="Python Course" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} 
+                  />
+                  
+                  {/* Overlay Gradiente */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: 0, left: 0, width: '100%', height: '100%', 
+                    background: 'linear-gradient(90deg, rgba(10, 25, 47, 0.9) 0%, rgba(10, 25, 47, 0.2) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '60px'
+                  }}>
+                    <div style={{ maxWidth: '500px' }}>
+                      <div style={{ background: '#3776ab', color: 'white', padding: '8px 16px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: '900', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+                        <Code size={14} /> CURSO EXTERNO PREMIUM
+                      </div>
+                      <h2 style={{ color: 'white', fontSize: '2.4rem', fontWeight: '900', margin: '0 0 15px 0', lineHeight: '1.1' }}>
+                        Aprende Python desde Cero
+                      </h2>
+                      <p style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '500', lineHeight: '1.6', marginBottom: '30px' }}>
+                        Domina el lenguaje de programación más versátil y potente de la actualidad. Luis Llamas te guía desde la sintaxis básica hasta conceptos avanzados.
+                      </p>
+                      
+                      <div style={{ display: 'flex', gap: '15px' }}>
+                        <GlowButton 
+                          color="blue" 
+                          onClick={() => window.open("https://www.luisllamas.es/aprende-python-desde-cero/", '_blank')} 
+                          style={{ 
+                            padding: '22px 60px', 
+                            fontSize: '1.3rem', 
+                            fontWeight: '900',
+                            background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                            border: '3px solid white',
+                            boxShadow: '0 15px 50px rgba(255, 215, 0, 0.7), 0 0 30px rgba(255, 255, 255, 0.5)',
+                            color: '#1a1a2e',
+                            textTransform: 'uppercase',
+                            letterSpacing: '2px',
+                            animation: 'pulse 2s infinite',
+                            scale: '1.1'
+                          }}
+                        >
+                          <ExternalLink size={24} style={{ marginRight: '15px' }} /> EMPEZAR CURSO AHORA
+                        </GlowButton>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Logo de Luis Llamas o Badge */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    bottom: '30px', 
+                    right: '30px', 
+                    background: 'rgba(255,255,255,0.1)', 
+                    backdropFilter: 'blur(10px)', 
+                    padding: '10px 20px', 
+                    borderRadius: '15px', 
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <Globe size={16} color="white" />
+                    <span style={{ color: 'white', fontSize: '0.7rem', fontWeight: '700' }}>WWW.LUISLLAMAS.ES</span>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* CURSOS LUIS LLAMAS (Solo para HTML/CSS/JS) */}
+          {activePlanet === 'html' && (
+            <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
+                  <Globe size={16} /> ENCICLOPEDIA EXPERTA: LUIS LLAMAS
+                </h3>
+                <span style={{ fontSize: '0.6rem', color: '#e44d26', fontWeight: '900', background: 'rgba(228, 77, 38, 0.1)', padding: '4px 12px', borderRadius: '15px' }}>TRILOGÍA WEB</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+                {/* HTML */}
+                <GlassCard style={{ padding: 0, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px' }}>
+                  <div style={{ position: 'relative', height: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '30px', background: 'linear-gradient(135deg, #e44d26 0%, #f16529 100%)' }}>
+                    <div style={{ position: 'absolute', top: '20px', right: '20px', opacity: 0.2 }}>
+                      <Globe size={120} color="white" />
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                      <div style={{ background: 'rgba(255,255,255,0.2)', color: 'white', padding: '5px 12px', borderRadius: '8px', fontSize: '0.6rem', fontWeight: '900', display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '10px' }}>
+                        <Code size={12} /> ESTRUCTURA
+                      </div>
+                      <h2 style={{ color: 'white', fontSize: '1.8rem', fontWeight: '900', margin: '0 0 10px 0', lineHeight: '1.1' }}>
+                        HTML desde Cero
+                      </h2>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', fontWeight: '500', lineHeight: '1.5', marginBottom: '20px', maxWidth: '280px' }}>
+                        La base fundamental de toda página web. Aprende a estructurar contenido de forma profesional.
+                      </p>
+                      <GlowButton 
+                        color="orange" 
+                        onClick={() => window.open("https://www.luisllamas.es/html-desde-cero/", '_blank')} 
+                        style={{ 
+                          padding: '12px 25px', 
+                          fontSize: '0.9rem', 
+                          fontWeight: '900',
+                          background: 'white',
+                          color: '#e44d26',
+                          border: 'none',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                        }}
+                      >
+                        <ExternalLink size={16} style={{ marginRight: '8px' }} /> VER CURSO
+                      </GlowButton>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                {/* CSS */}
+                <GlassCard style={{ padding: 0, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px' }}>
+                  <div style={{ position: 'relative', height: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '30px', background: 'linear-gradient(135deg, #2196f3 0%, #03a9f4 100%)' }}>
+                    <div style={{ position: 'absolute', top: '20px', right: '20px', opacity: 0.2 }}>
+                      <Code size={120} color="white" />
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                      <div style={{ background: 'rgba(255,255,255,0.2)', color: 'white', padding: '5px 12px', borderRadius: '8px', fontSize: '0.6rem', fontWeight: '900', display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '10px' }}>
+                        <Zap size={12} /> ESTILO
+                      </div>
+                      <h2 style={{ color: 'white', fontSize: '1.8rem', fontWeight: '900', margin: '0 0 10px 0', lineHeight: '1.1' }}>
+                        Aprende CSS desde Cero
+                      </h2>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', fontWeight: '500', lineHeight: '1.5', marginBottom: '20px', maxWidth: '280px' }}>
+                        Convierte esqueletos planos en experiencias visuales impresionantes con CSS moderno.
+                      </p>
+                      <GlowButton 
+                        color="blue" 
+                        onClick={() => window.open("https://www.luisllamas.es/aprende-css-desde-cero/", '_blank')} 
+                        style={{ 
+                          padding: '12px 25px', 
+                          fontSize: '0.9rem', 
+                          fontWeight: '900',
+                          background: 'white',
+                          color: '#2196f3',
+                          border: 'none',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                        }}
+                      >
+                        <ExternalLink size={16} style={{ marginRight: '8px' }} /> VER CURSO
+                      </GlowButton>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                {/* JS */}
+                <GlassCard style={{ padding: 0, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px' }}>
+                  <div style={{ position: 'relative', height: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '30px', background: 'linear-gradient(135deg, #f7df1e 0%, #ffc107 100%)' }}>
+                    <div style={{ position: 'absolute', top: '20px', right: '20px', opacity: 0.2 }}>
+                      <Cpu size={120} color="#323330" />
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                      <div style={{ background: 'rgba(50,51,48,0.1)', color: '#323330', padding: '5px 12px', borderRadius: '8px', fontSize: '0.6rem', fontWeight: '900', display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '10px' }}>
+                        <Zap size={12} /> LÓGICA
+                      </div>
+                      <h2 style={{ color: '#323330', fontSize: '1.8rem', fontWeight: '900', margin: '0 0 10px 0', lineHeight: '1.1' }}>
+                        JS desde Cero
+                      </h2>
+                      <p style={{ color: 'rgba(50,51,48,0.7)', fontSize: '0.85rem', fontWeight: '600', lineHeight: '1.5', marginBottom: '20px', maxWidth: '280px' }}>
+                        El cerebro de la web. Da vida a tus proyectos con interactividad y lógica avanzada.
+                      </p>
+                      <GlowButton 
+                        color="yellow" 
+                        onClick={() => window.open("https://www.luisllamas.es/javascript-desde-cero/", '_blank')} 
+                        style={{ 
+                          padding: '12px 25px', 
+                          fontSize: '0.9rem', 
+                          fontWeight: '900',
+                          background: '#323330',
+                          color: '#f7df1e',
+                          border: 'none',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+                        }}
+                      >
+                        <ExternalLink size={16} style={{ marginRight: '8px' }} /> VER CURSO
+                      </GlowButton>
+                    </div>
+                  </div>
+                </GlassCard>
+              </div>
+            </div>
+          )}
+
           {/* FILA 5: ITINERARIO NINJA (FULL WIDTH) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1068,8 +1366,11 @@ function ProfileContent() {
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {[
                     { id: null, label: 'ACADEMIA' },
+                    { id: 'picuino', label: 'RETOS PICUINO' },
                     { id: 'raspberry', label: 'RETOS PI' },
-                    { id: 'codedex', label: 'CODEDEX' }
+                    { id: 'kids', label: 'CODING KIDS' },
+                    { id: 'codedex', label: 'CODEDEX' },
+                    { id: 'freecodecamp', label: 'FREECODECAMP' }
                   ].map(opt => (
                     <button
                       key={opt.id}

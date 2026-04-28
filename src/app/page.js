@@ -336,7 +336,35 @@ export default function HomePage() {
 
           return (
             <div key={planet.id} className="planet-card-wrapper" style={{ animation: 'fadeInUp 0.6s ease-out backwards' }}>
-              <GlassCard className="planet-card" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <GlassCard 
+                className="planet-card" 
+                style={{ 
+                  height: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}
+                onClick={() => {
+                  if (isProfesor) {
+                    router.push(`/studio/${planet.id}`);
+                  } else {
+                    router.push(`/profile?planet=${planet.id}`);
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 20px rgba(13, 207, 207, 0.1)';
+                  e.currentTarget.style.borderColor = planet.barColor + '44';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                }}
+              >
                 <div className="planet-header" style={{ position: 'relative', height: '160px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
                   {planet.image ? (
                     <img src={planet.image} alt={planet.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
@@ -379,7 +407,10 @@ export default function HomePage() {
                     {!isProfesor && isAulaConectada && (
                       <GlowButton 
                         color="cyan" 
-                        onClick={() => window.open(launcherUrl, '_blank')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(launcherUrl, '_blank');
+                        }}
                         style={{ background: 'linear-gradient(135deg, #0dcfcf, #9c27b0)' }}
                       >
                         <ExternalLink size={16} /> ACCEDER A MI CLASE
@@ -388,7 +419,8 @@ export default function HomePage() {
                     
                     <GlowButton 
                       color={isProfesor ? "teal" : "purple"}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (isProfesor) {
                           router.push(`/studio/${planet.id}`);
                         } else {
