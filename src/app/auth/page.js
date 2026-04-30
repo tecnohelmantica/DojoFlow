@@ -151,46 +151,52 @@ export default function AuthPage() {
           // Lógica de Login Inteligente
           let finalAuthEmail = cleanAlias.includes('@') ? cleanAlias : internalAuthEmail;
 
-          // Si es un alias, intentamos buscar si tiene un correo real asociado en auth
-          if (!cleanAlias.includes('@')) {
-            const { data: pData } = await supabase
-              .from('profiles')
-              .select('id')
-              .eq('alias', cleanAlias)
-              .maybeSingle();
-          
-          if (pData) {
-            // Intentar obtener el email de auth.users (vía una función o asumiendo que el login fallará si el virtual no existe)
-            // Para mayor robustez, intentamos login con el virtual y si falla, informamos.
-            // Pero como hemos cambiado el maestro a gmail, vamos a permitir login directo con email.
+          let { data: authData, error } = await supabase.auth.signInWithPassword({
+            email: finalAuthEmail,
+            password
+          });
+
+          // Si falla, intentamos la resolución cruzada (Alias <-> Email Real)
+          if (error) {
+            if (!cleanAlias.includes('@')) {
+              // CASO A: Ingresó ALIAS pero falló el virtual. Probamos con su Email Real.
+              const { data: pData } = await supabase
+                .from('profiles')
+                .select('email_real')
+                .eq('alias', cleanAlias)
+                .maybeSingle();
+              
+              if (pData?.email_real) {
+                const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+                  email: pData.email_real,
+                  password
+                });
+                if (!retryError) {
+                  handleLoginSuccess(retryData);
+                  return;
+                }
+              }
+            } else {
+              // CASO B: Ingresó EMAIL pero falló. Probamos con su Alias Virtual.
+              const { data: pData } = await supabase
+                .from('profiles')
+                .select('alias')
+                .eq('email_real', cleanAlias)
+                .maybeSingle();
+              
+              if (pData?.alias) {
+                const virtualEmail = `${pData.alias.toLowerCase()}@dojoflow.local`;
+                const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+                  email: virtualEmail,
+                  password
+                });
+                if (!retryError) {
+                  handleLoginSuccess(retryData);
+                  return;
+                }
+              }
+            }
           }
-        }
-
-        const { data: authData, error } = await supabase.auth.signInWithPassword({
-          email: finalAuthEmail,
-          password
-        });
-
-        // Si falla con el alias/virtual, intentamos ver si el usuario existe por email_real
-        if (error && !cleanAlias.includes('@')) {
-           // Primero buscamos el perfil para obtener el email real
-           const { data: pData } = await supabase
-             .from('profiles')
-             .select('email_real')
-             .eq('alias', cleanAlias)
-             .maybeSingle();
-           
-           if (pData?.email_real) {
-             const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-               email: pData.email_real,
-               password
-             });
-             if (!retryError) {
-               handleLoginSuccess(retryData);
-               return;
-             }
-           }
-        }
 
         if (error) throw new Error("Credenciales inválidas o identidad no encontrada.");
         handleLoginSuccess(authData);

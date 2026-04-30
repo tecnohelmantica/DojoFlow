@@ -1770,10 +1770,35 @@ function ProfileContent() {
                   </div>
                 </div>
 
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px', fontWeight: '600' }}>Email de Recuperación</label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input
+                      type="email"
+                      value={profile.email_real || ''}
+                      placeholder="tu@email.com (para recuperar contraseña)"
+                      onChange={(e) => setProfile({ ...profile, email_real: e.target.value })}
+                      style={{
+                        flex: 1,
+                        padding: '14px',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        fontSize: '1rem'
+                      }}
+                    />
+                    <GlowButton color="cyan" onClick={handleUpdateEmail}>
+                      Vincular
+                    </GlowButton>
+                  </div>
+                  <p style={{ fontSize: '0.7rem', color: '#8a8a9e', marginTop: '8px', fontStyle: 'italic' }}>
+                    * El uso de correo es opcional. Solo se utilizará para enviarte un enlace si olvidas tu contraseña.
+                  </p>
+                </div>
+
                 <div style={{ padding: '20px', borderRadius: '15px', background: '#f8fafb', border: '1px dashed #cbd5e1' }}>
                   <h4 style={{ margin: '0 0 10px', fontSize: '1rem', fontWeight: '700' }}>Estado de Explorador</h4>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#64748b' }}>
-                    <span>Email verificado</span>
+                    <span>Identidad verificada</span>
                     <span style={{ color: '#10b981', fontWeight: '600' }}>SÍ</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#64748b', marginTop: '5px' }}>
