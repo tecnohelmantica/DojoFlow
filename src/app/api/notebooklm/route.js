@@ -33,7 +33,7 @@ const PLANET_TO_TECH_NAME = {
     'tinkercad': 'Diseño 3D y Codeblocks',
     'arduino': 'Arduino',
     'appinventor': 'App Inventor',
-    'ia': 'LearningML',
+    'ia': 'Machine Learning',
     'python': 'Python',
     'html': 'HTML / CSS / JS'
 };

@@ -45,27 +45,28 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-[#0a0a16]">
+    <main className="update-password-main">
       <div className="stars-overlay" />
       
-      <GlassCard className="max-w-md w-full p-8 text-center relative z-10">
-        <div className="mb-6 flex flex-col items-center">
-          <Key className="text-cyan-400 mb-4" size={48} />
-          <h1 className="text-2xl font-bold text-white mb-2">Actualizar Contraseña</h1>
-          <p className="text-gray-400 text-sm">Establece tu nueva llave de acceso al Dojo</p>
+      <GlassCard className="update-password-card">
+        <div className="update-password-header">
+          <div className="icon-wrapper">
+            <Key className="key-icon" size={48} />
+            <Sparkles className="sparkle-icon" size={24} />
+          </div>
+          <h1>Actualizar Contraseña</h1>
+          <p>Establece tu nueva llave de acceso al Dojo</p>
         </div>
 
         {status.msg && (
-          <div className={`p-4 rounded-lg mb-6 flex items-start gap-3 text-sm ${
-            status.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-          }`}>
-            <AlertCircle size={18} className="shrink-0" />
-            <span className="text-left">{status.msg}</span>
+          <div className={`status-alert ${status.type}`}>
+            <AlertCircle size={20} />
+            <span>{status.msg}</span>
           </div>
         )}
 
-        <form onSubmit={handleUpdate} className="space-y-4">
-          <div className="relative">
+        <form onSubmit={handleUpdate} className="update-password-form">
+          <div className="input-group">
             <input
               type={showPwd ? "text" : "password"}
               placeholder="Nueva contraseña (mín. 6 caracteres)"
@@ -73,26 +74,32 @@ export default function UpdatePasswordPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-500/50 transition-all"
+              className="password-input"
+              autoFocus
             />
             <button
               type="button"
               onClick={() => setShowPwd(!showPwd)}
-              className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-300 transition-colors"
+              className="toggle-pwd"
             >
-              {showPwd ? <Eye size={18} /> : <EyeOff size={18} />}
+              {showPwd ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
 
-          <GlowButton color="cyan" className="w-full py-3" disabled={loading || status.type === 'success'}>
-            {loading ? 'Actualizando...' : 'Confirmar Nueva Contraseña'}
+          <GlowButton 
+            color="cyan" 
+            fullWidth 
+            disabled={loading || status.type === 'success'}
+            className="submit-btn"
+          >
+            {loading ? 'Transmitiendo...' : 'Confirmar Nueva Contraseña'}
           </GlowButton>
         </form>
 
-        <div className="mt-8">
+        <div className="footer-actions">
           <button 
             onClick={() => router.push('/auth')}
-            className="text-gray-500 text-xs hover:text-cyan-400 transition-colors"
+            className="cancel-btn"
           >
             Cancelar y volver al inicio
           </button>
@@ -100,16 +107,170 @@ export default function UpdatePasswordPage() {
       </GlassCard>
 
       <style jsx>{`
+        .update-password-main {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #050510;
+          background-image: radial-gradient(circle at 50% 50%, #1a1a3a 0%, #050510 100%);
+          padding: 20px;
+          font-family: 'Outfit', sans-serif;
+          position: relative;
+        }
+
         .stars-overlay {
-          position: fixed;
+          position: absolute;
           inset: 0;
           background-image: 
-            radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
-            radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
-            radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
-            radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0));
-          background-size: 200px 200px;
-          opacity: 0.1;
+            radial-gradient(1.5px 1.5px at 10% 20%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 30% 50%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 70% 30%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 90% 80%, #fff, rgba(0,0,0,0));
+          background-size: 300px 300px;
+          opacity: 0.15;
+          pointer-events: none;
+        }
+
+        :global(.update-password-card) {
+          max-width: 450px;
+          width: 100%;
+          padding: 40px !important;
+          z-index: 10;
+        }
+
+        .update-password-header {
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .icon-wrapper {
+          position: relative;
+          display: inline-block;
+          margin-bottom: 20px;
+        }
+
+        .key-icon {
+          color: var(--accent-cyan);
+          filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5));
+        }
+
+        .sparkle-icon {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          color: #fff;
+          animation: sparkle 2s infinite ease-in-out;
+        }
+
+        @keyframes sparkle {
+          0%, 100% { transform: scale(1); opacity: 0.5; }
+          50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        h1 {
+          font-size: 2rem;
+          color: #fff;
+          margin: 0 0 10px 0;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+        }
+
+        p {
+          color: #8a8a9e;
+          font-size: 0.95rem;
+          margin: 0;
+        }
+
+        .status-alert {
+          padding: 15px;
+          border-radius: 12px;
+          margin-bottom: 25px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 0.9rem;
+          text-align: left;
+          border: 1px solid transparent;
+        }
+
+        .status-alert.error {
+          background: rgba(239, 68, 68, 0.1);
+          color: #fca5a5;
+          border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .status-alert.success {
+          background: rgba(16, 185, 129, 0.1);
+          color: #6ee7b7;
+          border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .update-password-form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .input-group {
+          position: relative;
+          width: 100%;
+        }
+
+        .password-input {
+          width: 100%;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          padding: 14px 50px 14px 16px;
+          color: #fff;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+          outline: none;
+        }
+
+        .password-input:focus {
+          border-color: var(--accent-cyan);
+          background: rgba(255, 255, 255, 0.08);
+          box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .toggle-pwd {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: #8a8a9e;
+          cursor: pointer;
+          padding: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color 0.2s;
+        }
+
+        .toggle-pwd:hover {
+          color: #fff;
+        }
+
+        .footer-actions {
+          margin-top: 30px;
+        }
+
+        .cancel-btn {
+          background: none;
+          border: none;
+          color: #8a8a9e;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: color 0.2s;
+          text-decoration: underline;
+        }
+
+        .cancel-btn:hover {
+          color: var(--accent-cyan);
         }
       `}</style>
     </main>

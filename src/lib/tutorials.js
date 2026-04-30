@@ -100,3 +100,12 @@ export const TINKERCAD_CODEBLOCKS_TUTORIALS = [
 export const BLOCKSCAD_TUTORIALS = [
   { id: 1, title: "Editor BlocksCAD", category: "BlocksCAD", description: "Accede al editor online de BlocksCAD para empezar a programar tus diseños 3D." }
 ];
+
+export const HTML_TUTORIALS = [
+  { id: 1, numero: 1, title: "HTML desde cero: Estructura", url: "https://www.luisllamas.es/", description: "Aprende la estructura básica de una página web y las etiquetas esenciales." },
+  { id: 2, numero: 2, title: "CSS desde cero: Estilo", url: "https://www.luisllamas.es/", description: "Dale vida a tus webs con colores, fuentes y diseños atractivos." },
+  { id: 3, numero: 3, title: "JavaScript desde cero: Lógica", url: "https://www.luisllamas.es/", description: "Introducción a la programación para hacer webs interactivas." },
+  { id: 4, numero: 4, title: "Manipulación del DOM", url: "https://www.luisllamas.es/", description: "Aprende a modificar el contenido de tu web dinámicamente con JS." },
+  { id: 5, numero: 5, title: "Flexbox y Grid Layout", url: "https://www.luisllamas.es/", description: "Domina las herramientas modernas para crear diseños responsivos." },
+  { id: 6, numero: 6, title: "Eventos en JavaScript", url: "https://www.luisllamas.es/", description: "Haz que tu web responda a clics, teclado y acciones del usuario." }
+];

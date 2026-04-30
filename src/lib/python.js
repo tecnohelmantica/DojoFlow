@@ -1,14 +1,5 @@
 export const PYTHON_ACADEMIA = [
-  { 
-    id: '1', 
-    numero: 1, 
-    titulo: 'Silent Teacher Python', 
-    url: 'https://silentteacher.toxicode.fr/',
-    externalUrl: 'https://silentteacher.toxicode.fr/',
-    description: 'Aprende Python adivinando qué hace el código. ¡Sin explicaciones aburridas!',
-    nivel: 'todos',
-    categoria: 'Academia'
-  }
+  { id: 'silent-teacher', numero: 1, titulo: 'Silent Teacher (Reto Inicial)', url: 'https://silentteacher.toxicode.fr/', externalUrl: 'https://silentteacher.toxicode.fr/', description: 'Aprende las bases de Python sin explicaciones, solo deduciendo.' }
 ];
 
 export const PYTHON_RASPBERRY = [
@@ -120,13 +111,13 @@ export const PYTHON_PICUINO = [
   { id: 19, numero: 19, titulo: 'Definición de funciones', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-def.html', description: 'Creando tus propios bloques de código.' },
   { id: 20, numero: 20, titulo: 'Parámetros con valores por omisión', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-default-params.html', description: 'Funciones flexibles con argumentos opcionales.' },
   { id: 21, numero: 21, titulo: 'Cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-strings.html', description: 'Trabajando con texto (strings).' },
-  { id: 22, numero: 22, titulo: 'Índices de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-string-index.html', description: 'Accediendo a caracteres individuales.' },
-  { id: 23, numero: 23, titulo: 'Métodos de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-string-methods.html', description: 'Transformaciones de texto útiles.' },
-  { id: 24, numero: 24, titulo: 'Formateo de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-string-format.html', description: 'Personalizando la salida de texto.' },
+  { id: 22, numero: 22, titulo: 'Índices de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-textos-indices.html', description: 'Accediendo a caracteres individuales.' },
+  { id: 23, numero: 23, titulo: 'Métodos de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-textos-metodos.html', description: 'Transformaciones de texto útiles.' },
+  { id: 24, numero: 24, titulo: 'Formateo de cadenas de texto', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-textos-formateo.html', description: 'Personalizando la salida de texto.' },
   { id: 25, numero: 25, titulo: 'Listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-lists.html', description: 'Colecciones de datos ordenadas.' },
-  { id: 26, numero: 26, titulo: 'Índices de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-list-index.html', description: 'Accediendo a elementos de la lista.' },
-  { id: 27, numero: 27, titulo: 'Iteración de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-list-iteration.html', description: 'Recorriendo listas con bucles.' },
-  { id: 28, numero: 28, titulo: 'Métodos de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-list-methods.html', description: 'Operaciones avanzadas con listas.' },
+  { id: 26, numero: 26, titulo: 'Índices de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-listas-indices.html', description: 'Accediendo a elementos de la lista.' },
+  { id: 27, numero: 27, titulo: 'Iteración de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-listas-iteracion.html', description: 'Recorriendo listas con bucles.' },
+  { id: 28, numero: 28, titulo: 'Métodos de listas', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-listas-metodos.html', description: 'Operaciones avanzadas con listas.' },
   { id: 29, numero: 29, titulo: 'Búsqueda de datos', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-search.html', description: 'Encontrando elementos en colecciones.' },
   { id: 30, numero: 30, titulo: 'Búsqueda binaria', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-binary-search.html', description: 'Algoritmo de búsqueda eficiente.' },
   { id: 31, numero: 31, titulo: 'Desplazamiento de datos', url: 'https://www.picuino.com/es/python-index.html', externalUrl: 'https://www.picuino.com/es/python-data-shift.html', description: 'Manipulando posiciones en listas.' },

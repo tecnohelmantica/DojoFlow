@@ -79,70 +79,12 @@ export const ARDUINO_CHALLENGES = {
 };
 
 export const ARDUINO_TUTORIALS = [
-  {
-    id: 1,
-    title: "Blink an LED With Digital Output",
-    url: "https://www.tinkercad.com/learn/overview/OMX1W9AL26F9EMF?type=circuits",
-    description: "Aprende a hacer parpadear un LED usando la salida digital de Arduino. Es el punto de partida perfecto para principiantes."
-  },
-  {
-    id: 2,
-    title: "Multiple LEDs & Breadboards",
-    url: "https://www.tinkercad.com/learn/overview/O94BCSIL26F9EV3?type=circuits",
-    description: "Controla varios LEDs usando salidas digitales y una placa de pruebas (breadboard) para crear patrones de luz."
-  },
-  {
-    id: 3,
-    title: "Fading LED With Analog Output",
-    url: "https://www.tinkercad.com/learn/overview/ORHT6NFL26F9GSW?type=circuits",
-    description: "Ajusta el brillo de un LED usando salidas analógicas (PWM) para crear efectos de desvanecimiento suave."
-  },
-  {
-    id: 4,
-    title: "RGB LED Color Mixing",
-    url: "https://www.tinkercad.com/learn/overview/ORLI9ZOL26F9GWK?type=circuits",
-    description: "Aprende a mezclar colores usando un LED RGB y salidas analógicas para crear cualquier color del arcoíris."
-  },
-  {
-    id: 5,
-    title: "Pushbutton (Digital Input)",
-    url: "https://www.tinkercad.com/learn/overview/OT6OSJQL26F9GYT?type=circuits",
-    description: "Interactúa con tus circuitos leyendo el estado de un pulsador como entrada digital."
-  },
-  {
-    id: 6,
-    title: "Potentiometer (Analog Input)",
-    url: "https://www.tinkercad.com/learn/overview/OG8Z4G7L26F9GZ6?type=circuits",
-    description: "Lee valores variables usando un potenciómetro para controlar componentes como el brillo de un LED."
-  },
-  {
-    id: 7,
-    title: "Using the Serial Monitor",
-    url: "https://www.tinkercad.com/learn/overview/OZ3W85UL26F9GZH?type=circuits",
-    description: "Aprende a comunicarte con tu Arduino desde el ordenador para ver qué está pasando dentro de tu código."
-  },
-  {
-    id: 8,
-    title: "PIR Motion Sensor",
-    url: "https://www.tinkercad.com/learn/overview/OJGMQFOL26F9H0F?type=circuits",
-    description: "Detecta movimiento en una habitación usando un sensor infrarrojo pasivo (PIR)."
-  },
-  {
-    id: 9,
-    title: "Photoresistor (LDR)",
-    url: "https://www.tinkercad.com/learn/overview/OXQL7IEL26F9H0U?type=circuits",
-    description: "Mide la intensidad de la luz ambiental usando una fotorresistencia como entrada analógica."
-  },
-  {
-    id: 10,
-    title: "Temperature Sensor",
-    url: "https://www.tinkercad.com/learn/overview/ON9M69XL26F9H15?type=circuits",
-    description: "Convierte tu Arduino en un termómetro digital leyendo la temperatura ambiente con un sensor analógico."
-  },
-  {
-    id: 11,
-    title: "Ultrasonic Distance Sensor",
-    url: "https://www.tinkercad.com/learn/overview/O3TAWASL26F9H1J?type=circuits",
-    description: "Mide distancias con precisión usando ondas sonoras y un sensor de ultrasonidos."
-  }
+  { id: 1, numero: 1, title: "Introducción a Arduino", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Qué es Arduino y qué kit de iniciación elegir para empezar." },
+  { id: 2, numero: 2, title: "Entorno IDE y configuración", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Instalación y configuración del entorno de desarrollo oficial." },
+  { id: 3, numero: 3, title: "Variables y operaciones", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Fundamentos de programación: tipos de datos y matemáticas básicas." },
+  { id: 4, numero: 4, title: "Estructuras de control", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Toma de decisiones (if) y repetición de tareas (for/while)." },
+  { id: 5, numero: 5, title: "Entradas y Salidas Digitales", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Control básico de pines para encender componentes y leer botones." },
+  { id: 6, numero: 6, title: "Entradas y Salidas Analógicas", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Uso de PWM y lectura de sensores analógicos como potenciómetros." },
+  { id: 7, numero: 7, title: "Comunicación Serie", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Envío y recepción de datos entre Arduino y tu ordenador." },
+  { id: 8, numero: 8, title: "Sensores y Actuadores básicos", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Primeros pasos con sensores de luz, temperatura y motores sencillos." }
 ];

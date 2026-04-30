@@ -138,7 +138,7 @@ export const PLANETS = [
       { label: 'TINKERCAD CIRCUITS', url: 'https://www.tinkercad.com/dashboard?type=circuits', color: 'teal' },
       { label: 'WOKWI SIMULATOR', url: 'https://wokwi.com/arduino', color: 'blue' }
     ],
-    attribution: "Contenidos y retos adaptados de: Angel Micelti (angelmicelti.github.io), Luis Llamas (luisllamas.es), Makinando (makinando.github.io), Lope González (lopegonzalez.es) y Autodesk Tinkercad Circuits."
+    attribution: "Contenidos y retos adaptados de: Luis Llamas (luisllamas.es), Autodesk Tinkercad Circuits, lopegonzalez.es, makinando.github.io y angelmicelti (github.io)."
   },
   { 
     id: 'appinventor', 
@@ -151,20 +151,29 @@ export const PLANETS = [
     notebook: '0140cffe-b3f5-4b83-bec3-f3639c156757', 
     subtitle: 'Creación de aplicaciones móviles.',
     description: 'Desarrolla aplicaciones para Android y iOS usando bloques.',
-    recommendation: 'Necesitarás un dispositivo real o el emulador para ver tus apps funcionar.'
+    recommendation: 'Necesitarás un dispositivo real o el emulador para ver tus apps funcionar.',
+    buttons: [
+      { label: 'MIT APP INVENTOR', url: 'https://ai2.appinventor.mit.edu/', color: 'teal' }
+    ],
+    attribution: "Contenidos y retos adaptados de: Justo Rodríguez Orta (profedeinformatica.es), Raspberry Pi Foundation y MIT App Inventor."
   },
   { 
     id: 'ia', 
-    name: 'LearningML', 
-    image: '/planets/learningml.png', 
+    name: 'Machine Learning', 
+    image: '/planets/machine_learning_v2.png', 
     icon: 'Brain',
     color: '#f5e6ff', 
     barColor: '#9c27b0', 
     url: 'https://www.learningml.org/editor/', 
     notebook: '468cee10-db1f-43b9-b063-bad9f37bcf45', 
     subtitle: 'Entrenamiento de modelos de IA.',
-    description: 'Descubre cómo las máquinas aprenden entrenando tus propios modelos.',
-    recommendation: 'Empieza con el reconocimiento de imágenes: es lo más visual y divertido.'
+    description: 'Descubre cómo las máquinas aprenden entrenando tus propios modelos con LearningML y Machine Learning for Kids.',
+    recommendation: 'Empieza con el reconocimiento de imágenes en LearningML: es lo más visual y divertido.',
+    buttons: [
+      { label: 'LEARNINGML OFICIAL', url: 'https://www.learningml.org/editor/', color: 'purple' },
+      { label: 'ML FOR KIDS', url: 'https://machinelearningforkids.co.uk/', color: 'blue' }
+    ],
+    attribution: "Contenidos y plataformas: LearningML.org y Machine Learning for Kids (IBM / Dale Lane)."
   },
   { 
     id: 'python', 
@@ -182,11 +191,9 @@ export const PLANETS = [
     recommendation: 'Domina los tipos de datos básicos antes de saltar a las funciones.',
     buttons: [
       { label: 'TRINKET (EDITOR)', url: 'https://trinket.io/python3', color: 'teal' },
-      { label: 'REPLIT (PRO)', url: 'https://replit.com', color: 'blue' },
-      { label: 'CODING FOR KIDS', url: 'https://codingforkids.io/es', color: 'pink' },
-      { label: 'FREECODECAMP', url: 'https://www.freecodecamp.org/espanol/learn/python-v9/', color: 'teal' }
+      { label: 'REPLIT (PRO)', url: 'https://replit.com', color: 'blue' }
     ],
-    attribution: "Contenidos y retos adaptados de: Picuino (picuino.com), Luis Llamas (luisllamas.es), Silent Teacher, Raspberry Pi Foundation, Coding for Kids, Codedex y FreeCodeCamp."
+    attribution: "Contenidos y retos adaptados de: Silent Teacher, Picuino, Raspberry Pi Foundation, Codédex, Coding for Kids y FreeCodeCamp."
   },
   { 
     id: 'html', 

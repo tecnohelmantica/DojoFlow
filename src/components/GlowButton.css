@@ -15,6 +15,10 @@
   overflow: hidden;
 }
 
+.glow-button.full-width {
+  width: 100%;
+}
+
 .glow-button::before {
   content: '';
   position: absolute;

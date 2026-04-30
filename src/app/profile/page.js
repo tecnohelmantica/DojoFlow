@@ -5,7 +5,7 @@ import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
 import {
   Settings, User, Medal, BookOpen, Send, TrendingUp,
-  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones, Castle, Camera, ShieldCheck, Target, Trash2, Globe, Eye, Box, Minimize, Maximize, Code
+  MessageSquare, Cpu, ExternalLink, Shield, Mail, IdCard, LogOut, Key, Upload, Sparkles, Brain, Award, Zap, Search, ChevronRight, CheckCircle2, Clock, Play, FileText, ArrowLeft, Stars, Rocket, Presentation, X, Layout, Headphones, Castle, Camera, ShieldCheck, Target, Trash2, Globe, Eye, Box, Minimize, Maximize, Code, Smartphone
 } from 'lucide-react';
 import TutorExperience from '@/components/TutorExperience';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -951,6 +951,18 @@ function ProfileContent() {
                       </GlowButton>
                     )}
                   </div>
+                  {planet?.attribution && (
+                    <p style={{ 
+                      fontSize: '0.65rem', 
+                      color: '#8a8a9e', 
+                      fontStyle: 'italic', 
+                      marginTop: '15px', 
+                      borderTop: '1px solid rgba(0,0,0,0.05)', 
+                      paddingTop: '10px' 
+                    }}>
+                      {planet.attribution}
+                    </p>
+                  )}
                 </div>
               </GlassCard>
             </div>
@@ -1322,6 +1334,7 @@ function ProfileContent() {
             </div>
           )}
 
+
           {/* FILA 5: ITINERARIO NINJA (FULL WIDTH) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1366,10 +1379,10 @@ function ProfileContent() {
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {[
                     { id: null, label: 'ACADEMIA' },
-                    { id: 'picuino', label: 'RETOS PICUINO' },
-                    { id: 'raspberry', label: 'RETOS PI' },
                     { id: 'kids', label: 'CODING KIDS' },
-                    { id: 'codedex', label: 'CODEDEX' },
+                    { id: 'raspberry', label: 'RASPBERRY PI' },
+                    { id: 'codedex', label: 'CODÉDEX' },
+                    { id: 'picuino', label: 'PICUINO' },
                     { id: 'freecodecamp', label: 'FREECODECAMP' }
                   ].map(opt => (
                     <button
@@ -1388,6 +1401,99 @@ function ProfileContent() {
                         background: itinerary === opt.id ? (planet?.barColor || '#306998') : 'white',
                         color: itinerary === opt.id ? 'white' : '#64748b',
                         border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#306998') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {activePlanet === 'appinventor' && (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {[
+                    { id: null, label: 'BÁSICO' },
+                    { id: 'intermediate', label: 'INTERMEDIO' },
+                    { id: 'social', label: 'RETOS RASPBERRY PI' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '6px 15px',
+                        borderRadius: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: itinerary === opt.id ? (planet?.barColor || '#f57c00') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#f57c00') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {activePlanet === 'ia' && (
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {[
+                    { id: null, label: 'LEARNINGML' },
+                    { id: 'mlforkids', label: 'ML FOR KIDS' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '6px 15px',
+                        borderRadius: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: itinerary === opt.id ? (planet?.barColor || '#9c27b0') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#9c27b0') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {(activePlanet === 'arduino' || activePlanet === 'html') && (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {[
+                    { id: null, label: 'ACADEMIA' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '6px 15px',
+                        borderRadius: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
                         boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
                       }}
                     >

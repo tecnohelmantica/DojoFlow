@@ -121,7 +121,7 @@ export const diagnosticQuizzes = {
   ],
   ia: [
     {
-      pregunta: "¿Qué es 'entrenar' un modelo en LearningML?",
+      pregunta: "¿Qué es 'entrenar' un modelo de Machine Learning?",
       opciones: ["Hacer que la IA haga ejercicio", "Darle muchos ejemplos para que aprenda a reconocer patrones", "Instalar el programa"],
       correcta: 1,
       explicacion: "Entrenar es enseñar. Cuantos más ejemplos le des (perros, gatos, etc.), mejor aprenderá."
