@@ -397,6 +397,8 @@ function ProfileContent() {
   };
 
   if (authLoading || loading) return <div className="flex-center" style={{ minHeight: '60vh', color: '#8a8a9e' }}>Sincronizando parámetros...</div>;
+  
+  if (!session || !profile) return null;
 
   if (role === 'profesor') {
     return (
