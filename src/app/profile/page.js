@@ -1517,13 +1517,15 @@ function ProfileContent() {
             />
           </div>
 
-          {/* MISIONES DEL SENSEI */}
-          <div style={{ marginTop: '40px' }}>
-            <SenseiMissions 
-              planetId={activePlanet} 
-              userId={session?.user?.id}
-            />
-          </div>
+          {/* MISIONES DEL SENSEI (Excepto en Code.org) */}
+          {activePlanet !== 'code' && (
+            <div style={{ marginTop: '40px' }}>
+              <SenseiMissions 
+                planetId={activePlanet} 
+                userId={session?.user?.id}
+              />
+            </div>
+          )}
 
         </main>
 
