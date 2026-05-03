@@ -376,22 +376,44 @@ function ProfileContent() {
     if (e) e.preventDefault();
     if (!socraticInputText.trim()) return;
 
-    const userMsg = { role: 'user', text: socraticInputText };
-    setSocraticMessages(prev => [...prev, userMsg]);
+    const userMsg = { role: 'user', content: socraticInputText };
+    setSocraticMessages(prev => [...prev, { role: 'user', text: socraticInputText }]);
     setSocraticInputText('');
     setIsTyping(true);
 
     try {
-      // Simulación de respuesta del Tutor NotebookLM
-      setTimeout(() => {
+      const response = await fetch('/api/tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.user.id,
+          mode: 'consulta',
+          message: socraticInputText,
+          history: socraticMessages.map(m => ({
+            role: m.role === 'user' ? 'user' : 'model',
+            content: m.text
+          })),
+          planet: activePlanet,
+          level: studentLevel
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
         setSocraticMessages(prev => [...prev, { 
           role: 'tutor', 
-          text: `¡Muy buena observación, Explorer! Como tu tutor socrático en ${activePlanet}, me gustaría que reflexionaras: ¿cómo crees que este concepto se conecta con lo que aprendimos sobre algoritmos?` 
+          text: data.text 
         }]);
-        setIsTyping(false);
-      }, 1500);
+      } else {
+        throw new Error(data.error || 'Error del Sensei');
+      }
     } catch (err) {
       console.error(err);
+      setSocraticMessages(prev => [...prev, { 
+        role: 'tutor', 
+        text: 'Lo siento, mi conexión con el Dojo se ha interrumpido momentáneamente. ¿Podrías repetirme tu duda?' 
+      }]);
+    } finally {
       setIsTyping(false);
     }
   };
@@ -690,7 +712,7 @@ function ProfileContent() {
                   border: `3px solid ${planet?.barColor || '#6366f1'}`,
                   opacity: 0.3
                 }}></div>
-                <img src={profile?.avatar_url || "/robotix.png"} alt="Avatar" className="avatar-img" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                <img src={profile?.avatar_url || "/alumno.png"} alt="Avatar" className="avatar-img" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 <div style={{ 
                   position: 'absolute', bottom: '-8px', left: '50%', transform: 'translateX(-50%)',
                   background: planet?.barColor || '#6366f1', color: 'white', padding: '3px 12px', 
