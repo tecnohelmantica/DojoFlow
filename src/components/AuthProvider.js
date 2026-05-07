@@ -261,9 +261,15 @@ export default function AuthProvider({ children }) {
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setProfile(null);
+    try {
+      await supabase.auth.signOut();
+      setSession(null);
+      setProfile(null);
+      // Redirección forzada al inicio para limpiar el estado de la UI
+      window.location.href = '/';
+    } catch (err) {
+      console.error('Error signing out:', err);
+    }
   };
 
   const role = profile?.role || null;

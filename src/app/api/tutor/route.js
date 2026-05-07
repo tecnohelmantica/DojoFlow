@@ -37,7 +37,24 @@ export async function POST(req) {
 
     console.log(`[Tutor API] Request for ${planetId} (${mode}) - Level: ${studentLevel} - Type: ${missionType} - Theme: ${missionTheme}`);
 
-    // --- PRIORIDAD 1: NOTEBOOKLM (Si estamos en local y hay ID configurado) ---
+    // --- NUEVA PRIORIDAD 1: CONOCIMIENTO MAESTRO (Desde Supabase) ---
+    let masterKnowledge = null;
+    try {
+      const { data: kData } = await supabase
+        .from('planet_knowledge')
+        .select('knowledge_data')
+        .eq('planet_id', planetId)
+        .maybeSingle();
+      
+      if (kData) {
+        masterKnowledge = kData.knowledge_data;
+        console.log(`[Tutor API] Conocimiento maestro cargado para ${planetId}`);
+      }
+    } catch (kError) {
+      console.warn(`[Tutor API] No se pudo cargar el conocimiento de Supabase:`, kError.message);
+    }
+
+    // --- PRIORIDAD 2: NOTEBOOKLM (Si estamos en local y hay ID configurado) ---
     const isLocal = process.env.NODE_ENV === 'development' || process.env.HOSTNAME === 'localhost';
     const notebookId = NOTEBOOK_MAP[planetId];
 
@@ -48,13 +65,16 @@ export async function POST(req) {
         
         let promptTemplate = "";
         
+        // Inyectamos el conocimiento maestro si existe para ayudar a NotebookLM o como contexto extra
+        const knowledgeContext = masterKnowledge ? `\nCONOCIMIENTO DE REFERENCIA:\n${JSON.stringify(masterKnowledge)}\n` : "";
+
         if (mode === 'mission_generator') {
           promptTemplate = `Actúa como el Sensei Socrático de DojoFlow. Genera una Misión Especial para un alumno:
 - Nivel: ${studentLevel}
 - Planeta: ${planetName}
 - Tipo de Reto: ${missionType || 'Aleatorio'}
 - Tema: ${missionTheme || 'Cualquiera'}
-
+${knowledgeContext}
 La respuesta DEBE ser exclusivamente un objeto JSON válido con estos campos:
 {
   "title": "Título épico",
@@ -66,13 +86,13 @@ La respuesta DEBE ser exclusivamente un objeto JSON válido con estos campos:
   "reward_xp": 50,
   "recommended_resources": ["recurso1", "recurso2"]
 }
-Usa exclusivamente el conocimiento de este cuaderno. No entregues código.`;
+Usa exclusivamente el conocimiento de este cuaderno y el contexto de referencia proporcionado. No entregues código.`;
         } else {
-          // Construimos un prompt enriquecido para el Sensei en NotebookLM
           promptTemplate = `Contexto: El alumno está en el planeta ${planetName}. 
 Nivel del alumno: ${studentLevel}.
 Modo: ${mode === 'validador' ? 'Validación de reto' : 'Consulta general'}.
 Historial reciente: ${JSON.stringify(history?.slice(-3))}
+${knowledgeContext}
 Pregunta: ${message}
 
 Responde como el Sensei de DojoFlow. Sé socrático y usa analogías.
@@ -95,16 +115,21 @@ REGLA DE VALIDACIÓN:
       }
     }
 
-    // --- PRIORIDAD 2: GEMINI (Fallback o Producción) ---
+    // --- PRIORIDAD 3: GEMINI (Con Contexto Maestro) ---
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY no configurada');
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    const systemPrompt = `Eres el Sensei de DojoFlow, un tutor experto en programación inspirado en la pedagogía de @tecnohelmantica.
+    // Construimos las instrucciones del sistema enriquecidas con el conocimiento maestro
+    const masterContextPrompt = masterKnowledge ? 
+      `USA ESTE CONOCIMIENTO MAESTRO COMO BASE:\n${JSON.stringify(masterKnowledge)}\n\n` : 
+      "Usa tu conocimiento general sobre programación educativa.";
+
+    const systemPromptBase = `Eres el Sensei de DojoFlow, un tutor experto en programación inspirado en la pedagogía de @tecnohelmantica.
          PLANETA ACTUAL: ${planetName}.
          NIVEL DEL ALUMNO: ${studentLevel}.
-         MODO: ${mode === 'validador' ? 'MENTOR DE VALIDACIÓN' : 'TUTOR SOCRÁTICO'}.
+         ${masterContextPrompt}
          REGLAS CRÍTICAS: 
          1. Nunca des el código directo. 
          2. Usa pistas graduadas y analogías. 
@@ -116,20 +141,12 @@ REGLA DE VALIDACIÓN:
     const model = genAI.getGenerativeModel({ 
       model: "gemini-flash-latest", 
       systemInstruction: mode === 'mission_generator' ? 
-        `Eres el Sensei de DojoFlow. Genera una Misión Especial en JSON para nivel ${studentLevel}, planeta ${planetName}, tipo ${missionType || 'aleatorio'} y tema ${missionTheme || 'libre'}.
+        `Eres el Sensei de DojoFlow. Genera una Misión Especial en JSON para nivel ${studentLevel}, planeta ${planetName}.
+         ${masterContextPrompt}
          Campos obligatorios: title, description, objective, learning_objectives (array), sensei_tips, estimated_time, reward_xp, recommended_resources (array).
-         No des código. Sé socrático y creativo. El reto debe ser práctico.` :
-        `Eres el Sensei de DojoFlow, un tutor experto en programación inspirado en la pedagogía de @tecnohelmantica.
-         PLANETA ACTUAL: ${planetName}.
-         NIVEL DEL ALUMNO: ${studentLevel}.
-         MODO: ${mode === 'validador' ? 'MENTOR DE VALIDACIÓN' : 'TUTOR SOCRÁTICO'}.
-         REGLAS CRÍTICAS: 
-         1. Nunca des el código directo. 
-         2. Usa pistas graduadas y analogías. 
-         3. Si el alumno es '${studentLevel}' y es Junior, haz preguntas muy simples.
-         4. NO hagas cuestionarios de varias preguntas. Haz una sola pregunta clara.
-         5. Si el alumno demuestra entender lo básico de su reto, incluye [VALIDADO] en tu respuesta.
-         6. Si es Arduino (Pro), usa C++ textual.`
+         No des código. Sé socrático y creativo.` :
+        systemPromptBase
+    }); Si es Arduino (Pro), usa C++ textual.`
     });
 
     const cleanMessage = (message || "").trim() || (mode === 'mission_generator' ? "Genera una nueva misión épica" : "");

@@ -7,7 +7,14 @@ import { supabase } from '../../lib/supabaseClient';
 
 export default function AulasPage() {
   const { session, role, loading } = useAuth();
+  const router = React.useMemo(() => typeof window !== 'undefined' ? require('next/navigation').useRouter() : null, []);
   const [misRecursos, setMisRecursos] = useState([]);
+
+  React.useEffect(() => {
+    if (!loading && (!session || role !== 'profesor')) {
+      if (router) router.push('/');
+    }
+  }, [loading, session, role, router]);
 
   const loadMisRecursos = useCallback(async () => {
     if (!session?.user?.id || role !== 'profesor') return;
@@ -23,8 +30,23 @@ export default function AulasPage() {
     loadMisRecursos();
   }, [loadMisRecursos]);
 
-  if (loading) return <div className="loading-container">Iniciando sistemas del aula...</div>;
-  if (!session || role !== 'profesor') return <div className="error-container">Acceso restringido a docentes.</div>;
+  if (loading || (!session || role !== 'profesor')) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'var(--color-bg)',
+        fontFamily: 'Outfit, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{ marginBottom: '20px' }}></div>
+          <p style={{ color: 'var(--color-text-muted)' }}>Validando credenciales de acceso...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '20px 5%', minHeight: '100vh', background: 'var(--color-bg)' }}>
