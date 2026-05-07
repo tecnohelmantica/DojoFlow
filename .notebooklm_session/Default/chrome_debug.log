@@ -1,7 +1,28 @@
-[0503/103746.143:INFO:CONSOLE:543] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.LR4tOoY_RrE.es5.O/am=Kd8AAAChEAVCBgDj__8GAAiAIGrg9SwATSAyAAAAAAAAAABgBQAAGgE/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlGFWLQXMrWu5F2RFXqPjsCzKv86oQ/dti=1/m=_b,_tp (543)
-[0503/103746.144:INFO:CONSOLE:543] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
+[0506/162330.778:ERROR:net\disk_cache\cache_util_win.cc:25] Unable to move the cache: Acceso denegado. (0x5)
+[0506/162330.778:ERROR:net\disk_cache\cache_util_win.cc:25] Unable to move the cache: Acceso denegado. (0x5)
+[0506/162330.778:ERROR:net\disk_cache\disk_cache.cc:284] Unable to create cache
+[0506/162330.778:ERROR:gpu\ipc\host\gpu_disk_cache.cc:737] Gpu Cache Creation failed: -2
+[0506/162330.778:ERROR:net\disk_cache\disk_cache.cc:284] Unable to create cache
+[0506/162330.778:ERROR:gpu\ipc\host\gpu_disk_cache.cc:737] Gpu Cache Creation failed: -2
+[0506/162330.784:ERROR:net\disk_cache\cache_util_win.cc:25] Unable to move the cache: Acceso denegado. (0x5)
+[0506/162330.784:ERROR:net\disk_cache\disk_cache.cc:284] Unable to create cache
+[0506/162330.784:ERROR:gpu\ipc\host\gpu_disk_cache.cc:737] Gpu Cache Creation failed: -2
+[0506/162331.005:WARNING:content\browser\btm\btm_database.cc:128] Failed to initialize the DIPS SQLite database.
+[0506/162331.992:INFO:CONSOLE:543] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.LR4tOoY_RrE.es5.O/am=Kd8AAAChEAVCBgDj__8GAAiAIGrg9SwATSAyAAAAAAAAAABgBQAAGgE/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlGFWLQXMrWu5F2RFXqPjsCzKv86oQ/dti=1/m=_b,_tp (543)
+[0506/162331.992:INFO:CONSOLE:543] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
 Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.LR4tOoY_RrE.es5.O/am=Kd8AAAChEAVCBgDj__8GAAiAIGrg9SwATSAyAAAAAAAAAABgBQAAGgE/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlGFWLQXMrWu5F2RFXqPjsCzKv86oQ/dti=1/m=_b,_tp (543)
-[0503/103746.755:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0503/103746.756:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0503/103746.884:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0503/103746.884:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162332.771:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
+[0506/162332.952:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162332.953:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162333.122:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162333.123:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162333.917:INFO:CONSOLE:543] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.LR4tOoY_RrE.es5.O/am=Kd8AAAChEAVCBgDj__8GAAiAIGrg9SwATSAyAAAAAAAAAABgAQAAGgE/d=1/excm=_b,_tp,identifierview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlEIuzkx5dj4wfp08ys3tOpqQYEFjQ/dti=1/m=_b,_tp (543)
+[0506/162333.917:INFO:CONSOLE:543] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
+Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.LR4tOoY_RrE.es5.O/am=Kd8AAAChEAVCBgDj__8GAAiAIGrg9SwATSAyAAAAAAAAAABgAQAAGgE/d=1/excm=_b,_tp,identifierview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlEIuzkx5dj4wfp08ys3tOpqQYEFjQ/dti=1/m=_b,_tp (543)
+[0506/162334.797:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
+[0506/162335.212:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162335.212:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162335.383:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162335.383:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0506/162336.818:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
+[0506/162338.842:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)

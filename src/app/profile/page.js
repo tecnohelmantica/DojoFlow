@@ -1497,7 +1497,7 @@ function ProfileContent() {
                 </div>
               )}
 
-              {(activePlanet === 'arduino' || activePlanet === 'html') && (
+              {activePlanet === 'arduino' && (
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {[
                     { id: null, label: 'ACADEMIA' }
@@ -1526,6 +1526,39 @@ function ProfileContent() {
                   ))}
                 </div>
               )}
+
+              {activePlanet === 'html' && (
+                <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                  {[
+                    { id: null, label: '1. ACADEMIA' },
+                    { id: 'raspberry', label: '2. RASPBERRY PI' },
+                    { id: 'javascript', label: '3. CURSO JS ⚡' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.7rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        whiteSpace: 'nowrap',
+                        background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <p style={{ fontSize: '0.75rem', color: '#8a8a9e', margin: '-10px 0 0 28px' }}>
@@ -1536,6 +1569,7 @@ function ProfileContent() {
               userId={session?.user?.id} 
               accentColor={planet?.barColor || '#6366f1'}
               itinerary={itinerary}
+              setItinerary={setItinerary}
             />
           </div>
 
