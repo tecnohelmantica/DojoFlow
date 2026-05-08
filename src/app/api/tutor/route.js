@@ -146,7 +146,6 @@ REGLA DE VALIDACIÓN:
          Campos obligatorios: title, description, objective, learning_objectives (array), sensei_tips, estimated_time, reward_xp, recommended_resources (array).
          No des código. Sé socrático y creativo.` :
         systemPromptBase
-    }); Si es Arduino (Pro), usa C++ textual.`
     });
 
     const cleanMessage = (message || "").trim() || (mode === 'mission_generator' ? "Genera una nueva misión épica" : "");
