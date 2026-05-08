@@ -107,6 +107,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [tinkercadCodeblocksTutorials, setTinkercadCodeblocksTutorials] = useState([]);
   const [blockscad, setBlockscad] = useState([]);
   const [blockscadTutorials, setBlockscadTutorials] = useState([]);
+  const [arduinoTutorials, setArduinoTutorials] = useState([]);
 
   const [userProgress, setUserProgress] = useState({});
   const [loading, setLoading] = useState(true);
@@ -282,6 +283,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); setChallenges(APP_INVENTOR_BASIC);
         } else if (pid === 'ia') {
           setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
+        } else if (pid === 'arduino') {
+          setDifficultyChallenges(ARDUINO_CHALLENGES);
+          setArduinoTutorials(ARDUINO_TUTORIALS);
+          const currentLevelList = ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner;
+          setChallenges(currentLevelList);
         }
       } else {
         // Map based on Planet
@@ -292,12 +298,22 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setExpertChallenges, dbChallenges, 'raspberry-l3', RASPBERRY_SCRATCH_CHALLENGES);
           populateState(setTutorials, dbTutorials, null, SCRATCH_TUTORIALS);
         } else if (pid === 'tinkercad' || pid === '3d') {
-          populateState(setTinkercad3dChallenges, dbChallenges, '3d-design', TINKERCAD_3D_CHALLENGES, difficultyLevel);
-          populateState(setTinkercadCodeblocks, dbChallenges, 'codeblocks', TINKERCAD_CODEBLOCKS_CHALLENGES);
-          populateState(setBlockscad, dbChallenges, 'blockscad', BLOCKSCAD_CHALLENGES);
+          populateState(setTinkercad3dChallenges, dbChallenges, '3d-design', TINKERCAD_3D_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          populateState(setTinkercadCodeblocks, dbChallenges, 'codeblocks', TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          populateState(setBlockscad, dbChallenges, 'blockscad', BLOCKSCAD_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          
           populateState(setTinkercad3d, dbTutorials, 'academy', TINKERCAD_3D_TUTORIALS);
           populateState(setTinkercadCodeblocksTutorials, dbTutorials, 'codeblocks', TINKERCAD_CODEBLOCKS_TUTORIALS);
           populateState(setBlockscadTutorials, dbTutorials, 'blockscad', BLOCKSCAD_TUTORIALS);
+          
+          // Establecer dificultad para que aparezcan los botones de niveles en Tinkercad 3D
+          if (itinerary === 'academy' || !itinerary) {
+            setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
+          } else if (itinerary === 'codeblocks') {
+            setDifficultyChallenges(TINKERCAD_CODEBLOCKS_CHALLENGES);
+          } else if (itinerary === 'blockscad') {
+            setDifficultyChallenges(BLOCKSCAD_CHALLENGES);
+          }
         } else if (pid === 'python') {
           populateState(setChallenges, dbChallenges, 'academia', PYTHON_ACADEMIA);
           populateState(setPythonAcademiaRaspberry, dbChallenges, 'raspberry', PYTHON_RASPBERRY);
@@ -314,10 +330,15 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setMlForKidsBeginner, dbChallenges, 'mlforkids', ML_FOR_KIDS.beginner, 'beginner');
           populateState(setMlForKidsIntermediate, dbChallenges, 'mlforkids', ML_FOR_KIDS.intermediate, 'intermediate');
           populateState(setMlForKidsAdvanced, dbChallenges, 'mlforkids', ML_FOR_KIDS.advanced, 'advanced');
+        } else if (pid === 'arduino') {
+          setDifficultyChallenges(ARDUINO_CHALLENGES);
+          populateState(setArduinoTutorials, dbTutorials, null, ARDUINO_TUTORIALS);
+          const currentLevelList = ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner;
+          populateState(setChallenges, dbChallenges, null, currentLevelList, difficultyLevel);
         } else if (pid.includes('microbit')) {
           setDifficultyChallenges(MICROBIT_CHALLENGES);
           const currentLevelList = MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner;
-          populateState(setChallenges, dbChallenges, difficultyLevel, currentLevelList);
+          populateState(setChallenges, dbChallenges, null, currentLevelList, difficultyLevel);
           populateState(setTutorials, dbTutorials, null, []);
         } else {
           setChallenges(dbChallenges.sort(sortFn));
