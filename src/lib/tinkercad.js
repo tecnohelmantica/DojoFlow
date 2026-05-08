@@ -57,31 +57,31 @@ export const TINKERCAD_3D_CHALLENGES = {
 
 export const TINKERCAD_CODEBLOCKS_CHALLENGES = {
   beginner: [
-    { numero: 1, titulo: "Introducción a las Formas", url: "https://www.tinkercad.com/learn/overview/gChbybratG7?type=codeblocks", descripcion: "Aprende a crear tus primeras formas usando bloques de código." },
-    { numero: 2, titulo: "Movimiento de Formas", url: "https://www.tinkercad.com/learn/overview/3i05bkj8Knm?type=codeblocks", descripcion: "Aprende a desplazar objetos por el espacio 3D." },
-    { numero: 3, titulo: "Rotación de Formas", url: "https://www.tinkercad.com/learn/overview/8I7pXDGWjCV?type=codeblocks", descripcion: "Descubre cómo girar tus diseños programando ángulos." },
-    { numero: 4, titulo: "Mesa", url: "https://www.tinkercad.com/learn/overview/aGNNh8wTAwB?type=codeblocks", descripcion: "Construye una mesa completa combinando bloques de patas y tablero." },
-    { numero: 5, titulo: "Cohete a Marte", url: "https://www.tinkercad.com/learn/overview/7vXu5UBIrnG?type=codeblocks", descripcion: "Diseña un cohete espacial usando formas básicas y repeticiones." },
-    { numero: 6, titulo: "Cesta", url: "https://www.tinkercad.com/learn/overview/6O0Pm7BIbMm?type=codeblocks", descripcion: "Crea una cesta estructurada mediante bloques de diseño." },
-    { numero: 7, titulo: "Definir Color", url: "https://www.tinkercad.com/learn/overview/hAWo5QOtTgs?type=codeblocks", descripcion: "Aprende a gestionar los colores de tus objetos mediante código." }
+    { numero: 1, titulo: "Introducción a las Formas", url: "https://www.tinkercad.com/codeblocks/edit?activity=gChbybratG7", descripcion: "Aprende a crear tus primeras formas usando bloques de código." },
+    { numero: 2, titulo: "Movimiento de Formas", url: "https://www.tinkercad.com/codeblocks/edit?activity=3i05bkj8Knm", descripcion: "Aprende a desplazar objetos por el espacio 3D." },
+    { numero: 3, titulo: "Rotación de Formas", url: "https://www.tinkercad.com/codeblocks/edit?activity=8I7pXDGWjCV", descripcion: "Descubre cómo girar tus diseños programando ángulos." },
+    { numero: 4, titulo: "Mesa", url: "https://www.tinkercad.com/codeblocks/edit?doc=aGNNh8wTAwB", descripcion: "Construye una mesa completa combinando bloques de patas y tablero." },
+    { numero: 5, titulo: "Cohete a Marte", url: "https://www.tinkercad.com/codeblocks/edit?doc=7vXu5UBIrnG", descripcion: "Diseña un cohete espacial usando formas básicas y repeticiones." },
+    { numero: 6, titulo: "Cesta", url: "https://www.tinkercad.com/codeblocks/edit?doc=6O0Pm7BIbMm", descripcion: "Crea una cesta estructurada mediante bloques de diseño." },
+    { numero: 7, titulo: "Definir Color", url: "https://www.tinkercad.com/codeblocks/edit?activity=hAWo5QOtTgs", descripcion: "Aprende a gestionar los colores de tus objetos mediante código." }
   ],
   intermediate: [
-    { numero: 8, titulo: "Bloque de Posición: Carámbanos", url: "https://www.tinkercad.com/learn/overview/5ebg60cQY7G?type=codeblocks", descripcion: "Usa el bloque de posición para crear carámbanos de hielo." },
-    { numero: 9, titulo: "Bloque de Tamaño: Etiqueta de Nombre", url: "https://www.tinkercad.com/learn/overview/kTUjYPpHnur?type=codeblocks", descripcion: "Crea una etiqueta que se ajusta automáticamente al tamaño del texto." },
-    { numero: 10, titulo: "Soporte de Tamaño Variable", url: "https://www.tinkercad.com/learn/overview/4Oajmq9Vbc2?type=codeblocks", descripcion: "Diseña un soporte paramétrico que cambia según las variables." },
-    { numero: 11, titulo: "Portavelas", url: "https://www.tinkercad.com/learn/overview/jsafE2Fga85?type=codeblocks", descripcion: "Crea un portavelas geométrico y decorativo." },
-    { numero: 12, titulo: "Fidget Spinner", url: "https://www.tinkercad.com/learn/overview/gzA8G3b4UvE?type=codeblocks", descripcion: "Programa un Fidget Spinner funcional y equilibrado." },
-    { numero: 13, titulo: "Plantilla: Generador de Bosques", url: "https://www.tinkercad.com/learn/overview/5Spdpd1UDWi?type=codeblocks", descripcion: "Crea un algoritmo para generar bosques de forma aleatoria." },
-    { numero: 14, titulo: "Reloj", url: "https://www.tinkercad.com/learn/overview/gtoVgiaaaXY?type=codeblocks", descripcion: "Diseña la esfera y manecillas de un reloj programable." }
+    { numero: 8, titulo: "Bloque de Posición: Carámbanos", url: "https://www.tinkercad.com/codeblocks/edit?activity=5ebg60cQY7G", descripcion: "Usa el bloque de posición para crear carámbanos de hielo." },
+    { numero: 9, titulo: "Bloque de Tamaño: Etiqueta de Nombre", url: "https://www.tinkercad.com/codeblocks/edit?activity=kTUjYPpHnur", descripcion: "Crea una etiqueta que se ajusta automáticamente al tamaño del texto." },
+    { numero: 10, titulo: "Soporte de Tamaño Variable", url: "https://www.tinkercad.com/codeblocks/edit?activity=4Oajmq9Vbc2", descripcion: "Diseña un soporte paramétrico que cambia según las variables." },
+    { numero: 11, titulo: "Portavelas", url: "https://www.tinkercad.com/codeblocks/edit?doc=jsafE2Fga85", descripcion: "Crea un portavelas geométrico y decorativo." },
+    { numero: 12, titulo: "Fidget Spinner", url: "https://www.tinkercad.com/codeblocks/edit?doc=gzA8G3b4UvE", descripcion: "Programa un Fidget Spinner funcional y equilibrado." },
+    { numero: 13, titulo: "Plantilla: Generador de Bosques", url: "https://www.tinkercad.com/codeblocks/edit?doc=5Spdpd1UDWi", descripcion: "Crea un algoritmo para generar bosques de forma aleatoria." },
+    { numero: 14, titulo: "Reloj", url: "https://www.tinkercad.com/codeblocks/edit?doc=gtoVgiaaaXY", descripcion: "Diseña la esfera y manecillas de un reloj programable." }
   ],
   advanced: [
-    { numero: 15, titulo: "Copo de Nieve", url: "https://www.tinkercad.com/learn/overview/2FJDxW9EGTV?type=codeblocks", descripcion: "Genera patrones fractales complejos para crear un copo de nieve." },
-    { numero: 16, titulo: "Muelle Variable", url: "https://www.tinkercad.com/learn/overview/aKbaruX3cNT?type=codeblocks", descripcion: "Crea un resorte o muelle cuya altura y radio son variables." },
-    { numero: 17, titulo: "Ladrillo", url: "https://www.tinkercad.com/learn/overview/iTQK3hJwm2H?type=codeblocks", descripcion: "Modela un ladrillo de construcción con todos sus detalles." },
-    { numero: 18, titulo: "Conector", url: "https://www.tinkercad.com/learn/overview/iAmciU78hTj?type=codeblocks", descripcion: "Diseña una pieza de conexión técnica para conjuntos mecánicos." },
-    { numero: 19, titulo: "Aspa de Viento", url: "https://www.tinkercad.com/learn/overview/eJ08BFBSBbW?type=codeblocks", descripcion: "Modela un aspa de aerogenerador optimizada mediante código." },
-    { numero: 20, titulo: "Pizza Aleatoria", url: "https://www.tinkercad.com/learn/overview/i8zy1C018TU?type=codeblocks", descripcion: "Usa la aleatoriedad para colocar ingredientes sobre una pizza." },
-    { numero: 21, titulo: "Marco de Fotos", url: "https://www.tinkercad.com/learn/overview/19ZvI1Jk24G?type=codeblocks", descripcion: "Diseña un marco de fotos paramétrico y personalizable." }
+    { numero: 15, titulo: "Copo de Nieve", url: "https://www.tinkercad.com/codeblocks/edit?doc=2FJDxW9EGTV", descripcion: "Genera patrones fractales complejos para crear un copo de nieve." },
+    { numero: 16, titulo: "Muelle Variable", url: "https://www.tinkercad.com/codeblocks/edit?doc=aKbaruX3cNT", descripcion: "Crea un resorte o muelle cuya altura y radio son variables." },
+    { numero: 17, titulo: "Ladrillo", url: "https://www.tinkercad.com/codeblocks/edit?doc=iTQK3hJwm2H", descripcion: "Modela un ladrillo de construcción con todos sus detalles." },
+    { numero: 18, titulo: "Conector", url: "https://www.tinkercad.com/codeblocks/edit?doc=iAmciU78hTj", descripcion: "Diseña una pieza de conexión técnica para conjuntos mecánicos." },
+    { numero: 19, titulo: "Aspa de Viento", url: "https://www.tinkercad.com/codeblocks/edit?doc=eJ08BFBSBbW", descripcion: "Modela un aspa de aerogenerador optimizada mediante código." },
+    { numero: 20, titulo: "Pizza Aleatoria", url: "https://www.tinkercad.com/codeblocks/edit?doc=i8zy1C018TU", descripcion: "Usa la aleatoriedad para colocar ingredientes sobre una pizza." },
+    { numero: 21, titulo: "Marco de Fotos", url: "https://www.tinkercad.com/codeblocks/edit?doc=19ZvI1Jk24G", descripcion: "Diseña un marco de fotos paramétrico y personalizable." }
   ]
 };
 

@@ -373,9 +373,13 @@ export default function HomePage() {
                   )}
                   <div className="status-overlay" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50%', background: `linear-gradient(0deg, ${planet.barColor}CC 0%, transparent 100%)` }} />
                   
-                  {isAulaConectada && (
+                  {isAulaConectada ? (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: '#e0f5f5', color: '#128989', padding: '4px 10px', borderRadius: '12px', fontSize: '0.65rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                      <Zap size={10} fill="#128989" /> AULA CONECTADA
+                      <Zap size={10} fill="#128989" /> MISIÓN DE CLASE
+                    </div>
+                  ) : (
+                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(255,255,255,0.9)', color: planet.barColor, padding: '4px 10px', borderRadius: '12px', fontSize: '0.65rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                      <Globe size={10} /> SECTOR ABIERTO
                     </div>
                   )}
 
@@ -404,21 +408,8 @@ export default function HomePage() {
 
                   {/* ACCIONES */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-                    {!isProfesor && isAulaConectada && (
-                      <GlowButton 
-                        color="cyan" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.open(launcherUrl, '_blank');
-                        }}
-                        style={{ background: 'linear-gradient(135deg, #0dcfcf, #9c27b0)' }}
-                      >
-                        <ExternalLink size={16} /> ACCEDER A MI CLASE
-                      </GlowButton>
-                    )}
-                    
                     <GlowButton 
-                      color={isProfesor ? "teal" : "purple"}
+                      color={isProfesor ? "teal" : "premium-cyan"}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (isProfesor) {
@@ -427,6 +418,7 @@ export default function HomePage() {
                           router.push(`/profile?planet=${planet.id}`);
                         }
                       }}
+                      style={!isProfesor && isAulaConectada ? { background: 'linear-gradient(135deg, #0dcfcf, #9c27b0)' } : {}}
                     >
                       {isProfesor ? 'VER CONTENIDO' : '🚀 IA TUTOR / RETOS'}
                     </GlowButton>

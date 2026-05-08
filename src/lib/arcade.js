@@ -78,17 +78,17 @@ export const ARCADE_CHALLENGES = [
   },
   {
     "numero": 12,
-    "titulo": "JUEGO DE PREGUNTAS (TRIVIA)",
-    "descripcion": "Lógica condicional, variables de texto e interfaz de usuario (botones). Pon a prueba los conocimientos con este trivia.",
-    "pdfUrl": "https://drive.google.com/file/d/1vCqNt87kJgPzFeMp2cpvfgk877p8NyA9/view",
-    "editorUrl": "https://makecode.com/_MsuRMddFVfE2"
-  },
-  {
-    "numero": 13,
     "titulo": "PIEDRA, PAPEL O TIJERAS",
     "descripcion": "Lógica de decisión, valores aleatorios y comparación de variables. Un duelo de azar y programación.",
     "pdfUrl": "https://drive.google.com/file/d/10cixRNvndH1xHwV4OrUwx3otNlSZ4oxf/view",
     "editorUrl": "https://makecode.com/_AjPbgMd3d9R9"
+  },
+  {
+    "numero": 13,
+    "titulo": "DUCK HUNT",
+    "descripcion": "Puntería, eventos de click/pelota, animaciones y tiempos de reacción. ¡Apunta y dispara!",
+    "pdfUrl": "https://drive.google.com/file/d/1vCqNt87kJgPzFeMp2cpvfgk877p8NyA9/view",
+    "editorUrl": "https://makecode.com/_MsuRMddFVfE2"
   },
   {
     "numero": 14,
@@ -99,8 +99,8 @@ export const ARCADE_CHALLENGES = [
   },
   {
     "numero": 15,
-    "titulo": "DUCK HUNT",
-    "descripcion": "Puntería, eventos de click/pelota, animaciones y tiempos de reacción. ¡Apunta y dispara!",
+    "titulo": "ROMPE BLOQUES",
+    "descripcion": "Mecánicas de colisión, rebote y destrucción de elementos. Un clásico Arkanoid para dominar las físicas.",
     "pdfUrl": "https://drive.google.com/file/d/1vCqNt87kJgPzFeMp2cpvfgk877p8NyA9/view",
     "editorUrl": "https://makecode.com/_MsuRMddFVfE2"
   },
@@ -113,14 +113,14 @@ export const ARCADE_CHALLENGES = [
   },
   {
     "numero": 17,
-    "titulo": "JUEGO DE COCHES",
-    "descripcion": "Físicas de conducción, trazado de circuitos en tilemaps y cronómetro. ¡Pisa a fondo el acelerador!",
+    "titulo": "TABLAS DE MULTIPLICAR",
+    "descripcion": "Lógica matemática, variables y entrada de usuario. Aprende divirtiéndote con este desafío educativo.",
     "pdfUrl": "https://drive.google.com/file/d/1vdALy5y2apCoYJkVKZw5qVjyQH8ytKsT/view",
     "editorUrl": "https://makecode.com/_AWEfMvAfbVg0"
   },
   {
     "numero": 18,
-    "titulo": "JUEGO DE MEMORIA (SIMON)",
+    "titulo": "JUEGO DE MEMORIA",
     "descripcion": "Uso de Arrays (listas), patrones lógicos y feedback visual/sonoro. Entrena tu memoria con este desafío.",
     "pdfUrl": "https://drive.google.com/file/d/1dOVgSE4WnMBgRDWtmb5AmsJiJxht77mP/view",
     "editorUrl": "https://makecode.com/_9wJLbtL73bTj"

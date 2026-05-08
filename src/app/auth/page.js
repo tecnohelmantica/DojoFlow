@@ -201,7 +201,7 @@ export default function AuthPage() {
         if (error) throw new Error("Credenciales inválidas o identidad no encontrada.");
         handleLoginSuccess(authData);
       } else {
-        // Lógica de Registro (Signup) con Email Real Opcional
+        // Lógica de Registro (Signup) ULTRA-SIMPLIFICADA PARA NIÑOS
         const { data, error } = await supabase.auth.signUp({
           email: internalAuthEmail,
           password,
@@ -213,10 +213,15 @@ export default function AuthPage() {
           }
         });
         
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes("already registered")) {
+            throw new Error("Ese Alias ya ha sido reclamado. ¡Prueba uno más original!");
+          }
+          throw error;
+        }
 
-        // Inyectar datos en 'public.profiles'
         if (data.user) {
+          // Crear perfil inicial
           const { error: profileError } = await supabase
             .from('profiles')
             .insert([
@@ -224,39 +229,20 @@ export default function AuthPage() {
                 id: data.user.id, 
                 alias: alias,
                 email_real: emailReal || null,
-                role: role,
-                real_name: role === 'profesor' ? alias : null
+                role: 'alumno',
+                xp: 100, // Regalo de bienvenida
+                level: 1,
+                avatar_url: 'alumno.png'
               }
             ]);
             
-          if (profileError) throw profileError;
-          
-          // Sincronizar estado local inmediatamente para evitar condiciones de carrera
-          updateProfile({
-            id: data.user.id,
-            alias: alias,
-            email_real: emailReal || null,
-            role: role,
-            real_name: role === 'profesor' ? alias : null
-          });
-
-          // Auto-login tras registro exitoso
-          const { error: loginError } = await supabase.auth.signInWithPassword({
+          // Login automático
+          await supabase.auth.signInWithPassword({
             email: internalAuthEmail,
             password
           });
 
-          if (loginError) {
-            setErrorMsg("Identidad Creada. Por favor, ingresa manualmente.");
-            setIsLogin(true);
-          } else {
-            // Redirigir según rol
-            if (role === 'profesor') {
-              router.push('/');
-            } else {
-              router.push('/profile');
-            }
-          }
+          router.push('/profile');
         }
       }
     } catch (err) {
@@ -287,7 +273,7 @@ export default function AuthPage() {
         <div className="auth-header">
           <Sparkles className="colorful-icon" size={60} strokeWidth={2.5} />
           <h1 className="glow-text-cyan">DojoFlow</h1>
-          <p>{isUpdatingPassword ? 'Actualización de Protocolos' : isRecovering ? 'Recuperación de Señal de Acceso' : isLogin ? 'Accede a tus simuladores de código' : 'Forja tu identidad en la academia'}</p>
+          <p>{isUpdatingPassword ? 'Actualización de Protocolos' : isRecovering ? 'Recuperación de Señal de Acceso' : isLogin ? 'Accede a tus simuladores de código' : '¡Crea tu personaje y empieza a explorar!'}</p>
         </div>
 
         {errorMsg && (
@@ -379,24 +365,14 @@ export default function AuthPage() {
             <>
               <input 
                 type="email" 
-                placeholder="Email (opcional para recuperar contraseña)"
+                placeholder="Correo de un padre/tutor (opcional)"
                 value={emailReal} 
                 onChange={(e) => setEmailReal(e.target.value)} 
                 className="auth-input"
               />
-              <p style={{ fontSize: '0.7rem', color: '#8a8a9e', marginTop: '-10px', marginBottom: '15px', lineHeight: '1.4' }}>
-                “El uso de correo electrónico es opcional y su finalidad es exclusivamente la recuperación de contraseña.”
+              <p style={{ fontSize: '0.7rem', color: '#8a8a9e', marginTop: '-10px', marginBottom: '20px', lineHeight: '1.4' }}>
+                Tu Alias es tu identidad. El correo es solo por si olvidas tu contraseña.
               </p>
-              <div className="role-selector">
-                <label>
-                  <input type="radio" value="alumno" checked={role === 'alumno'} onChange={() => setRole('alumno')} />
-                  <span>Alumno Explorador</span>
-                </label>
-                <label>
-                  <input type="radio" value="profesor" checked={role === 'profesor'} onChange={() => setRole('profesor')} />
-                  <span>Maestro Docente</span>
-                </label>
-              </div>
             </>
           )}
 

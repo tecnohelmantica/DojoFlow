@@ -30,7 +30,7 @@ export const MICROBIT_CHALLENGES = {
     {"numero": 28, "titulo": "Sensor de tacto", "id": "touch-sensor"},
     {"numero": 29, "titulo": "Emoción de sonido", "id": "sound-emotion"},
     {"numero": 30, "titulo": "Juguete sensorial", "id": "sensory-toy"},
-    {"numero": 31, "titulo": "Nieve al agitar", "id": "snow-flakes"},
+    {"numero": 31, "titulo": "Nieve al agitar", "id": "snow-globe"},
     {"numero": 32, "titulo": "Melodía al agitar", "id": "melody-player"},
     {"numero": 33, "titulo": "Contador", "id": "counter"},
     {"numero": 34, "titulo": "Selector de actividades", "id": "activity-picker"},
@@ -62,7 +62,7 @@ export const MICROBIT_CHALLENGES = {
     {"numero": 7, "titulo": "Búsqueda del tesoro", "id": "treasure-hunt"},
     {"numero": 8, "titulo": "Matriz actividades", "id": "activity-picker"},
     {"numero": 9, "titulo": "Termómetro Fahrenheit", "id": "fahrenheit-thermometer"},
-    {"numero": 10, "titulo": "Gramola con volumen", "id": "volume-jukebox"},
+    {"numero": 10, "titulo": "Gramola con volumen", "id": "jukebox-with-volume"},
     {"numero": 11, "titulo": "Alarma puerta", "id": "simple-door-alarm"},
     {"numero": 12, "titulo": "Temporizador táctil", "id": "touch-timer"},
     {"numero": 13, "titulo": "Cronómetro táctil", "id": "touch-stopwatch"},
@@ -83,7 +83,7 @@ export const MICROBIT_CHALLENGES = {
     {"numero": 28, "titulo": "Temp. máx/mín", "id": "max-min-thermometer"},
     {"numero": 29, "titulo": "Registrador temp.", "id": "temperature-logger"},
     {"numero": 30, "titulo": "Casa inteligente", "id": "smart-home-lights"},
-    {"numero": 31, "titulo": "Luces aplauso IA", "id": "clap-lights-ai"},
+    {"numero": 31, "titulo": "Luces aplauso IA", "id": "ai-light-switch"},
     {"numero": 32, "titulo": "Alarma galletas v2", "id": "cookie-jar-alarm"}
   ],
   advanced: [
@@ -94,14 +94,14 @@ export const MICROBIT_CHALLENGES = {
     {"numero": 5, "titulo": "Alarma inclinación", "id": "tilt-alarm"},
     {"numero": 6, "titulo": "Alarma de luz", "id": "light-alarm"},
     {"numero": 7, "titulo": "Alarma presostato", "id": "pressure-switch-alarm"},
-    {"numero": 8, "titulo": "Alarma inalámbrica", "id": "wireless-door-alarm"},
+    {"numero": 8, "titulo": "Alarma inalámbrica", "id": "door-alarm"},
     {"numero": 9, "titulo": "Alarma PIR", "id": "pir-movement-alarm"},
     {"numero": 10, "titulo": "Juego reacción", "id": "reaction-game"},
-    {"numero": 11, "titulo": "Datalogger MakeCode", "id": "makecode-data-logger"},
+    {"numero": 11, "titulo": "Datalogger MakeCode", "id": "movement-data-logger"},
     {"numero": 12, "titulo": "Luciérnagas", "id": "fireflies"},
-    {"numero": 13, "titulo": "Piedra Papel Tijera Sonido", "id": "rock-paper-scissors-with-sound"},
-    {"numero": 14, "titulo": "Pitcher and catcher", "id": "pitcher-and-catcher"},
+    {"numero": 13, "titulo": "Piedra Papel Tijera Sonido", "id": "audible-rock-paper-scissors"},
+    {"numero": 14, "titulo": "Pitcher and catcher", "id": "audible-teleporting-duck"},
     {"numero": 15, "titulo": "Datalogger ambiental", "id": "environment-data-logger"},
-    {"numero": 16, "titulo": "Datalogger radio", "id": "radio-data-logger"}
+    {"numero": 16, "titulo": "Datalogger radio", "id": "wireless-data-logger"}
   ]
 };
