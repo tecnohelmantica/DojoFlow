@@ -9,7 +9,7 @@
   align-items: center;
   background-color: #030014;
   background-image: 
-    linear-gradient(to bottom, rgba(3, 0, 20, 0.7), rgba(3, 0, 20, 0.8)),
+    linear-gradient(to bottom, rgba(3, 0, 20, 0.4), rgba(3, 0, 20, 0.6)),
     url('/backgrounds/galactic_dojo_bg.png');
   background-size: cover;
   background-position: center;
@@ -24,7 +24,7 @@
   border-radius: 50%;
   filter: blur(80px);
   z-index: 0;
-  opacity: 0.5;
+  opacity: 0.7;
   animation: float 20s infinite alternate ease-in-out;
 }
 
@@ -79,11 +79,13 @@
   width: 100%;
   max-width: 480px;
   padding: 50px 40px !important;
-  background: rgba(13, 13, 26, 0.6) !important;
-  backdrop-filter: blur(25px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-  border-radius: 32px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  border-radius: 40px !important;
 }
 
 .auth-header {
@@ -114,7 +116,7 @@
 
 .brand-subtitle {
   font-family: 'Inter', sans-serif;
-  color: rgba(138, 138, 158, 0.8);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1rem;
   line-height: 1.5;
   max-width: 300px;
@@ -129,8 +131,8 @@
 
 .auth-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
   padding: 16px 20px;
   border-radius: 14px;
@@ -141,7 +143,7 @@
 }
 
 .auth-input::placeholder {
-  color: rgba(138, 138, 158, 0.6);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .auth-input:focus {
@@ -181,7 +183,7 @@
 .switch-btn {
   background: none;
   border: none;
-  color: rgba(138, 138, 158, 0.8);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   font-size: 0.95rem;
   font-family: 'Inter', sans-serif;

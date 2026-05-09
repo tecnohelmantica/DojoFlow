@@ -3,7 +3,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
-import { UserPlus, LogIn, AlertCircle, Rocket, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { UserPlus, LogIn, AlertCircle, Rocket, Eye, EyeOff, Sparkles, Shield } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../components/AuthProvider';
 import './page.css';
@@ -196,11 +196,21 @@ function AuthContent() {
 
         if (data.user) {
           await supabase.from('profiles').insert([{ 
-            id: data.user.id, alias: alias, email_real: emailReal || null,
-            role: 'alumno', xp: 100, level: 1, avatar_url: 'alumno.png'
+            id: data.user.id, 
+            alias: alias, 
+            email_real: emailReal || null,
+            role: role, 
+            xp: 100, 
+            level: 1, 
+            avatar_url: role === 'profesor' ? 'profesor.png' : 'alumno.png'
           }]);
           await supabase.auth.signInWithPassword({ email: internalAuthEmail, password });
-          router.push('/profile');
+          
+          if (role === 'profesor') {
+            router.push('/');
+          } else {
+            router.push('/profile');
+          }
         }
       }
     } catch (err) {
@@ -301,6 +311,51 @@ function AuthContent() {
 
               {!isLogin && !isRecovering && (
                 <>
+                  <div className="role-selector-label" style={{ fontSize: '0.8rem', color: '#8a8a9e', fontWeight: '600', marginBottom: '8px' }}>ELIGE TU CAMINO:</div>
+                  <div className="role-selector" style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+                    <div 
+                      onClick={() => setRole('alumno')}
+                      className={`role-option ${role === 'alumno' ? 'active' : ''}`}
+                      style={{
+                        flex: 1,
+                        padding: '16px 12px',
+                        borderRadius: '16px',
+                        border: `2px solid ${role === 'alumno' ? 'var(--accent-teal)' : 'rgba(255,255,255,0.05)'}`,
+                        background: role === 'alumno' ? 'rgba(102, 226, 213, 0.1)' : 'rgba(255,255,255,0.02)',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <Rocket size={24} style={{ color: role === 'alumno' ? 'var(--accent-teal)' : '#8a8a9e' }} />
+                      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: role === 'alumno' ? 'white' : '#8a8a9e', letterSpacing: '1px' }}>SOY ALUMNO</div>
+                    </div>
+                    <div 
+                      onClick={() => setRole('profesor')}
+                      className={`role-option ${role === 'profesor' ? 'active' : ''}`}
+                      style={{
+                        flex: 1,
+                        padding: '16px 12px',
+                        borderRadius: '16px',
+                        border: `2px solid ${role === 'profesor' ? 'var(--accent-purple)' : 'rgba(255,255,255,0.05)'}`,
+                        background: role === 'profesor' ? 'rgba(197, 129, 255, 0.1)' : 'rgba(255,255,255,0.02)',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <Shield size={24} style={{ color: role === 'profesor' ? 'var(--accent-purple)' : '#8a8a9e' }} />
+                      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: role === 'profesor' ? 'white' : '#8a8a9e', letterSpacing: '1px' }}>SOY DOCENTE</div>
+                    </div>
+                  </div>
                   <input type="email" placeholder="Correo de un padre/tutor (opcional)" value={emailReal} onChange={(e) => setEmailReal(e.target.value)} className="auth-input" />
                   <p className="input-hint">Tu Alias es tu identidad. El correo es opcional.</p>
                 </>

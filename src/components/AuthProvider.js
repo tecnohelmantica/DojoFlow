@@ -299,6 +299,9 @@ export default function AuthProvider({ children }) {
   }, []);
 
   const handleSignOut = async (redirectPath = '/') => {
+    // Asegurar que el path sea un string (evitar [object Object] si se pasa el evento de click)
+    const finalPath = typeof redirectPath === 'string' ? redirectPath : '/';
+    
     try {
       if (isGuest) {
         localStorage.removeItem('dojoflow_guest');
@@ -307,17 +310,17 @@ export default function AuthProvider({ children }) {
         await supabase.auth.signOut();
       }
       
-      if (redirectPath.includes('?')) {
-        window.location.href = redirectPath;
+      if (finalPath.includes('?')) {
+        window.location.href = finalPath;
         return;
       }
 
       setSession(null);
       setProfile(null);
-      window.location.href = redirectPath;
+      window.location.href = finalPath;
     } catch (err) {
       console.error('Error signing out:', err);
-      window.location.href = redirectPath;
+      window.location.href = finalPath;
     }
   };
 

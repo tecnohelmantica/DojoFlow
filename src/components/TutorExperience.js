@@ -197,7 +197,7 @@ const TutorExperience = ({ technology, onComplete }) => {
       `}</style>
       <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100 }}>
         <button 
-          onClick={signOut}
+          onClick={() => signOut()}
           style={{ 
             background: 'white', 
             border: '1px solid #eee', 

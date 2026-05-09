@@ -201,7 +201,7 @@ const TopHeader = () => {
           </div>
 
           <div 
-            onClick={signOut}
+            onClick={() => signOut()}
             style={{ 
               cursor: 'pointer', 
               color: '#ff4b4b', 
