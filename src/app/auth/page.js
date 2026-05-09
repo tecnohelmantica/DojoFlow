@@ -302,10 +302,10 @@ function AuthContent() {
 
               {!isLogin && !isRecovering && (
                 <div className="pwd-rules">
-                  <div style={{ color: pwdRules.length ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.7)' }}>{pwdRules.length ? '✓' : '○'} Más de 8 caracteres</div>
-                  <div style={{ color: pwdRules.upperLower ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.7)' }}>{pwdRules.upperLower ? '✓' : '○'} Mayúsculas y minúsculas</div>
-                  <div style={{ color: pwdRules.number ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.7)' }}>{pwdRules.number ? '✓' : '○'} Un número</div>
-                  <div style={{ color: pwdRules.symbol ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.7)' }}>{pwdRules.symbol ? '✓' : '○'} Un símbolo especial</div>
+                  <div style={{ color: pwdRules.length ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.length ? '✓' : '○'} Más de 8 caracteres</div>
+                  <div style={{ color: pwdRules.upperLower ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.upperLower ? '✓' : '○'} Mayúsculas y minúsculas</div>
+                  <div style={{ color: pwdRules.number ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.number ? '✓' : '○'} Un número</div>
+                  <div style={{ color: pwdRules.symbol ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.symbol ? '✓' : '○'} Un símbolo especial</div>
                 </div>
               )}
 
