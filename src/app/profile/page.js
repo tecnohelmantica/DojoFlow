@@ -501,9 +501,8 @@ function ProfileContent() {
             <button 
               onClick={() => { 
                 sessionStorage.setItem('dojoflow_navigating_to_signup', 'true');
-                clearGuestSession().finally(() => {
-                  window.location.href = '/?mode=signup'; 
-                });
+                clearGuestSession(); 
+                window.location.href = '/?mode=signup'; 
               }}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', marginLeft: '12px', fontSize: '0.8rem' }}
             >
@@ -783,9 +782,8 @@ function ProfileContent() {
             <button 
               onClick={() => { 
                 sessionStorage.setItem('dojoflow_navigating_to_signup', 'true');
-                clearGuestSession().finally(() => {
-                  window.location.href = '/?mode=signup'; 
-                });
+                clearGuestSession();
+                window.location.href = '/?mode=signup'; 
               }}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', marginLeft: '12px', fontSize: '0.8rem' }}
             >

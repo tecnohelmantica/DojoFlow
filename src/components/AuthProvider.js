@@ -246,10 +246,12 @@ export default function AuthProvider({ children }) {
       const isSigningUp = searchParams.get('mode') === 'signup' || pathname === '/auth' || isNavigatingToSignup;
       
       // Si el usuario tiene intención de registrarse, limpiar cualquier rastro de invitado previo
-      if (isSigningUp && (localStorage.getItem('dojoflow_guest') === 'true' || isGuest)) {
+      if (isSigningUp && (localStorage.getItem('dojoflow_guest') === 'true' || isGuest || isNavigatingToSignup)) {
         localStorage.removeItem('dojoflow_guest');
         if (typeof window !== 'undefined') sessionStorage.removeItem('dojoflow_navigating_to_signup');
         setIsGuest(false);
+        setProfile(null);
+        setSession(null);
       }
 
       const isGuestMode = localStorage.getItem('dojoflow_guest') === 'true' && !isSigningUp;
