@@ -385,9 +385,13 @@ function AuthContent() {
                 <button type="button" onClick={() => { setIsLogin(!isLogin); setErrorMsg(null); }} className="switch-btn">
                   {isLogin ? '¿Aún no tienes pasaporte? Regístrate.' : '¿Ya eres miembro? Inicia Sesión.'}
                 </button>
-                <button type="button" onClick={() => { guestLogin(); router.push('/profile'); }} className="switch-btn guest-btn">
-                  <Rocket size={16} /> Explorar como Invitado
-                </button>
+                <GlowButton 
+                  onClick={() => { guestLogin(); router.push('/profile'); }} 
+                  className="auth-submit guest-btn-standard"
+                  color="dark"
+                >
+                  <Rocket size={20} /> Explorar como Invitado
+                </GlowButton>
               </div>
             )}
           </div>
