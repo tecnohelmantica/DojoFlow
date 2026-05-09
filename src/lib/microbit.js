@@ -68,7 +68,7 @@ export const MICROBIT_CHALLENGES = {
     {"numero": 13, "titulo": "Cronómetro táctil", "id": "touch-stopwatch"},
     {"numero": 14, "titulo": "Registrador sonido", "id": "sound-logger"},
     {"numero": 15, "titulo": "Mascota micro:bit", "id": "microbit-pet"},
-    {"numero": 16, "titulo": "Nivel de burbuja", "id": "bubble-level"},
+    {"numero": 16, "titulo": "Nivel de burbuja", "id": "spirit-level"},
     {"numero": 17, "titulo": "Brújula de sonido", "id": "sound-compass"},
     {"numero": 18, "titulo": "Vela", "id": "candle"},
     {"numero": 19, "titulo": "Cronómetro radio", "id": "radio-stopwatch"},

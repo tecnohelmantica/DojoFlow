@@ -51,7 +51,7 @@ const sortRecursos = (a, b) => {
 
 function ProfileContent() {
   const router = useRouter();
-  const { session, role, profile: authProfile, loading: authLoading, signOut, updateProfile } = useAuth();
+  const { session, role, profile: authProfile, loading: authLoading, signOut, clearGuestSession, updateProfile, isGuest } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -183,10 +183,77 @@ function ProfileContent() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!session) { router.push('/auth'); return; }
+    if (!session && !isGuest) { 
+      // Si ya tenemos intención de ir a signup, asegurar que redirigimos allí con el parámetro
+      if (typeof window !== 'undefined' && sessionStorage.getItem('dojoflow_navigating_to_signup') === 'true') {
+        router.push('/?mode=signup');
+        return;
+      }
+      
+      // Evitar redirigir si el usuario ya tiene intención de registrarse en la URL
+      if (typeof window !== 'undefined' && window.location.search.includes('mode=signup')) {
+        return;
+      }
+
+      router.push('/auth'); 
+      return; 
+    }
 
     const loadData = async () => {
       // 1. Perfil completo
+      if (isGuest) {
+        setProfile({
+          id: 'guest_user',
+          role: 'alumno',
+          alias: 'Invitado',
+          real_name: 'Explorador Anónimo',
+          avatar_url: 'alumno.png',
+          has_seen_onboarding: true,
+          isGuest: true
+        });
+        
+        setStudentStats({
+          retos: 0,
+          medallas: 0,
+          progreso: 0
+        });
+        setIsAutodidact(true);
+
+        // Cargar solo recursos maestros para invitados
+        setLoadingResources(true);
+        try {
+          // Simplificamos la query para invitados asegurando que solo pedimos lo público/maestro
+          const { data: globalRes, error: resError } = await supabase
+            .from('recursos_docentes')
+            .select('*')
+            .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->>isGlobal.eq.true,contenido->>isMaster.eq.true`);
+          
+          if (resError) throw resError;
+
+          const resourcesList = (globalRes || []).sort(sortRecursos);
+          setTeacherResources(resourcesList);
+
+          // Auto-seleccionar primer recurso relacionado con el planeta
+          if (resourcesList.length > 0) {
+            const planetRelated = resourcesList.find(r => 
+              r.tecnologia?.toLowerCase() === activePlanet?.toLowerCase()
+            );
+            const defaultInfo = resourcesList.find(r => 
+              r.tipo_recurso?.toLowerCase().includes('info') && 
+              r.tecnologia?.toLowerCase() === activePlanet?.toLowerCase()
+            ) || planetRelated || resourcesList[0];
+            
+            setSelectedScroll(defaultInfo);
+          }
+        } catch (err) {
+          console.error("Error cargando recursos maestros para invitado:", err);
+        } finally {
+          setLoadingResources(false);
+          setLoading(false);
+        }
+        return;
+      }
+
       const { data: profileData } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
       setProfile(profileData || { alias: 'Explorer_Kai' });
 
@@ -420,12 +487,30 @@ function ProfileContent() {
 
   if (authLoading || loading) return <div className="flex-center" style={{ minHeight: '60vh', color: '#8a8a9e' }}>Sincronizando parámetros...</div>;
   
-  if (!session || !profile) return null;
+  if (!session && !isGuest) return null;
+  if (!profile) return null;
 
   if (role === 'profesor') {
     return (
       <div className="profile-wrapper" style={{ padding: '20px 5%' }}>
         <TopHeader />
+        {isGuest && (
+          <div style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', textAlign: 'center', padding: '12px', marginBottom: '20px', borderRadius: '8px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Sparkles size={16} />
+            <strong>Modo Explorador:</strong> Estás viendo la plataforma sin registrarte. Tu progreso no se guardará.
+            <button 
+              onClick={() => { 
+                sessionStorage.setItem('dojoflow_navigating_to_signup', 'true');
+                clearGuestSession().finally(() => {
+                  window.location.href = '/?mode=signup'; 
+                });
+              }}
+              style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', marginLeft: '12px', fontSize: '0.8rem' }}
+            >
+              Registrarme
+            </button>
+          </div>
+        )}
 
         <div className="profile-dashboard-teacher" style={{ animation: 'fadeIn 0.6s ease-out' }}>
           <div className="profile-col-left" style={{ width: '100%' }}>
@@ -691,6 +776,23 @@ function ProfileContent() {
     return (
       <div className="layout-container" style={{ minHeight: '100vh', background: '#f8fafb' }}>
         <TopHeader />
+        {isGuest && (
+          <div style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', textAlign: 'center', padding: '12px', zIndex: 1000, position: 'relative', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Sparkles size={16} />
+            <strong>Modo Explorador:</strong> Estás viendo la plataforma sin registrarte. Tu progreso no se guardará.
+            <button 
+              onClick={() => { 
+                sessionStorage.setItem('dojoflow_navigating_to_signup', 'true');
+                clearGuestSession().finally(() => {
+                  window.location.href = '/?mode=signup'; 
+                });
+              }}
+              style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', marginLeft: '12px', fontSize: '0.8rem' }}
+            >
+              Registrarme
+            </button>
+          </div>
+        )}
         
         <main style={{ padding: '40px 5% 80px', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
           
@@ -1566,7 +1668,7 @@ function ProfileContent() {
             </p>
             <NinjaChallenges 
               planetId={activePlanet} 
-              userId={session?.user?.id} 
+              userId={isGuest ? 'guest_user' : session?.user?.id} 
               accentColor={planet?.barColor || '#6366f1'}
               itinerary={itinerary}
               setItinerary={setItinerary}
@@ -1578,7 +1680,7 @@ function ProfileContent() {
             <div style={{ marginTop: '40px' }}>
               <SenseiMissions 
                 planetId={activePlanet} 
-                userId={session?.user?.id}
+                userId={isGuest ? 'guest_user' : session?.user?.id}
               />
             </div>
           )}
@@ -1669,6 +1771,23 @@ function ProfileContent() {
       padding: '40px 20px'
     }}>
       <TopHeader />
+      {isGuest && (
+        <div style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', textAlign: 'center', padding: '12px', zIndex: 1000, position: 'relative', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <Sparkles size={16} />
+          <strong>Modo Explorador:</strong> Estás viendo la plataforma sin registrarte. Tu progreso no se guardará.
+          <button 
+            onClick={() => { 
+              if (typeof window !== 'undefined') {
+                sessionStorage.setItem('dojoflow_navigating_to_signup', 'true');
+              }
+              signOut(); 
+            }}
+            style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', marginLeft: '12px', fontSize: '0.8rem' }}
+          >
+            Registrarme
+          </button>
+        </div>
+      )}
       
       <div style={{ maxWidth: '1000px', margin: '40px auto' }}>
         {/* Header con estadísticas del alumno */}

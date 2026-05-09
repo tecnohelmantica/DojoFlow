@@ -12,6 +12,8 @@ const AuthContext = createContext({
   notifications: [],
   markNotificationsAsRead: () => {},
   signOut: async () => {},
+  guestLogin: () => {},
+  isGuest: false,
 });
 
 export function useAuth() {
@@ -23,10 +25,11 @@ export default function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
+  const [isGuest, setIsGuest] = useState(false);
 
   // Sistema de Notificaciones Reales
   const fetchNotifications = async (userId, userRole) => {
-    if (!userId) return;
+    if (!userId || isGuest || userId === 'guest_user') return;
 
     try {
       if (userRole === 'profesor') {
@@ -236,17 +239,52 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     // 1. Obtener sesión actual
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      if (s) {
-        fetchProfile(s.user.id);
-      } else {
-        setLoading(false);
+    const checkSession = async () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      const isNavigatingToSignup = typeof window !== 'undefined' && sessionStorage.getItem('dojoflow_navigating_to_signup') === 'true';
+      const isSigningUp = searchParams.get('mode') === 'signup' || pathname === '/auth' || isNavigatingToSignup;
+      
+      // Si el usuario tiene intención de registrarse, limpiar cualquier rastro de invitado previo
+      if (isSigningUp && (localStorage.getItem('dojoflow_guest') === 'true' || isGuest)) {
+        localStorage.removeItem('dojoflow_guest');
+        if (typeof window !== 'undefined') sessionStorage.removeItem('dojoflow_navigating_to_signup');
+        setIsGuest(false);
       }
-    });
+
+      const isGuestMode = localStorage.getItem('dojoflow_guest') === 'true' && !isSigningUp;
+
+      if (isGuestMode) {
+        setIsGuest(true);
+        setProfile({
+          id: 'guest_user',
+          role: 'alumno',
+          alias: 'Invitado',
+          real_name: 'Explorador Anónimo',
+          avatar_url: 'alumno.png',
+          has_seen_onboarding: true,
+          isGuest: true
+        });
+        setSession({ user: { id: 'guest_user' } });
+        setLoading(false);
+        return;
+      }
+
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        setSession(s);
+        if (s) {
+          fetchProfile(s.user.id);
+        } else {
+          setLoading(false);
+        }
+      });
+    };
+    checkSession();
 
     // 2. Escuchar cambios de auth
     const { data: listener } = supabase.auth.onAuthStateChange((event, s) => {
+      if (localStorage.getItem('dojoflow_guest') === 'true') return; // Ignorar si es invitado
+      
       setSession(s);
       if (s && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
         fetchProfile(s.user.id);
@@ -260,15 +298,55 @@ export default function AuthProvider({ children }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (redirectPath = '/') => {
     try {
-      await supabase.auth.signOut();
+      if (isGuest) {
+        localStorage.removeItem('dojoflow_guest');
+        setIsGuest(false);
+      } else {
+        await supabase.auth.signOut();
+      }
+      
+      if (redirectPath.includes('?')) {
+        window.location.href = redirectPath;
+        return;
+      }
+
       setSession(null);
       setProfile(null);
-      // Redirección forzada al inicio para limpiar el estado de la UI
-      window.location.href = '/';
+      window.location.href = redirectPath;
     } catch (err) {
       console.error('Error signing out:', err);
+      window.location.href = redirectPath;
+    }
+  };
+
+  const handleGuestLogin = () => {
+    localStorage.setItem('dojoflow_guest', 'true');
+    setIsGuest(true);
+    setProfile({
+      id: 'guest_user',
+      role: 'alumno',
+      alias: 'Invitado',
+      real_name: 'Explorador Anónimo',
+      avatar_url: 'alumno.png',
+      has_seen_onboarding: true,
+      isGuest: true
+    });
+    setSession({ user: { id: 'guest_user' } });
+    setLoading(false);
+  };
+
+  const clearGuestSession = async () => {
+    console.log('[AuthProvider] Clearing Guest Session...');
+    localStorage.removeItem('dojoflow_guest');
+    setIsGuest(false);
+    setSession(null);
+    setProfile(null);
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('Error during silent signOut for guest:', e);
     }
   };
 
@@ -287,7 +365,10 @@ export default function AuthProvider({ children }) {
       notifications, 
       markNotificationsAsRead, 
       signOut: handleSignOut,
-      updateProfile
+      updateProfile,
+      guestLogin: handleGuestLogin,
+      clearGuestSession,
+      isGuest
     }}>
       {children}
     </AuthContext.Provider>

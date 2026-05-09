@@ -212,22 +212,116 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       return aVal - bVal;
     };
 
+    const resetLists = () => {
+      setChallenges([]);
+      setTutorials([]);
+      setExpertChallenges([]);
+      setDifficultyChallenges(null);
+      setRaspberryL1([]);
+      setRaspberryL2([]);
+      setTinkercad3d([]);
+      setTinkercad3dChallenges([]);
+      setTinkercadCodeblocks([]);
+      setTinkercadCodeblocksTutorials([]);
+      setBlockscad([]);
+      setBlockscadTutorials([]);
+      setArduinoTutorials([]);
+      setPythonAcademiaRaspberry([]);
+      setPythonCodedexBeginner([]);
+      setPythonCodedexIntermediate([]);
+      setPythonCodedexAdvanced([]);
+      setAppInventorBasic([]);
+      setAppInventorIntermediate([]);
+      setAppInventorSocial([]);
+      setMlForKidsBeginner([]);
+      setMlForKidsIntermediate([]);
+      setMlForKidsAdvanced([]);
+    };
+
+    resetLists();
+
+    if (userId === 'guest_user') {
+      // Invitado no tiene progreso en DB, cargar solo locales
+      setLoading(true);
+      if (pid === 'code') {
+        setChallenges(CODE_MODERN_COURSES); setCodeModern(CODE_MODERN_COURSES); setCodeHourOfCode(CODE_HOUR_OF_CODE); setCodeHourOfAI(CODE_HOUR_OF_AI);
+      } else if (pid === 'html') {
+        setHtmlCodeOrg(HTML_CODE_ORG); setJsCourse(JS_LEARN_COURSE); setRaspberryL1(RASPBERRY_WEB_LEVEL_1); setRaspberryL2(RASPBERRY_WEB_LEVEL_2); setExpertChallenges(RASPBERRY_WEB_LEVEL_3); setChallenges(HTML_CODE_ORG);
+      } else if (pid === 'scratch') {
+        setChallenges(ROBOTIX_CHALLENGES); setRaspberryL1(RASPBERRY_SCRATCH_L1); setRaspberryL2(RASPBERRY_SCRATCH_L2); setExpertChallenges(RASPBERRY_SCRATCH_CHALLENGES); setTutorials(SCRATCH_TUTORIALS);
+      } else if (pid === 'tinkercad' || pid === '3d') {
+        setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
+        setTinkercad3d(TINKERCAD_3D_ACADEMY); setTinkercad3dChallenges(TINKERCAD_3D_CHALLENGES[difficultyLevel] || []); setTinkercadCodeblocks(TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || []); setBlockscad(BLOCKSCAD_CHALLENGES[difficultyLevel] || []); setChallenges(TINKERCAD_3D_CHALLENGES[difficultyLevel] || []);
+      } else if (pid === 'python') {
+        setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
+      } else if (pid === 'appinventor') {
+        setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); setChallenges(APP_INVENTOR_BASIC);
+      } else if (pid === 'ia') {
+        setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
+      } else if (pid === 'arduino') {
+        setDifficultyChallenges(ARDUINO_CHALLENGES);
+        setChallenges(ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner); setArduinoTutorials(ARDUINO_TUTORIALS); setTutorials(ARDUINO_TUTORIALS);
+      } else if (pid.includes('microbit')) {
+        setDifficultyChallenges(MICROBIT_CHALLENGES);
+        setChallenges(MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner); setTutorials(MICROBIT_TUTORIALS);
+      }
+      
+      // Intentar recuperar progreso local de invitados si existe
+      try {
+        const localProg = JSON.parse(localStorage.getItem('guest_user_challenges') || '[]');
+        const progressMap = {};
+        localProg.forEach(p => {
+          if (p.challenge_id) progressMap[p.challenge_id] = p;
+        });
+        setUserProgress(progressMap);
+      } catch (e) {
+        console.error("Error cargando progreso local de invitado", e);
+      }
+
+      setLoading(false);
+      return;
+    }
+
     try {
       const dbPlanetId = pid === 'ia' ? 'machinelearning' : 
                          (pid === '3d' ? 'tinkercad' : 
                          (pid === 'makecode-microbit' ? 'microbit' : pid));
 
-      const [
-        { data: progressData },
-        { data: milestoneData },
-        { data: dbChallengesRaw },
-        { data: dbTutorialsRaw }
-      ] = await Promise.all([
-        supabase.from('user_challenges').select('*').eq('student_id', userId).eq('planet_id', pid),
-        supabase.from('explore_progress').select('*').eq('student_id', userId).eq('planet_id', pid),
-        supabase.from('retos').select('*').eq('planet_id', dbPlanetId).order('order_index', { ascending: true }),
-        supabase.from('tutoriales').select('*').eq('planet_id', dbPlanetId).order('order_index', { ascending: true })
-      ]);
+      let progressData = [];
+      let milestoneData = [];
+      let dbChallengesRaw = [];
+      let dbTutorialsRaw = [];
+
+      if (userId === 'guest_user') {
+        progressData = JSON.parse(localStorage.getItem('guest_user_challenges') || '[]');
+        milestoneData = JSON.parse(localStorage.getItem('guest_explore_progress') || '[]');
+        
+        const [
+          { data: dbCRaw },
+          { data: dbTRaw }
+        ] = await Promise.all([
+          supabase.from('retos').select('*').eq('planet_id', dbPlanetId).order('order_index', { ascending: true }),
+          supabase.from('tutoriales').select('*').eq('planet_id', dbPlanetId).order('order_index', { ascending: true })
+        ]);
+        dbChallengesRaw = dbCRaw;
+        dbTutorialsRaw = dbTRaw;
+      } else {
+        const [
+          { data: pData },
+          { data: mData },
+          { data: cRaw },
+          { data: tRaw }
+        ] = await Promise.all([
+          supabase.from('user_challenges').select('*').eq('student_id', userId).eq('planet_id', pid),
+          supabase.from('explore_progress').select('*').eq('student_id', userId).eq('planet_id', pid),
+          supabase.from('retos').select('*').eq('planet_id', dbPlanetId).order('order_index', { ascending: true }),
+          supabase.from('tutoriales').select('*').eq('planet_id', dbPlanetId).order('order_index', { ascending: true })
+        ]);
+        progressData = pData;
+        milestoneData = mData;
+        dbChallengesRaw = cRaw;
+        dbTutorialsRaw = tRaw;
+      }
 
       const dbChallenges = (dbChallengesRaw || []).map(c => ({
         ...c,
@@ -255,16 +349,18 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           return catMatch && levelMatch;
         });
         
+        let result = [];
         if (filtered.length > 0) {
-          // Asegurar que cada item tenga la propiedad 'numero' para la UI
-          const mapped = filtered.map(item => ({
+          result = filtered.map(item => ({
             ...item,
             numero: item.numero || item.order_index
-          }));
-          setter(mapped.sort(sortFn));
+          })).sort(sortFn);
+          setter(result);
         } else {
-          setter(localFallback || []);
+          result = localFallback || [];
+          setter(result);
         }
+        return result;
       };
 
       if (dbChallenges.length === 0 && dbTutorials.length === 0) {
@@ -276,17 +372,40 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         } else if (pid === 'scratch') {
           setChallenges(ROBOTIX_CHALLENGES); setRaspberryL1(RASPBERRY_SCRATCH_L1); setRaspberryL2(RASPBERRY_SCRATCH_L2); setExpertChallenges(RASPBERRY_SCRATCH_CHALLENGES); setTutorials(SCRATCH_TUTORIALS);
         } else if (pid === 'tinkercad' || pid === '3d') {
-          setTinkercad3d(TINKERCAD_3D_ACADEMY); setTinkercad3dChallenges(TINKERCAD_3D_CHALLENGES[difficultyLevel] || []); setTinkercadCodeblocks(TINKERCAD_CODEBLOCKS_CHALLENGES.beginner); setBlockscad(BLOCKSCAD_CHALLENGES.beginner); setChallenges(TINKERCAD_3D_ACADEMY);
+          const c3d = TINKERCAD_3D_CHALLENGES[difficultyLevel] || [];
+          const ccb = TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || [];
+          const cbc = BLOCKSCAD_CHALLENGES[difficultyLevel] || [];
+          
+          setTinkercad3d(TINKERCAD_3D_ACADEMY); 
+          setTinkercad3dChallenges(c3d); 
+          setTinkercadCodeblocks(ccb); 
+          setBlockscad(cbc);
+          
+          if (itinerary === 'codeblocks') setChallenges(ccb);
+          else if (itinerary === 'blockscad') setChallenges(cbc);
+          else setChallenges(c3d);
+          
+          if (itinerary === 'codeblocks') setDifficultyChallenges(TINKERCAD_CODEBLOCKS_CHALLENGES);
+          else if (itinerary === 'blockscad') setDifficultyChallenges(BLOCKSCAD_CHALLENGES);
+          else setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
+          
         } else if (pid === 'python') {
           setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
         } else if (pid === 'appinventor') {
-          setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); setChallenges(APP_INVENTOR_BASIC);
+          setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); 
+          setChallenges(itinerary === 'social' ? APP_INVENTOR_SOCIAL : (itinerary === 'intermediate' ? APP_INVENTOR_INTERMEDIATE : APP_INVENTOR_BASIC));
         } else if (pid === 'ia') {
           setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
         } else if (pid === 'arduino') {
           setDifficultyChallenges(ARDUINO_CHALLENGES);
           setArduinoTutorials(ARDUINO_TUTORIALS);
+          setTutorials(ARDUINO_TUTORIALS);
           const currentLevelList = ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner;
+          setChallenges(currentLevelList);
+        } else if (pid.includes('microbit')) {
+          setDifficultyChallenges(MICROBIT_CHALLENGES);
+          setTutorials(MICROBIT_TUTORIALS);
+          const currentLevelList = MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner;
           setChallenges(currentLevelList);
         }
       } else {
@@ -298,19 +417,22 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setExpertChallenges, dbChallenges, 'raspberry-l3', RASPBERRY_SCRATCH_CHALLENGES);
           populateState(setTutorials, dbTutorials, null, SCRATCH_TUTORIALS);
         } else if (pid === 'tinkercad' || pid === '3d') {
-          populateState(setTinkercad3dChallenges, dbChallenges, '3d-design', TINKERCAD_3D_CHALLENGES[difficultyLevel] || [], difficultyLevel);
-          populateState(setTinkercadCodeblocks, dbChallenges, 'codeblocks', TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || [], difficultyLevel);
-          populateState(setBlockscad, dbChallenges, 'blockscad', BLOCKSCAD_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          const list3d = populateState(setTinkercad3dChallenges, dbChallenges, '3d-design', TINKERCAD_3D_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          const listCb = populateState(setTinkercadCodeblocks, dbChallenges, 'codeblocks', TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          const listBc = populateState(setBlockscad, dbChallenges, 'blockscad', BLOCKSCAD_CHALLENGES[difficultyLevel] || [], difficultyLevel);
           
           populateState(setTinkercad3d, dbTutorials, 'academy', TINKERCAD_3D_TUTORIALS);
           populateState(setTinkercadCodeblocksTutorials, dbTutorials, 'codeblocks', TINKERCAD_CODEBLOCKS_TUTORIALS);
           populateState(setBlockscadTutorials, dbTutorials, 'blockscad', BLOCKSCAD_TUTORIALS);
           
-          // Establecer dificultad para que aparezcan los botones de niveles en Tinkercad 3D
+          if (itinerary === 'codeblocks') setChallenges(listCb);
+          else if (itinerary === 'blockscad') setChallenges(listBc);
+          else setChallenges(list3d);
+
           if (itinerary === 'academy' || !itinerary) {
             setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
           } else if (itinerary === 'codeblocks') {
-            setDifficultyChallenges(TINKERCAD_CODEBLOCKS_CHALLENGES);
+            setDifficultyChallenges(null); // Simple UI
           } else if (itinerary === 'blockscad') {
             setDifficultyChallenges(BLOCKSCAD_CHALLENGES);
           }
@@ -321,10 +443,10 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setPythonCodedexIntermediate, dbChallenges, 'codedex', PYTHON_CODEDEX_INTERMEDIATE, 'intermediate');
           populateState(setPythonCodedexAdvanced, dbChallenges, 'codedex', PYTHON_CODEDEX_ADVANCED, 'advanced');
         } else if (pid === 'appinventor') {
-          populateState(setAppInventorBasic, dbChallenges, 'basic', APP_INVENTOR_BASIC);
-          populateState(setAppInventorIntermediate, dbChallenges, 'intermediate', APP_INVENTOR_INTERMEDIATE);
-          populateState(setAppInventorSocial, dbChallenges, 'social', APP_INVENTOR_SOCIAL);
-          setChallenges(itinerary === 'social' ? appInventorSocial : (itinerary === 'intermediate' ? appInventorIntermediate : appInventorBasic));
+          const basic = populateState(setAppInventorBasic, dbChallenges, 'basic', APP_INVENTOR_BASIC);
+          const inter = populateState(setAppInventorIntermediate, dbChallenges, 'intermediate', APP_INVENTOR_INTERMEDIATE);
+          const social = populateState(setAppInventorSocial, dbChallenges, 'social', APP_INVENTOR_SOCIAL);
+          setChallenges(itinerary === 'social' ? social : (itinerary === 'intermediate' ? inter : basic));
         } else if (pid === 'ia') {
           populateState(setLearningML, dbChallenges, 'learningml', ML_LEARNINGML);
           populateState(setMlForKidsBeginner, dbChallenges, 'mlforkids', ML_FOR_KIDS.beginner, 'beginner');
@@ -333,6 +455,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         } else if (pid === 'arduino') {
           setDifficultyChallenges(ARDUINO_CHALLENGES);
           populateState(setArduinoTutorials, dbTutorials, null, ARDUINO_TUTORIALS);
+          populateState(setTutorials, dbTutorials, null, ARDUINO_TUTORIALS);
           const currentLevelList = ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner;
           populateState(setChallenges, dbChallenges, null, currentLevelList, difficultyLevel);
         } else if (pid.includes('microbit')) {
@@ -358,8 +481,21 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     const pid = (planetId || '').toLowerCase();
     
     // 1. Prioridad absoluta: externalUrl en metadata (usado en Raspberry Pi y otros)
-    const externalUrl = item.metadata?.externalUrl || item.metadata?.external_url || item.externalUrl || item.external_url;
+    // Usamos encadenamiento opcional y múltiples fallbacks
+    const meta = item.metadata || {};
+    // Detectar el mejor slug posible (evitando UUIDs de la base de datos)
+    const detectedSlug = item.slug || meta.id || (typeof item.id === 'string' && item.id.length < 30 ? item.id : null);
+
+    const externalUrl = meta.externalUrl || meta.external_url || item.externalUrl || item.external_url || meta.url || meta.url_guide;
     if (externalUrl) return externalUrl;
+
+    // 2. Fallbacks específicos por planeta si no hay URL en metadata
+    if (pid.includes('scratch') || pid.includes('raspberry')) {
+      // Si es Raspberry Pi Scratch, intentar reconstruir si tenemos el slug
+      if (detectedSlug && detectedSlug.startsWith('raspberry-')) {
+         return `https://projects.raspberrypi.org/es-ES/projects/${detectedSlug.replace('raspberry-', '')}`;
+      }
+    }
     
     // 2. URLs directas desde campos de la base de datos o constantes locales
     if (item.url_guide) return item.url_guide;
@@ -368,11 +504,17 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     if (item.editorUrl) return item.editorUrl;
     if (item.pdfUrl) return item.pdfUrl;
 
+    // 2b. Reconstrucción para Microbit
+    if (pid.includes('microbit')) {
+      if (detectedSlug) return `https://microbit.org/projects/make-it-code-it/${detectedSlug}/?lang=es`;
+      return `https://makecode.microbit.org/`;
+    }
+
     // 3. Fallbacks para compatibilidad con itinerarios específicos de MakeCode y Scratch
     if (tab?.startsWith('tutorials') || tab === 'tutorials') {
-      if (pid.includes('microbit')) return `https://makecode.microbit.org/#tutorial:/projects/${item.slug || item.id}`;
-      if (pid === 'makecode-arcade') return `https://arcade.makecode.com/#tutorial:${item.slug}`;
-      if (pid === 'scratch') return `https://scratch.mit.edu/projects/editor/?tutorial=${item.slug || 'all'}`;
+      if (pid.includes('microbit')) return `https://makecode.microbit.org/#tutorial:/projects/${detectedSlug || 'all'}`;
+      if (pid === 'makecode-arcade') return `https://arcade.makecode.com/#tutorial:${detectedSlug}`;
+      if (pid === 'scratch') return `https://scratch.mit.edu/projects/editor/?tutorial=${detectedSlug || 'all'}`;
     }
 
     if (pid === 'scratch') {
@@ -388,14 +530,18 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     
     if (pid.includes('microbit')) {
       // Priorizar URL en metadata si existe
-      const metaUrl = item.metadata?.externalUrl || item.metadata?.url_guide;
+      const metaUrl = meta.externalUrl || meta.url_guide || meta.url || item.url_guide;
       if (metaUrl) return metaUrl;
       
-      // Fallback a slug oficial si no hay URL directa
-      const slug = item.slug || item.id;
-      if (slug) {
-        return `https://microbit.org/projects/make-it-code-it/${slug}/`;
+      if (detectedSlug && typeof detectedSlug === 'string') {
+        // Si parece un share code de MakeCode (ej: _12345 o texto largo sin guiones)
+        if (detectedSlug.startsWith('_') || (detectedSlug.length >= 12 && !detectedSlug.includes('-'))) {
+          return `https://makecode.microbit.org/${detectedSlug.startsWith('_') ? '' : '_'}${detectedSlug}`;
+        }
+        // Si es un reto estándar (ej: 'dice', 'emojis'), va a microbit.org
+        return `https://microbit.org/projects/make-it-code-it/${detectedSlug.toLowerCase().replace('mb-', '')}/`;
       }
+      return 'https://makecode.microbit.org/';
     }
 
     if (pid?.startsWith('tinkercad')) {
@@ -440,27 +586,15 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     setIsSubmitting(true);
     try {
       let uploadedFileUrl = null;
-      if (evidenceFile) {
-        const fileExt = evidenceFile.name.split('.').pop();
-        const fileName = `${userId}/${challengeId}_${Date.now()}.${fileExt}`;
-        const filePath = `evidences/${fileName}`;
-
-        const { error: storageError } = await supabase.storage
-          .from('dojoflow-assets')
-          .upload(filePath, evidenceFile);
-
-        if (storageError) throw storageError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('dojoflow-assets')
-          .getPublicUrl(filePath);
+      
+      if (userId === 'guest_user') {
+        if (evidenceFile) {
+          uploadedFileUrl = URL.createObjectURL(evidenceFile);
+        }
         
-        uploadedFileUrl = publicUrl;
-      }
-
-      const { error: upsertError } = await supabase
-        .from('user_challenges')
-        .upsert({
+        const guestChallenges = JSON.parse(localStorage.getItem('guest_user_challenges') || '[]');
+        const existingIdx = guestChallenges.findIndex(c => c.challenge_id === challengeId);
+        const newChallenge = {
           student_id: userId,
           planet_id: planetId,
           challenge_id: challengeId,
@@ -468,9 +602,48 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           evidence_url: evidenceUrl,
           evidence_file_url: uploadedFileUrl || userProgress[challengeId]?.evidence_file_url,
           updated_at: new Date().toISOString()
-        }, { onConflict: 'student_id, challenge_id' });
+        };
+        
+        if (existingIdx >= 0) {
+          guestChallenges[existingIdx] = newChallenge;
+        } else {
+          guestChallenges.push(newChallenge);
+        }
+        
+        localStorage.setItem('guest_user_challenges', JSON.stringify(guestChallenges));
+      } else {
+        if (evidenceFile) {
+          const fileExt = evidenceFile.name.split('.').pop();
+          const fileName = `${userId}/${challengeId}_${Date.now()}.${fileExt}`;
+          const filePath = `evidences/${fileName}`;
 
-      if (upsertError) throw upsertError;
+          const { error: storageError } = await supabase.storage
+            .from('dojoflow-assets')
+            .upload(filePath, evidenceFile);
+
+          if (storageError) throw storageError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('dojoflow-assets')
+            .getPublicUrl(filePath);
+          
+          uploadedFileUrl = publicUrl;
+        }
+
+        const { error: upsertError } = await supabase
+          .from('user_challenges')
+          .upsert({
+            student_id: userId,
+            planet_id: planetId,
+            challenge_id: challengeId,
+            status: 'En revisión',
+            evidence_url: evidenceUrl,
+            evidence_file_url: uploadedFileUrl || userProgress[challengeId]?.evidence_file_url,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'student_id, challenge_id' });
+
+        if (upsertError) throw upsertError;
+      }
 
       // Notificar al padre para iniciar validación socrática o aviso de profesor
       if (onValidateChallenge) {

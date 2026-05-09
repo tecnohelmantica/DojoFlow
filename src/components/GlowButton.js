@@ -13,6 +13,7 @@ export default function GlowButton({ children, color = 'teal', className = '', o
       case 'gray': return 'var(--accent-gray)';
       case 'dark': return '#1a1a24';
       case 'black-outline': return 'transparent';
+      case 'premium-ninja': return 'linear-gradient(135deg, #00f2fe 0%, #9c27b0 100%)';
       case 'custom': return 'var(--glow-color)';
       default: return 'var(--accent-teal)';
     }
@@ -21,7 +22,7 @@ export default function GlowButton({ children, color = 'teal', className = '', o
   const getTextColor = () => {
     if (color === 'gray') return 'var(--color-text)';
     if (color === 'black-outline') return '#1a1a24';
-    if (color === 'premium-cyan') return '#00334e';
+    if (color === 'premium-cyan' || color === 'premium-ninja') return '#ffffff';
     return '#ffffff';
   };
 
@@ -30,6 +31,7 @@ export default function GlowButton({ children, color = 'teal', className = '', o
   const btnStyle = {
     background: getBackgroundColor(),
     color: getTextColor(),
+    textShadow: color === 'premium-ninja' ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
     border: color === 'black-outline' ? '1.5px solid #1a1a24' : 'none',
     borderRadius: '12px',
     padding: '12px 24px',

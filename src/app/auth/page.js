@@ -1,33 +1,59 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import GlassCard from '../../components/GlassCard';
 import GlowButton from '../../components/GlowButton';
 import { UserPlus, LogIn, AlertCircle, Rocket, Eye, EyeOff, Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../components/AuthProvider';
 import './page.css';
 
-export default function AuthPage() {
+// Importamos fuentes premium
+const outfitFont = "'Outfit', sans-serif";
+const interFont = "'Inter', sans-serif";
+
+function AuthContent() {
   const router = useRouter();
-  const { updateProfile } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const { updateProfile, guestLogin } = useAuth();
+  
+  const searchParams = useSearchParams();
+  
+  // Inicialización sincrónica para evitar saltos de UI
+  const [isLogin, setIsLogin] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const isSignup = params.get('mode') === 'signup';
+      if (isSignup) {
+        localStorage.removeItem('dojoflow_guest');
+      }
+      return !isSignup;
+    }
+    return true;
+  });
+
   const [isRecovering, setIsRecovering] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
 
-  // Detectar si venimos de un enlace de recuperación
+  // Detectar cambios en la URL (por si el usuario navega internamente)
   useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'signup') {
+      setIsLogin(false);
+      localStorage.removeItem('dojoflow_guest');
+    }
+
     const handleRecovery = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      // Si hay una sesión y la URL tiene el hash de recovery
       if (session && window.location.hash.includes('type=recovery')) {
         setIsUpdatingPassword(true);
       }
     };
     handleRecovery();
-  }, [router]);
+  }, [searchParams]);
+
+  // ... (rest of state and handlers)
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -36,8 +62,6 @@ export default function AuthPage() {
   const [alias, setAlias] = useState('');
   const [emailReal, setEmailReal] = useState('');
   const [password, setPassword] = useState('');
-  
-  // Extra campos para Signup
   const [role, setRole] = useState('alumno');
 
   // Reglas de contraseña
@@ -49,10 +73,9 @@ export default function AuthPage() {
   };
   const isValidPwd = Object.values(pwdRules).every(Boolean);
 
-  // Reglas de Alias
   const aliasRules = {
     length: alias.length >= 6,
-    format: /^[a-zA-Z0-9_.]+$/.test(alias), // Permitir puntos (.)
+    format: /^[a-zA-Z0-9_.]+$/.test(alias),
     noEmail: !alias.includes('@')
   };
   const isValidAlias = Object.values(aliasRules).every(Boolean);
@@ -65,50 +88,51 @@ export default function AuthPage() {
         .eq('id', authData.user.id)
         .single();
       
-      const searchParams = new URLSearchParams(window.location.search);
-      const redirectTo = searchParams.get('redirect');
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get('redirect');
 
       if (redirectTo) {
         router.push(redirectTo);
       } else if (profileData?.role === 'profesor') {
-        router.push('/'); // Dojo Studio
+        router.push('/');
       } else {
-        router.push('/profile'); // Perfil Explorador
+        router.push('/profile');
       }
     }
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('dojoflow_navigating_to_signup');
+    }
+  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg(null);
 
-    // Flujo de Recuperación
     if (isRecovering) {
       try {
         const cleanAlias = alias.trim();
-        
-        // Intento 1: Buscar por alias
         let { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('email_real, role')
           .eq('alias', cleanAlias)
           .maybeSingle();
 
-        // Intento 2: Si no se encuentra, buscar por email_real
         if (!profileData && !profileError) {
           const { data: emailData, error: emailError } = await supabase
             .from('profiles')
             .select('email_real, role')
             .eq('email_real', cleanAlias)
             .maybeSingle();
-          
           profileData = emailData;
           profileError = emailError;
         }
 
         if (profileError || !profileData?.email_real) {
-          setErrorMsg("⚠️ No se ha encontrado una identidad vinculada a ese alias o correo. Si eres alumno, contacta con tu profesor.");
+          setErrorMsg("⚠️ No se ha encontrado una identidad vinculada a ese alias o correo.");
           setLoading(false);
           return;
         }
@@ -117,131 +141,65 @@ export default function AuthPage() {
           redirectTo: window.location.origin + '/auth/update-password',
         });
 
-        if (error) {
-          setErrorMsg(error.message);
-        } else {
-          setErrorMsg("¡Enlace enviado! Revisa tu bandeja de entrada personalizada para restablecer la contraseña.");
-        }
+        if (error) setErrorMsg(error.message);
+        else setErrorMsg("¡Enlace enviado! Revisa tu bandeja de entrada.");
       } catch (err) {
-        setErrorMsg("Error al procesar la recuperación de señal.");
+        setErrorMsg("Error al procesar la recuperación.");
       }
       setLoading(false);
       return;
     }
 
-    // Reglas de Alias
     if (!isLogin && !isValidAlias) {
-      setErrorMsg("Protocolo de Identidad: El alias debe tener min. 6 caracteres y solo letras, números, puntos o guiones bajos.");
+      setErrorMsg("Protocolo de Identidad: El alias debe tener min. 6 caracteres.");
       setLoading(false);
       return;
     }
 
-    // Reglas Strictas de Registro
     if (!isLogin && !isValidPwd) {
        setErrorMsg("Protección Activa: La contraseña debe cumplir todas las reglas.");
        setLoading(false);
        return;
     }
 
-      const cleanAlias = alias.trim();
-      const internalAuthEmail = `${cleanAlias.toLowerCase()}@dojoflow.local`;
+    const cleanAlias = alias.trim();
+    const internalAuthEmail = `${cleanAlias.toLowerCase()}@dojoflow.local`;
 
-      try {
-        if (isLogin) {
-          // Lógica de Login Inteligente
-          let finalAuthEmail = cleanAlias.includes('@') ? cleanAlias : internalAuthEmail;
+    try {
+      if (isLogin) {
+        let finalAuthEmail = cleanAlias.includes('@') ? cleanAlias : internalAuthEmail;
+        let { data: authData, error } = await supabase.auth.signInWithPassword({
+          email: finalAuthEmail,
+          password
+        });
 
-          let { data: authData, error } = await supabase.auth.signInWithPassword({
-            email: finalAuthEmail,
-            password
-          });
-
-          // Si falla, intentamos la resolución cruzada (Alias <-> Email Real)
-          if (error) {
-            if (!cleanAlias.includes('@')) {
-              // CASO A: Ingresó ALIAS pero falló el virtual. Probamos con su Email Real.
-              const { data: pData } = await supabase
-                .from('profiles')
-                .select('email_real')
-                .eq('alias', cleanAlias)
-                .maybeSingle();
-              
-              if (pData?.email_real) {
-                const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-                  email: pData.email_real,
-                  password
-                });
-                if (!retryError) {
-                  handleLoginSuccess(retryData);
-                  return;
-                }
-              }
-            } else {
-              // CASO B: Ingresó EMAIL pero falló. Probamos con su Alias Virtual.
-              const { data: pData } = await supabase
-                .from('profiles')
-                .select('alias')
-                .eq('email_real', cleanAlias)
-                .maybeSingle();
-              
-              if (pData?.alias) {
-                const virtualEmail = `${pData.alias.toLowerCase()}@dojoflow.local`;
-                const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-                  email: virtualEmail,
-                  password
-                });
-                if (!retryError) {
-                  handleLoginSuccess(retryData);
-                  return;
-                }
-              }
-            }
+        if (error && !cleanAlias.includes('@')) {
+          const { data: pData } = await supabase.from('profiles').select('email_real').eq('alias', cleanAlias).maybeSingle();
+          if (pData?.email_real) {
+            const { data: rData, error: rErr } = await supabase.auth.signInWithPassword({ email: pData.email_real, password });
+            if (!rErr) { handleLoginSuccess(rData); return; }
           }
-
-        if (error) throw new Error("Credenciales inválidas o identidad no encontrada.");
+        }
+        if (error) throw new Error("Credenciales inválidas.");
         handleLoginSuccess(authData);
       } else {
-        // Lógica de Registro (Signup) ULTRA-SIMPLIFICADA PARA NIÑOS
         const { data, error } = await supabase.auth.signUp({
           email: internalAuthEmail,
           password,
-          options: {
-            data: {
-              alias: alias,
-              email_real: emailReal || null
-            }
-          }
+          options: { data: { alias: alias, email_real: emailReal || null } }
         });
         
         if (error) {
-          if (error.message.includes("already registered")) {
-            throw new Error("Ese Alias ya ha sido reclamado. ¡Prueba uno más original!");
-          }
+          if (error.message.includes("already registered")) throw new Error("Ese Alias ya ha sido reclamado.");
           throw error;
         }
 
         if (data.user) {
-          // Crear perfil inicial
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert([
-              { 
-                id: data.user.id, 
-                alias: alias,
-                email_real: emailReal || null,
-                role: 'alumno',
-                xp: 100, // Regalo de bienvenida
-                level: 1,
-                avatar_url: 'alumno.png'
-              }
-            ]);
-            
-          // Login automático
-          await supabase.auth.signInWithPassword({
-            email: internalAuthEmail,
-            password
-          });
-
+          await supabase.from('profiles').insert([{ 
+            id: data.user.id, alias: alias, email_real: emailReal || null,
+            role: 'alumno', xp: 100, level: 1, avatar_url: 'alumno.png'
+          }]);
+          await supabase.auth.signInWithPassword({ email: internalAuthEmail, password });
           router.push('/profile');
         }
       }
@@ -256,159 +214,144 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      setErrorMsg("Error al actualizar: " + error.message);
-    } else {
-      setErrorMsg("¡Éxito! Contraseña actualizada. Redirigiendo...");
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
+    if (error) setErrorMsg("Error: " + error.message);
+    else {
+      setErrorMsg("¡Éxito! Redirigiendo...");
+      setTimeout(() => router.push('/'), 2000);
     }
     setLoading(false);
   };
 
   return (
-    <div className="auth-container">
-      <GlassCard className="auth-card">
-        <div className="auth-header">
-          <Sparkles className="colorful-icon" size={60} strokeWidth={2.5} />
-          <h1 className="glow-text-cyan">DojoFlow</h1>
-          <p>{isUpdatingPassword ? 'Actualización de Protocolos' : isRecovering ? 'Recuperación de Señal de Acceso' : isLogin ? 'Accede a tus simuladores de código' : '¡Crea tu personaje y empieza a explorar!'}</p>
-        </div>
-
-        {errorMsg && (
-          <div 
-            className={`auth-alert ${errorMsg.includes('Exitoso') || errorMsg.includes('enviado') || errorMsg.includes('Éxito') ? 'success' : 'error'}`}
-            style={errorMsg.includes('Exitoso') || errorMsg.includes('enviado') || errorMsg.includes('Éxito') ? { color: '#065f46', borderColor: '#10b981', backgroundColor: '#ecfdf5' } : {}}
-          >
-            <AlertCircle size={20} />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {isUpdatingPassword ? (
-          <form onSubmit={handleUpdatePassword} className="auth-form">
-            <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
-              <input 
-                type={showPwd ? "text" : "password"} 
-                placeholder="Nueva Contraseña Secreta" 
-                value={newPassword} 
-                onChange={(e) => setNewPassword(e.target.value)} 
-                required
-                className="auth-input"
-                minLength={6}
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPwd(!showPwd)}
-                style={{ position: 'absolute', right: '14px', top: '14px', background: 'none', border: 'none', color: '#8a8a9e', cursor: 'pointer' }}
-              >
-                {showPwd ? <Eye size={18} /> : <EyeOff size={18} />}
-              </button>
+    <div className="auth-page-wrapper">
+      <div className="orb orb-1"></div>
+      <div className="orb orb-2"></div>
+      <div className="orb orb-3"></div>
+      
+      <div className="auth-container">
+        <GlassCard className="auth-card">
+          <div className="auth-header">
+            <div className="icon-wrapper">
+              <Sparkles className="colorful-icon" size={64} strokeWidth={2.5} />
             </div>
-            <button type="submit" className="auth-button primary" disabled={loading}>
-              {loading ? <div className="spinner-small" /> : 'Confirmar Nueva Contraseña'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleAuth} className="auth-form">
-          <input 
-            type="text" 
-            placeholder="Tu Alias Ninja" 
-            value={alias} 
-            onChange={(e) => setAlias(e.target.value)} 
-            required
-            className="auth-input"
-            autoComplete="username"
-          />
-          
-          {!isRecovering && (
-             <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
+            <h1 className="brand-title">DojoFlow</h1>
+            <p className="brand-subtitle">
+              {isUpdatingPassword ? 'Actualización de Protocolos' : 
+               isRecovering ? 'Recuperación de Señal' : 
+               isLogin ? 'Accede a tus simuladores de código' : 
+               '¡Crea tu personaje y empieza a explorar!'}
+            </p>
+          </div>
+
+          {errorMsg && (
+            <div className={`auth-alert ${errorMsg.includes('Exitoso') || errorMsg.includes('enviado') || errorMsg.includes('Éxito') ? 'success' : 'error'}`}>
+              <AlertCircle size={20} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {isUpdatingPassword ? (
+            <form onSubmit={handleUpdatePassword} className="auth-form">
+              <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
                 <input 
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="Contraseña Secreta" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
+                  type={showPwd ? "text" : "password"} 
+                  placeholder="Nueva Contraseña Secreta" 
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)} 
                   required
                   className="auth-input"
                   minLength={6}
-                  style={{ marginBottom: 0 }}
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: 'absolute', right: '14px', top: '14px', background: 'none', border: 'none', color: '#8a8a9e', cursor: 'pointer' }}
-                >
-                  {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                <button type="button" onClick={() => setShowPwd(!showPwd)} className="eye-btn">
+                  {showPwd ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
-             </div>
-          )}
-
-          {!isLogin && !isRecovering && (
-            <div className="pwd-rules" style={{ fontSize: '0.75rem', color: '#8a8a9e', textAlign: 'left', marginBottom: '12px', paddingLeft: '8px' }}>
-              <div style={{ color: pwdRules.length ? 'var(--accent-teal)' : 'inherit', marginBottom: '4px' }}>
-                {pwdRules.length ? '✓' : '○'} Más de 8 caracteres
               </div>
-              <div style={{ color: pwdRules.upperLower ? 'var(--accent-teal)' : 'inherit', marginBottom: '4px' }}>
-                {pwdRules.upperLower ? '✓' : '○'} Uso de mayúsculas y minúsculas
-              </div>
-              <div style={{ color: pwdRules.number ? 'var(--accent-teal)' : 'inherit', marginBottom: '4px' }}>
-                {pwdRules.number ? '✓' : '○'} Un número
-              </div>
-              <div style={{ color: pwdRules.symbol ? 'var(--accent-teal)' : 'inherit', marginBottom: '4px' }}>
-                {pwdRules.symbol ? '✓' : '○'} Un símbolo especial (@, #, $, etc.)
-              </div>
-            </div>
-          )}
-
-          {!isLogin && !isRecovering && (
-            <>
-              <input 
-                type="email" 
-                placeholder="Correo de un padre/tutor (opcional)"
-                value={emailReal} 
-                onChange={(e) => setEmailReal(e.target.value)} 
-                className="auth-input"
-              />
-              <p style={{ fontSize: '0.7rem', color: '#8a8a9e', marginTop: '-10px', marginBottom: '20px', lineHeight: '1.4' }}>
-                Tu Alias es tu identidad. El correo es solo por si olvidas tu contraseña.
-              </p>
-            </>
-          )}
-
-          {isLogin && !isRecovering && (
-            <div style={{ textAlign: 'right', marginTop: '-8px', marginBottom: '12px' }}>
-              <button 
-                type="button" 
-                onClick={() => { setIsRecovering(true); setErrorMsg(null); }}
-                style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Inter' }}
-              >
-                ¿Olvidaste tu contraseña?
+              <button type="submit" className="auth-button primary" disabled={loading}>
+                {loading ? <div className="spinner-small" /> : 'Confirmar Nueva Contraseña'}
               </button>
-            </div>
-          )}
-
-          <GlowButton color={isRecovering ? 'teal' : isLogin ? 'cyan' : 'purple'} className="auth-submit" disabled={loading}>
-            {loading ? 'Transmitiendo...' : isRecovering ? 'Enviar Enlace de Recuperación' : isLogin ? <><LogIn /> Ingresar</> : <><UserPlus /> Crear Identidad</>}
-          </GlowButton>
-          </form>
-        )}
-
-        <div className="auth-switcher">
-          {isRecovering ? (
-             <button type="button" onClick={() => { setIsRecovering(false); setIsLogin(true); setErrorMsg(null); }} className="switch-btn">
-               Cancelar y volver al inicio de sesión
-             </button>
+            </form>
           ) : (
-             <button type="button" onClick={() => { setIsLogin(!isLogin); setErrorMsg(null); }} className="switch-btn">
-               {isLogin ? '¿Aún no tienes pasaporte galáctico? Regístrate.' : '¿Ya eres miembro del Dojo? Inicia Sesión.'}
-             </button>
+            <form onSubmit={handleAuth} className="auth-form">
+              <input type="text" placeholder="Tu Alias Ninja" value={alias} onChange={(e) => setAlias(e.target.value)} required className="auth-input" />
+              
+              {!isRecovering && (
+                <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="Contraseña Secreta" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    className="auth-input" 
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="eye-btn">
+                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                  </button>
+                </div>
+              )}
+
+              {!isLogin && !isRecovering && (
+                <div className="pwd-rules">
+                  <div style={{ color: pwdRules.length ? 'var(--accent-teal)' : 'inherit' }}>{pwdRules.length ? '✓' : '○'} Más de 8 caracteres</div>
+                  <div style={{ color: pwdRules.upperLower ? 'var(--accent-teal)' : 'inherit' }}>{pwdRules.upperLower ? '✓' : '○'} Mayúsculas y minúsculas</div>
+                  <div style={{ color: pwdRules.number ? 'var(--accent-teal)' : 'inherit' }}>{pwdRules.number ? '✓' : '○'} Un número</div>
+                  <div style={{ color: pwdRules.symbol ? 'var(--accent-teal)' : 'inherit' }}>{pwdRules.symbol ? '✓' : '○'} Un símbolo especial</div>
+                </div>
+              )}
+
+              {!isLogin && !isRecovering && (
+                <>
+                  <input type="email" placeholder="Correo de un padre/tutor (opcional)" value={emailReal} onChange={(e) => setEmailReal(e.target.value)} className="auth-input" />
+                  <p className="input-hint">Tu Alias es tu identidad. El correo es opcional.</p>
+                </>
+              )}
+
+              {isLogin && !isRecovering && (
+                <div style={{ textAlign: 'right', marginTop: '-8px', marginBottom: '12px' }}>
+                  <button type="button" onClick={() => { setIsRecovering(true); setErrorMsg(null); }} className="link-btn">
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              )}
+
+              <GlowButton color={isRecovering ? 'teal' : 'premium-ninja'} className="auth-submit" disabled={loading}>
+                {loading ? 'Transmitiendo...' : isRecovering ? 'Enviar Enlace' : isLogin ? <><LogIn /> Ingresar</> : <><UserPlus /> Crear Identidad</>}
+              </GlowButton>
+            </form>
           )}
-        </div>
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <a href="/privacidad" style={{ fontSize: '0.7rem', color: '#8a8a9e', textDecoration: 'none', opacity: 0.7 }}>Política de Privacidad y Protección de Datos</a>
-        </div>
-      </GlassCard>
+
+          <div className="auth-switcher">
+            {isRecovering ? (
+              <button type="button" onClick={() => { setIsRecovering(false); setIsLogin(true); setErrorMsg(null); }} className="switch-btn">
+                Cancelar y volver
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button type="button" onClick={() => { setIsLogin(!isLogin); setErrorMsg(null); }} className="switch-btn">
+                  {isLogin ? '¿Aún no tienes pasaporte? Regístrate.' : '¿Ya eres miembro? Inicia Sesión.'}
+                </button>
+                <button type="button" onClick={() => { guestLogin(); router.push('/profile'); }} className="switch-btn guest-btn">
+                  <Rocket size={16} /> Explorar como Invitado
+                </button>
+              </div>
+            )}
+          </div>
+        </GlassCard>
+      </div>
+      <style jsx>{`
+        .eye-btn { position: absolute; right: 14px; top: 14px; background: none; border: none; color: #8a8a9e; cursor: pointer; }
+        .link-btn { background: none; border: none; color: var(--accent-cyan); fontSize: 0.8rem; cursor: pointer; }
+        .input-hint { font-size: 0.7rem; color: #8a8a9e; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; }
+        .guest-btn { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--accent-cyan) !important; }
+      `}</style>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1a2e', color: '#fff' }}>Cargando DojoFlow...</div>}>
+      <AuthContent />
+    </Suspense>
   );
 }

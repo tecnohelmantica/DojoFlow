@@ -49,6 +49,24 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const loadData = async () => {
     setLoading(true);
     try {
+      if (userId === 'guest_user') {
+        const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
+        const activeMission = guestMissions.find(m => m.status === 'active');
+        if (activeMission) setMission(activeMission);
+
+        const completed = guestMissions.filter(m => m.status === 'completed');
+        const totalXp = completed.reduce((acc, m) => acc + (m.reward_xp || 50), 0);
+        
+        setStats({
+          completed: completed.length,
+          xp: totalXp,
+          streak: Math.min(completed.length, 7),
+          medals: completed.length >= 5 ? ['Veterano', 'Explorador'] : completed.length >= 1 ? ['Iniciado'] : []
+        });
+        setLoading(false);
+        return;
+      }
+
       // 1. Load active mission
       const { data: missionData } = await supabase
         .from('sensei_missions')
@@ -116,9 +134,10 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           throw new Error("El Sensei está concentrado... Reintenta en un momento.");
         }
 
-        const { data: savedMission, error: saveError } = await supabase
-          .from('sensei_missions')
-          .insert({
+        let savedMission;
+        if (userId === 'guest_user') {
+          savedMission = {
+            id: 'guest_mission_' + Date.now(),
             student_id: userId,
             planet_id: planetId,
             title: missionData.title,
@@ -134,11 +153,36 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
               config,
               generated_at: new Date().toISOString()
             }
-          })
-          .select()
-          .single();
+          };
+          const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
+          guestMissions.push(savedMission);
+          localStorage.setItem('guest_sensei_missions', JSON.stringify(guestMissions));
+        } else {
+          const { data: sM, error: saveError } = await supabase
+            .from('sensei_missions')
+            .insert({
+              student_id: userId,
+              planet_id: planetId,
+              title: missionData.title,
+              description: missionData.description,
+              objective: missionData.objective,
+              learning_objectives: missionData.learning_objectives,
+              sensei_tips: missionData.sensei_tips,
+              estimated_time: missionData.estimated_time,
+              reward_xp: missionData.reward_xp || 50,
+              recommended_resources: missionData.recommended_resources,
+              status: 'active',
+              metadata: { 
+                config,
+                generated_at: new Date().toISOString()
+              }
+            })
+            .select()
+            .single();
 
-        if (saveError) throw saveError;
+          if (saveError) throw saveError;
+          savedMission = sM;
+        }
         setMission(savedMission);
         setHints([]);
         setShowConfig(false);

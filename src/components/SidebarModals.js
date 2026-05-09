@@ -16,7 +16,7 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
   const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
-    if (activeModal && userId) {
+    if (activeModal && (userId || userId === 'guest_user')) {
       loadModalData();
     } else {
       setData([]);
@@ -53,20 +53,22 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
         // Cargar recursos maestros y de clase
         const MASTER_PROFESOR_ID = '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
         
-        // 1. Obtener IDs de las clases del alumno
-        const { data: vincs } = await supabase
-          .from('clase_alumnos')
-          .select('clase_id')
-          .eq('alumno_id', userId);
-        
-        const claseIds = (vincs || []).map(v => v.clase_id);
+        // 1. Obtener IDs de las clases del alumno (Solo si no es invitado)
+        let claseIds = [];
+        if (userId !== 'guest_user') {
+          const { data: vincs } = await supabase
+            .from('clase_alumnos')
+            .select('clase_id')
+            .eq('alumno_id', userId);
+          
+          claseIds = (vincs || []).map(v => v.clase_id);
+        }
 
         // 2. Obtener recursos maestros
         const { data: masterRecs } = await supabase
           .from('recursos_docentes')
           .select('*')
-          .eq('profesor_id', MASTER_PROFESOR_ID)
-          .eq('contenido->meta->isGlobal', true);
+          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->>isGlobal.eq.true,contenido->>isMaster.eq.true`);
 
         // 3. Obtener recursos de sus clases
         let classRecs = [];
