@@ -284,6 +284,27 @@ function AuthContent() {
             <form onSubmit={handleAuth} className="auth-form">
               <input type="text" placeholder="Tu Alias Ninja" value={alias} onChange={(e) => setAlias(e.target.value)} required className="auth-input" />
               
+              {!isRecovering && !isUpdatingPassword && (
+                <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder={isLogin ? "Tu Contraseña Secreta" : "Crea tu Contraseña Ninja"} 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    className="auth-input" 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    className="eye-btn"
+                    style={{ position: 'absolute', right: '14px', top: '14px', background: 'none', border: 'none', color: '#8a8a9e', cursor: 'pointer' }}
+                  >
+                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                  </button>
+                </div>
+              )}
+              
               {!isLogin && !isRecovering && (
                 <div className="pwd-rules" style={{ marginBottom: '20px' }}>
                   <div style={{ color: pwdRules.length ? '#00f2fe' : '#ffffff', fontWeight: '800', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{pwdRules.length ? '✓' : '○'} Más de 8 caracteres</div>

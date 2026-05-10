@@ -68,9 +68,9 @@ export const PLANETS = [
       { label: 'MAKECODE OFICIAL', url: 'https://makecode.microbit.org/', color: 'teal' }
     ],
     challengesUrls: {
-      beginner: 'https://microbit.org/es-es/projects/make-it-code-it/?filters=beginner%2Cmakecode',
-      intermediate: 'https://microbit.org/es-es/projects/make-it-code-it/?filters=intermediate%2Cmakecode',
-      advanced: 'https://microbit.org/es-es/projects/make-it-code-it/?filters=advanced%2Cmakecode'
+      beginner: 'https://microbit.org/es-es/projects/make-it-code-it/?filters=beginner',
+      intermediate: 'https://microbit.org/es-es/projects/make-it-code-it/?filters=intermediate',
+      advanced: 'https://microbit.org/es-es/projects/make-it-code-it/?filters=advanced'
     }
   },
   { 

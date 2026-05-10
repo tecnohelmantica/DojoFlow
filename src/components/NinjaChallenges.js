@@ -6,7 +6,8 @@ import { supabase } from '../lib/supabaseClient';
 import { 
   CODE_MODERN_COURSES, 
   CODE_HOUR_OF_CODE, 
-  CODE_HOUR_OF_AI 
+  CODE_HOUR_OF_AI,
+  Brain
 } from '../lib/code';
 import { 
   HTML_CODE_ORG, 
@@ -980,6 +981,44 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     const status = currentProgress?.status || 'No iniciado';
     const isSelected = selectedTutorial ? (isTutorialTab ? selectedTutorial.id === item.id : selectedTutorial.numero === item.numero) : false;
     
+    if (item.id === 'socratic-tutor' || item.isIA) {
+      return (
+        <div 
+          key={`ia-tutor-${num}`}
+          onClick={() => setSelectedTutorial(item)}
+          className="group"
+          style={{ 
+            aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: '24px', cursor: 'pointer', 
+            background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+            border: isSelected ? '4px solid white' : '2px solid rgba(255,255,255,0.5)',
+            position: 'relative', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 
+            transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+            boxShadow: isSelected ? '0 15px 35px rgba(0, 242, 254, 0.6)' : '0 8px 25px rgba(79, 172, 254, 0.3)',
+            overflow: 'hidden'
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '15px', position: 'relative', zIndex: 1 }}>
+             <div style={{ 
+              background: 'white', borderRadius: '12px', padding: '8px', 
+              boxShadow: '0 4px 10px rgba(0,0,0,0.1)', marginBottom: '5px'
+            }}>
+              <Brain size={28} color="#4facfe" />
+            </div>
+            <span style={{ 
+              fontSize: '0.75rem', fontWeight: '900', 
+              color: 'white',
+              textAlign: 'center', textTransform: 'uppercase', lineHeight: '1.2'
+            }}>IA TUTOR</span>
+            <div style={{ 
+              background: 'rgba(255,255,255,0.3)', padding: '2px 8px', borderRadius: '20px',
+              fontSize: '0.5rem', fontWeight: 'bold', color: 'white'
+            }}>ACTIVO</div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div 
         key={`${isTutorialTab ? 'tut' : 'chal'}-${num}`}
@@ -1003,12 +1042,12 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', padding: '10px', position: 'relative', zIndex: 1 }}>
           <span style={{ 
             fontSize: '1.2rem', fontWeight: '900', 
-            color: isSelected ? 'white' : (status === 'Validado' ? '#22c55e' : (status === 'Corregir' ? '#ff4b4b' : accentColor)), 
+            color: isSelected ? (status === 'Validado' ? '#22c55e' : accentColor) : (status === 'Validado' ? '#22c55e' : (status === 'Corregir' ? '#ff4b4b' : accentColor)), 
             marginBottom: '4px' 
           }}>{num}</span>
           <span style={{ 
             fontSize: '0.6rem', fontWeight: '800', 
-            color: isSelected ? 'white' : (status === 'Validado' ? '#22c55e' : (status === 'Corregir' ? '#ff4b4b' : accentColor)),
+            color: isSelected ? (status === 'Validado' ? '#22c55e' : accentColor) : (status === 'Validado' ? '#22c55e' : (status === 'Corregir' ? '#ff4b4b' : accentColor)),
             textAlign: 'center', textTransform: 'uppercase', lineHeight: '1.2',
             maxWidth: '100%'
           }}>{(item.titulo || item.title)?.length > 25 ? (item.titulo || item.title).substring(0, 22) + '...' : (item.titulo || item.title)}</span>
@@ -1763,22 +1802,40 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                             </>
                           ) : pid === 'makecode-arcade' ? (
                             <>
-                              <div style={{ display: 'flex', gap: '15px' }}>
+                              <div style={{ marginBottom: '20px' }}>
+                                <GlowButton 
+                                  color="blue" 
+                                  onClick={() => window.open(currentItem.editorUrl || 'https://arcade.makecode.com/', '_blank')}
+                                  style={{ 
+                                    padding: '12px 25px', 
+                                    fontSize: '0.95rem', 
+                                    fontWeight: '800',
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '10px'
+                                  }}
+                                >
+                                  <ExternalLink size={18} /> ABRIR EDITOR MAKECODE ARCADE
+                                </GlowButton>
+                              </div>
+                              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Entra en la <a href={currentItem.pdfUrl || 'https://view.genially.com/64ca324dc4c807001173a6ec'} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>página de retos</a> y busca en el mapa el reto número <strong>{currentItem.numero || (challenges.indexOf(currentItem) + 1)}</strong>.
+                                  Usa el editor oficial de <strong>MakeCode Arcade</strong> para resolver este desafío.
                                 </p>
                               </div>
-                              <div style={{ display: 'flex', gap: '15px' }}>
+                              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>2</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Resuélvelo en el <a href={currentItem.editorUrl || 'https://arcade.makecode.com/'} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>editor oficial</a>.
+                                  Si necesitas consultar la guía visual del mapa de retos, puedes verla <a href={currentItem.pdfUrl || 'https://view.genially.com/64ca324dc4c807001173a6ec'} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>aquí</a> (busca el Reto #{currentItem.numero}).
                                 </p>
                               </div>
                               <div style={{ display: 'flex', gap: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>3</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Comparte el reto con nosotros.
+                                  Cuando termines tu proyecto, comparte el enlace generado por el editor con nosotros.
                                 </p>
                               </div>
                             </>

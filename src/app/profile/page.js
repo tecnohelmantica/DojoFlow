@@ -116,7 +116,6 @@ function ProfileContent() {
   useEffect(() => {
     // Reset itinerary to the leftmost option (null/default) when changing planets
     setItinerary(null);
-    setAssessmentCompleted(false); // Reiniciar evaluación para el nuevo planeta si no está en localStorage
   }, [activePlanet]);
 
   const handleFileUpload = async (event) => {
@@ -165,14 +164,21 @@ function ProfileContent() {
     if (!activePlanet) return;
 
     // Check assessment state
+    const savedAssessment = localStorage.getItem(`dojoflow_assessment_${activePlanet}`);
     const savedLevel = localStorage.getItem(`dojoflow_level_${activePlanet}`);
     const savedItinerary = localStorage.getItem(`dojoflow_itinerary_${activePlanet}`);
-    
-    if (savedLevel) {
+    const planet = getPlanetById(activePlanet);
+    const planetName = planet?.name || activePlanet.toUpperCase();
+
+    if (savedAssessment === 'true' || savedLevel) {
       setAssessmentCompleted(true);
-      setStudentLevel(savedLevel);
+      setStudentLevel(savedLevel || 'principiante');
+      setSocraticMessages([
+        { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${planetName}. ¿En qué puedo ayudarte hoy?` }
+      ]);
     } else {
       setAssessmentCompleted(false);
+      setStudentLevel('principiante');
     }
 
     if (savedItinerary) {
@@ -180,11 +186,6 @@ function ProfileContent() {
     } else {
       setItinerary(null);
     }
-    // Actualizar mensaje inicial del tutor
-    const planetName = getPlanetById(activePlanet)?.name || activePlanet?.toUpperCase() || 'GENERAL';
-    setSocraticMessages([
-      { role: 'tutor', text: `Saludos, Explorer. He analizado tu lógica actual en el sector ${planetName}. ¿En qué puedo ayudarte hoy?` }
-    ]);
   }, [activePlanet]);
 
   useEffect(() => {
@@ -217,6 +218,18 @@ function ProfileContent() {
           has_seen_onboarding: true,
           isGuest: true
         });
+
+        // Sincronizar nivel de invitado desde localStorage para el planeta activo
+        const savedAssessment = localStorage.getItem(`dojoflow_assessment_${activePlanet}`);
+        const savedLevel = localStorage.getItem(`dojoflow_level_${activePlanet}`);
+        
+        if (savedAssessment === 'true' || savedLevel) {
+          setStudentLevel(savedLevel || 'principiante');
+          setAssessmentCompleted(true);
+        } else {
+          setStudentLevel('principiante');
+          setAssessmentCompleted(false);
+        }
         
         setStudentStats({
           retos: 0,
@@ -433,6 +446,7 @@ function ProfileContent() {
   };
 
   const handleAssessmentComplete = (level) => {
+    localStorage.setItem(`dojoflow_assessment_${activePlanet}`, 'true');
     localStorage.setItem(`dojoflow_level_${activePlanet}`, level);
     setStudentLevel(level);
     setAssessmentCompleted(true);

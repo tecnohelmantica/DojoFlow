@@ -1,4 +1,11 @@
 export const CODE_MODERN_COURSES = [
+  { 
+    numero: 0, 
+    id: "socratic-tutor", 
+    titulo: "IA TUTOR / RETOS", 
+    explicacion: "Haz clic aquí para activar tu evaluación diagnóstica y recibir ayuda personalizada de la IA.",
+    isIA: true 
+  },
   { numero: 1, id: "coursec", titulo: "Curso C", dificultad: "6-10 años", explicacion: "10 etapas con 111 ejercicios.", externalUrl: "https://studio.code.org/s/coursec-2025" },
   { numero: 2, id: "coursed", titulo: "Curso D", dificultad: "7-11 años", explicacion: "12 etapas con 139 ejercicios.", externalUrl: "https://studio.code.org/s/coursed-2025" },
   { numero: 3, id: "coursee", titulo: "Curso E", dificultad: "8-12 años", explicacion: "11 etapas con 130 ejercicios y proyecto final.", externalUrl: "https://studio.code.org/s/coursee-2025" },
@@ -7,6 +14,13 @@ export const CODE_MODERN_COURSES = [
 ];
 
 export const CODE_HOUR_OF_CODE = [
+  { 
+    numero: 0, 
+    id: "socratic-tutor", 
+    titulo: "IA TUTOR / RETOS", 
+    explicacion: "Haz clic aquí para activar tu evaluación diagnóstica y recibir ayuda personalizada de la IA.",
+    isIA: true 
+  },
   { numero: 1, id: "dance-party", titulo: "Fiesta de baile", dificultad: "Todos", explicacion: "Crea tu propia fiesta de baile.", externalUrl: "https://studio.code.org/s/dance-2019/lessons/1/levels/1" },
   { numero: 2, id: "dance-party-2", titulo: "¡Sigue bailando!", dificultad: "Todos", explicacion: "Aprende más pasos de baile.", externalUrl: "https://studio.code.org/s/dance-extras-2019/lessons/1/levels/1" },
   { numero: 3, id: "minecraft-aquatic", titulo: "Viaje acuático de Minecraft", dificultad: "Iniciación", explicacion: "Explora el océano con Minecraft.", externalUrl: "https://studio.code.org/s/aquatic/lessons/1/levels/1" },
@@ -32,5 +46,12 @@ export const CODE_HOUR_OF_CODE = [
 ];
 
 export const CODE_HOUR_OF_AI = [
+  { 
+    numero: 0, 
+    id: "socratic-tutor", 
+    titulo: "IA TUTOR / RETOS", 
+    explicacion: "Haz clic aquí para activar tu evaluación diagnóstica y recibir ayuda personalizada de la IA.",
+    isIA: true 
+  },
   { numero: 1, id: "hour-of-ai", titulo: "Hour of AI (Más retos)", dificultad: "IA", explicacion: "Acceso a una amplia colección de actividades de Inteligencia Artificial.", externalUrl: "https://csforall.org/es-ES/activities/hour-of-ai?utm_source=redirect&utm_medium=web&utm_campaign=hour-of-ai&utm_term=hourofairedirect&utm_content=activites" }
 ];
