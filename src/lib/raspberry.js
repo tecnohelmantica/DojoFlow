@@ -1,6 +1,5 @@
 // Raspberry Pi Scratch Challenges - Updated 2026
 export const RASPBERRY_SCRATCH_L1 = [
-  { numero: 0, id: "socratic-tutor", titulo: "IA TUTOR / RETOS", isIA: true },
   { numero: 1, id: "rock-band", titulo: "Banda de Rock", dificultad: "Principiante" },
   { numero: 2, id: "lost-in-space", titulo: "Perdidos en el espacio", dificultad: "Principiante" },
   { numero: 3, id: "ghostbusters", titulo: "Cazafantasmas", dificultad: "Principiante" },
@@ -27,7 +26,6 @@ export const RASPBERRY_SCRATCH_L1 = [
 ];
 
 export const RASPBERRY_SCRATCH_L2 = [
-  { numero: 0, id: "socratic-tutor", titulo: "IA TUTOR / RETOS", isIA: true },
   { numero: 1, id: "binary-hero", titulo: "Héroe Binario", dificultad: "Intermedio" },
   { numero: 2, id: "slug-race", titulo: "Carrera de Babosas", dificultad: "Intermedio" },
   { numero: 3, id: "dress-up-terry", titulo: "Viste a Terry", dificultad: "Intermedio" },
@@ -41,7 +39,6 @@ export const RASPBERRY_SCRATCH_L2 = [
 ];
 
 export const RASPBERRY_SCRATCH_CHALLENGES = [
-  { numero: 0, id: "socratic-tutor", titulo: "IA TUTOR / RETOS", isIA: true },
   { numero: 1, id: "scratch-survival-game", titulo: "Supervivencia Extrema", dificultad: "Avanzado" },
   { numero: 2, id: "3d-graphics-engine", titulo: "Motor Gráfico 3D", dificultad: "Avanzado" },
   { numero: 3, id: "multiplayer-racing", titulo: "Carreras Multijugador", dificultad: "Avanzado" },

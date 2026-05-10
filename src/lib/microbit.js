@@ -39,7 +39,6 @@ export const MICROBIT_CHALLENGES = {
 };
 
 export const MICROBIT_TUTORIALS = [
-  { numero: 0, id: "socratic-tutor", titulo: "IA TUTOR / RETOS", descripcion: "Tu Sensei personal para guiarte en cada misión.", isIA: true },
   { numero: 1, id: "hello-world", titulo: "Hola Mundo", plataforma: "MakeCode" },
   { numero: 2, id: "variables", titulo: "Uso de Variables", plataforma: "MakeCode" },
   { numero: 3, id: "loops", titulo: "Bucles Infinitos", plataforma: "MakeCode" },

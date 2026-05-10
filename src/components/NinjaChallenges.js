@@ -431,8 +431,10 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           }
         });
 
-        // 5. Ordenar y Guardar
-        const sortedResult = finalResult.sort(sortFn);
+        // 5. Ordenar y Guardar (Filter out Socratic Tutor items as they have their own dedicated UI)
+        const sortedResult = finalResult
+          .filter(it => it.id !== 'socratic-tutor' && !it.isIA)
+          .sort(sortFn);
         setter(sortedResult);
         return sortedResult;
       };

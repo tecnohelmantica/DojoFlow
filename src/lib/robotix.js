@@ -1,11 +1,4 @@
 export const ROBOTIX_CHALLENGES = [
-  { 
-    numero: 0, 
-    titulo: "IA TUTOR / RETOS", 
-    id: "socratic-tutor", 
-    explicacion: "Haz clic aquí para activar tu evaluación diagnóstica y recibir ayuda personalizada de la IA.",
-    isIA: true 
-  },
   { "numero": 1, "titulo": "¡Vamos a cantar!", "id": "375835363" },
   { "numero": 2, "titulo": "Descubrimos la ciudad", "id": "375854305" },
   { "numero": 3, "titulo": "Fiesta de disfraces", "id": "376182689" },

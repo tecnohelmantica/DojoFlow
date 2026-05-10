@@ -170,7 +170,7 @@ function ProfileContent() {
     const planet = getPlanetById(activePlanet);
     const planetName = planet?.name || activePlanet.toUpperCase();
 
-    if (savedAssessment === 'true' || savedLevel) {
+    if (savedAssessment === 'true') {
       setAssessmentCompleted(true);
       setStudentLevel(savedLevel || 'principiante');
       setSocraticMessages([
@@ -179,6 +179,10 @@ function ProfileContent() {
     } else {
       setAssessmentCompleted(false);
       setStudentLevel('principiante');
+      // If no assessment, we could also reset messages or keep a default welcome
+      setSocraticMessages([
+        { role: 'tutor', text: `Saludos, Explorer. Iniciando sistemas de acompañamiento socrático para ${planetName}...` }
+      ]);
     }
 
     if (savedItinerary) {
@@ -223,7 +227,7 @@ function ProfileContent() {
         const savedAssessment = localStorage.getItem(`dojoflow_assessment_${activePlanet}`);
         const savedLevel = localStorage.getItem(`dojoflow_level_${activePlanet}`);
         
-        if (savedAssessment === 'true' || savedLevel) {
+        if (savedAssessment === 'true') {
           setStudentLevel(savedLevel || 'principiante');
           setAssessmentCompleted(true);
         } else {
