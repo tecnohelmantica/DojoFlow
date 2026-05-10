@@ -169,40 +169,67 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   useEffect(() => {
     if (!pid) return;
 
-    // Sincronización de Pestaña Activa según Itinerario
+    // Sincronización de Pestaña Activa según Itinerario y Prioridad de Tab Izquierdo
     if (pid === 'html') {
       if (!itinerary || itinerary === 'academy') {
-        if (activeTab === 'challenges' || activeTab.startsWith('raspberry') || activeTab === 'js_basics') setActiveTab('html_academy');
+        setActiveTab('html_academy');
       } else if (itinerary === 'raspberry') {
-        if (activeTab === 'challenges' || activeTab === 'html_academy' || activeTab === 'js_basics') setActiveTab('raspberry_l1');
+        setActiveTab('raspberry_l1');
       } else if (itinerary === 'javascript') {
         setActiveTab('js_basics');
       }
     } 
     else if (pid === 'python') {
       if (itinerary === 'codedex') {
-        if (activeTab === 'challenges') setActiveTab('codedex_beginner');
+        setActiveTab('codedex_beginner');
       } else {
-        if (activeTab.startsWith('codedex')) setActiveTab('challenges');
+        // Academia es el más a la izquierda
+        if (tutorials.length > 0) setActiveTab('tutorials');
+        else setActiveTab('challenges');
       }
     }
     else if (pid === 'ia') {
       if (itinerary === 'mlforkids') {
-        if (activeTab === 'challenges') setActiveTab('mlfk_beginner');
+        setActiveTab('mlfk_beginner');
       } else {
-        if (activeTab.startsWith('mlfk')) setActiveTab('challenges');
+        setActiveTab('challenges');
       }
     }
     else if (pid === 'appinventor') {
-      // App Inventor mostly uses 'challenges' state but with filtered content in loadData
-      if (activeTab !== 'challenges' && activeTab !== 'tutorials') setActiveTab('challenges');
+      setActiveTab('challenges');
     }
     else if (pid === 'tinkercad' || pid === '3d') {
-      if (itinerary === 'codeblocks' || itinerary === 'blockscad') {
-        if (activeTab === 'tutorials') setActiveTab('challenges');
+      if (itinerary === 'codeblocks') {
+        setActiveTab('challenges');
+      } else if (itinerary === 'blockscad') {
+        setActiveTab('challenges');
+      } else {
+        setActiveTab('tutorials'); // Academia 3D
       }
     }
-  }, [pid, itinerary, activeTab]);
+    else if (pid === 'scratch' || pid === 'makecode-microbit' || pid === 'makecode-arcade') {
+      // Forzar siempre el itinerario más a la izquierda al entrar
+      if (itinerary === 'raspberry') {
+        setActiveTab('raspberry_l1');
+      } else {
+        // Por defecto Academia si existe, si no Robotix/Retos
+        if (tutorials.length > 0) {
+          setActiveTab('tutorials');
+        } else {
+          setActiveTab('challenges');
+        }
+      }
+    }
+    else {
+      // Comportamiento genérico: preferir tutoriales/academia si existen
+      if (tutorials.length > 0) {
+        setActiveTab('tutorials');
+      } else {
+        setActiveTab('challenges');
+      }
+    }
+  }, [pid, itinerary, tutorials.length, challenges.length]); // Incluimos longitudes para reaccionar cuando carguen los datos
+
 
   const loadData = async () => {
     setLoading(true);
@@ -264,6 +291,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       } else if (pid.includes('microbit')) {
         setDifficultyChallenges(MICROBIT_CHALLENGES);
         setChallenges(MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner); setTutorials(MICROBIT_TUTORIALS);
+      } else if (pid === 'makecode-arcade') {
+        setChallenges(ARCADE_CHALLENGES); setTutorials(ARCADE_TUTORIALS);
       }
       
       // Intentar recuperar progreso local de invitados si existe
@@ -343,24 +372,69 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
 
       // Population Helper
       const populateState = (setter, list, category, localFallback, level = null) => {
-        let filtered = list.filter(item => {
+        // 1. Enriquecer la lista de la DB con campos consistentes
+        const enrichedDB = (list || []).map(item => ({
+          ...item,
+          titulo: item.titulo || item.title || item.name,
+          id: item.id || item.slug || item.numero || item.order_index,
+          category: item.category || item.categoria || 'General'
+        }));
+
+        // 2. Filtrar DB por categoría/nivel
+        const filteredDB = enrichedDB.filter(item => {
           const catMatch = !category || item.category === category;
           const levelMatch = !level || item.level === level;
           return catMatch && levelMatch;
         });
-        
-        let result = [];
-        if (filtered.length > 0) {
-          result = filtered.map(item => ({
-            ...item,
-            numero: item.numero || item.order_index
-          })).sort(sortFn);
-          setter(result);
-        } else {
-          result = localFallback || [];
-          setter(result);
-        }
-        return result;
+
+        // 3. Empezar con el localFallback como base para asegurar que NUNCA desaparezcan los retos locales
+        let finalResult = (localFallback || []).map((localItem, idx) => {
+          // Buscar si este item local existe en la DB para enriquecerlo con estado de validación
+          const dbMatch = filteredDB.find(db => 
+            (localItem.id && (localItem.id === db.slug || localItem.id === db.id)) || 
+            (localItem.titulo && db.titulo && localItem.titulo.toLowerCase().trim() === db.titulo.toLowerCase().trim())
+          );
+
+          if (dbMatch) {
+            return {
+              ...dbMatch,
+              metadata: { 
+                ...localItem, 
+                ...(typeof dbMatch.metadata === 'string' ? JSON.parse(dbMatch.metadata) : (dbMatch.metadata || {})) 
+              },
+              numero: dbMatch.numero || localItem.numero || idx + 1
+            };
+          }
+
+          // Si no hay match en DB, devolver el item local
+          return {
+            ...localItem,
+            id: localItem.id || localItem.slug || `local-${idx}`,
+            titulo: localItem.titulo || localItem.title,
+            metadata: { ...localItem },
+            isLocalOnly: true
+          };
+        });
+
+        // 4. Añadir items de la DB que NO estaban en el localFallback (retos nuevos creados en el panel)
+        filteredDB.forEach(db => {
+          const alreadyExists = finalResult.some(r => 
+            (r.id === db.id) || 
+            (r.titulo && db.titulo && r.titulo.toLowerCase().trim() === db.titulo.toLowerCase().trim())
+          );
+
+          if (!alreadyExists) {
+            finalResult.push({
+              ...db,
+              metadata: typeof db.metadata === 'string' ? JSON.parse(db.metadata) : (db.metadata || {})
+            });
+          }
+        });
+
+        // 5. Ordenar y Guardar
+        const sortedResult = finalResult.sort(sortFn);
+        setter(sortedResult);
+        return sortedResult;
       };
 
       if (dbChallenges.length === 0 && dbTutorials.length === 0) {
@@ -407,6 +481,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setTutorials(MICROBIT_TUTORIALS);
           const currentLevelList = MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner;
           setChallenges(currentLevelList);
+        } else if (pid === 'makecode-arcade') {
+          setChallenges(ARCADE_CHALLENGES);
+          setTutorials(ARCADE_TUTORIALS);
         }
       } else {
         // Map based on Planet
@@ -463,6 +540,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           const currentLevelList = MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner;
           populateState(setChallenges, dbChallenges, null, currentLevelList, difficultyLevel);
           populateState(setTutorials, dbTutorials, null, []);
+        } else if (pid === 'makecode-arcade') {
+          populateState(setChallenges, dbChallenges, null, ARCADE_CHALLENGES);
+          populateState(setTutorials, dbTutorials, null, ARCADE_TUTORIALS);
         } else {
           setChallenges(dbChallenges.sort(sortFn));
           setTutorials(dbTutorials.sort(sortFn));
@@ -490,10 +570,14 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     if (externalUrl) return externalUrl;
 
     // 2. Fallbacks específicos por planeta si no hay URL en metadata
-    if (pid.includes('scratch') || pid.includes('raspberry')) {
+    // IMPORTANTE: Solo reconstruir URL de Raspberry si el item pertenece a una categoría de Raspberry
+    const itemCategory = item.category || '';
+    if ((pid.includes('scratch') || pid.includes('raspberry') || pid === 'html') && (itemCategory.includes('raspberry') || pid.includes('raspberry'))) {
       // Si es Raspberry Pi Scratch, intentar reconstruir si tenemos el slug
-      if (detectedSlug && detectedSlug.startsWith('raspberry-')) {
-         return `https://projects.raspberrypi.org/es-ES/projects/${detectedSlug.replace('raspberry-', '')}`;
+      const slugToUse = meta.id || item.slug || (typeof item.id === 'string' && item.id.length < 40 && !/^\d+$/.test(item.id) ? item.id : null);
+      if (slugToUse && (slugToUse.startsWith('raspberry-') || slugToUse.length > 3)) {
+         const cleanSlug = slugToUse.replace('raspberry-', '');
+         return `https://projects.raspberrypi.org/es-ES/projects/${cleanSlug}`;
       }
     }
     
@@ -1098,7 +1182,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  CURSOS MODERNOS ({codeModernCompleted}/5)
+                  CURSOS MODERNOS ({codeModernCompleted}/{codeModern.length})
                 </button>
                 <button 
                   onClick={() => { setActiveTab('hora_codigo'); setSelectedTutorial(null); }}
@@ -1111,7 +1195,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  HORA DEL CÓDIGO ({codeHourOfCodeCompleted}/22)
+                  HORA DEL CÓDIGO ({codeHourOfCodeCompleted}/{codeHourOfCode.length})
                 </button>
                 <button 
                   onClick={() => { setActiveTab('hour_of_ai'); setSelectedTutorial(null); }}
@@ -1185,7 +1269,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         transition: 'all 0.2s', minWidth: 'fit-content'
                       }}
                     >
-                      CODE.ORG CURSO ({htmlCodeOrgCompleted}/21)
+                      CODE.ORG CURSO ({htmlCodeOrgCompleted}/{htmlCodeOrg.length})
                     </button>
                   ) : itinerary === 'raspberry' ? (
                     <>
@@ -1199,7 +1283,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                           transition: 'all 0.2s', minWidth: 'fit-content'
                         }}
                       >
-                        BÁSICOS ({l1Completed}/11)
+                        BÁSICOS ({l1Completed}/{raspberryL1.length})
                       </button>
                       <button 
                         onClick={() => setActiveTab('raspberry_l2')}
@@ -1211,7 +1295,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                           transition: 'all 0.2s', minWidth: 'fit-content'
                         }}
                       >
-                        INTERMEDIO ({l2Completed}/10)
+                        INTERMEDIO ({l2Completed}/{raspberryL2.length})
                       </button>
                       <button 
                         onClick={() => setActiveTab('expert')}
@@ -1223,7 +1307,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                           transition: 'all 0.2s', minWidth: 'fit-content'
                         }}
                       >
-                        AVANZADO ({expertChallengesCompleted}/6)
+                        AVANZADO ({expertChallengesCompleted}/{expertChallenges.length})
                       </button>
                     </>
                   ) : itinerary === 'javascript' ? (
@@ -1237,7 +1321,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                           transition: 'all 0.2s', minWidth: 'fit-content'
                         }}
                       >
-                        CURSO ({jsCourseCompleted}/1)
+                        CURSO ({jsCourseCompleted}/{jsCourse.length})
                       </button>
                   ) : null}
                 </div>
@@ -1277,7 +1361,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  RETOS NINJA ({challengesCompleted}/{challenges.length})
+                  {`RETOS NINJA (${challengesCompleted}/${challenges.length})`}
                 </button>
               </>
             ) : pid === 'ia' && itinerary === 'mlforkids' ? (
@@ -1351,7 +1435,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                       transition: 'all 0.2s', minWidth: 'fit-content'
                     }}
                   >
-                    {planetId === 'makecode-arcade' ? 'WE TEACH ROBOTICS' : planetId === 'scratch' ? 'RETOS ROBOTIX' : itinerary === 'blockscad' ? 'RETOS BLOCKSCAD' : planetId === 'python' ? (itinerary === 'codedex' ? 'PROYECTOS CODEDEX' : 'RETOS RASPBERRY PI') : planetId === 'appinventor' ? (itinerary === 'social' ? 'RETOS RASPBERRY PI' : 'RETOS APP INVENTOR') : 'RETOS NINJA'} ({challengesCompleted}/{challenges.length})
+                    {planetId === 'makecode-arcade' ? 'WE TEACH ROBOTICS' : planetId === 'scratch' ? 'RETOS ROBOTIX' : itinerary === 'blockscad' ? 'RETOS BLOCKSCAD' : planetId === 'python' ? (itinerary === 'codedex' ? 'PROYECTOS CODEDEX' : 'RETOS RASPBERRY PI') : planetId === 'appinventor' ? (itinerary === 'social' ? 'RETOS RASPBERRY PI' : 'RETOS APP INVENTOR') : 'RETOS NINJA'} {`(${challengesCompleted}/${challenges.length})`}
                   </button>
                 )}
                 {planetId === 'scratch' && (
@@ -1367,7 +1451,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         transition: 'all 0.2s', minWidth: 'fit-content'
                       }}
                     >
-                      RASPBERRY L1 ({l1Completed}/53)
+                      RASPBERRY L1 {`(${l1Completed}/${raspberryL1.length})`}
                     </button>
                     <button 
                       onClick={() => setActiveTab('raspberry_l2')}
@@ -1380,7 +1464,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         transition: 'all 0.2s', minWidth: 'fit-content'
                       }}
                     >
-                      RASPBERRY L2 ({l2Completed}/44)
+                      RASPBERRY L2 {`(${l2Completed}/${raspberryL2.length})`}
                     </button>
                     <button 
                       onClick={() => setActiveTab('expert')}
@@ -1972,13 +2056,15 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                             ⚠️ Importante: Debes iniciar sesión en Tinkercad para acceder a este tutorial.
                           </p>
                         )}
-                        <GlowButton 
-                          onClick={() => handleAction(currentItem, 'open_only')}
-                          style={{ marginTop: '20px' }}
-                          variant="secondary"
-                        >
-                          Abrir Tutorial en {pid === 'scratch' ? 'Scratch' : (pid?.startsWith('tinkercad') || pid === 'arduino' ? 'Tinkercad' : (pid === 'appinventor' ? 'App Inventor' : 'MakeCode'))}
-                        </GlowButton>
+                        {/* Botón Centrado si es el único */}
+                        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}>
+                          <GlowButton 
+                            onClick={() => handleAction(currentItem, 'open_only')}
+                            variant="secondary"
+                          >
+                            Abrir Tutorial en {pid === 'scratch' ? 'Scratch' : (pid?.startsWith('tinkercad') || pid === 'arduino' ? 'Tinkercad' : (pid === 'appinventor' ? 'App Inventor' : 'MakeCode'))}
+                          </GlowButton>
+                        </div>
                       </div>
                     )}
 
@@ -2224,7 +2310,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
             background: 'rgba(0,0,0,0.03)', padding: '20px', borderRadius: '24px'
           }}>
             {activeList.map((item, index) => (
-              <div key={item.id}>
+              <div key={item.id || item.numero || `item-${index}`}>
                 {renderChallengeCard(item, activeTab === 'tutorials', index)}
               </div>
             ))}

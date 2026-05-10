@@ -284,81 +284,78 @@ function AuthContent() {
             <form onSubmit={handleAuth} className="auth-form">
               <input type="text" placeholder="Tu Alias Ninja" value={alias} onChange={(e) => setAlias(e.target.value)} required className="auth-input" />
               
-              {!isRecovering && (
-                <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="Contraseña Secreta" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                    className="auth-input" 
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="eye-btn">
-                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-                  </button>
+              {!isLogin && !isRecovering && (
+                <div className="pwd-rules" style={{ marginBottom: '20px' }}>
+                  <div style={{ color: pwdRules.length ? '#00f2fe' : '#ffffff', fontWeight: '800', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{pwdRules.length ? '✓' : '○'} Más de 8 caracteres</div>
+                  <div style={{ color: pwdRules.upperLower ? '#00f2fe' : '#ffffff', fontWeight: '800', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{pwdRules.upperLower ? '✓' : '○'} Mayúsculas y minúsculas</div>
+                  <div style={{ color: pwdRules.number ? '#00f2fe' : '#ffffff', fontWeight: '800', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{pwdRules.number ? '✓' : '○'} Un número</div>
+                  <div style={{ color: pwdRules.symbol ? '#00f2fe' : '#ffffff', fontWeight: '800', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{pwdRules.symbol ? '✓' : '○'} Un símbolo especial</div>
                 </div>
               )}
 
               {!isLogin && !isRecovering && (
-                <div className="pwd-rules">
-                  <div style={{ color: pwdRules.length ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.length ? '✓' : '○'} Más de 8 caracteres</div>
-                  <div style={{ color: pwdRules.upperLower ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.upperLower ? '✓' : '○'} Mayúsculas y minúsculas</div>
-                  <div style={{ color: pwdRules.number ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.number ? '✓' : '○'} Un número</div>
-                  <div style={{ color: pwdRules.symbol ? 'var(--accent-teal)' : 'rgba(255, 255, 255, 0.85)' }}>{pwdRules.symbol ? '✓' : '○'} Un símbolo especial</div>
-                </div>
-              )}
-
-              {!isLogin && !isRecovering && (
-                <>
-                  <div className="role-selector-label" style={{ fontSize: '0.8rem', color: '#8a8a9e', fontWeight: '600', marginBottom: '8px' }}>ELIGE TU CAMINO:</div>
-                  <div className="role-selector" style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+                <div className="role-selection-area" style={{ marginBottom: '20px' }}>
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', fontWeight: '700', marginBottom: '12px', textAlign: 'left', letterSpacing: '0.5px' }}>ELIGE TU CAMINO:</p>
+                  <div style={{ display: 'flex', gap: '12px' }}>
                     <div 
                       onClick={() => setRole('alumno')}
-                      className={`role-option ${role === 'alumno' ? 'active' : ''}`}
+                      className={`role-option-box ${role === 'alumno' ? 'active' : ''}`}
                       style={{
                         flex: 1,
-                        padding: '16px 12px',
-                        borderRadius: '16px',
-                        border: `2px solid ${role === 'alumno' ? 'var(--accent-teal)' : 'rgba(255,255,255,0.05)'}`,
-                        background: role === 'alumno' ? 'rgba(102, 226, 213, 0.1)' : 'rgba(255,255,255,0.02)',
+                        padding: '16px 10px',
+                        borderRadius: '20px',
+                        border: `2px solid ${role === 'alumno' ? '#00f2fe' : 'rgba(255,255,255,0.1)'}`,
+                        background: role === 'alumno' ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255,255,255,0.03)',
                         cursor: 'pointer',
                         textAlign: 'center',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'all 0.3s ease',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        boxShadow: role === 'alumno' ? '0 0 20px rgba(0, 242, 254, 0.2)' : 'none'
                       }}
                     >
-                      <Rocket size={24} style={{ color: role === 'alumno' ? 'var(--accent-teal)' : '#8a8a9e' }} />
-                      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: role === 'alumno' ? 'white' : '#8a8a9e', letterSpacing: '1px' }}>SOY ALUMNO</div>
+                      <Rocket size={24} style={{ color: role === 'alumno' ? '#00f2fe' : 'rgba(255,255,255,0.4)' }} />
+                      <span style={{ fontSize: '0.7rem', fontWeight: '800', color: role === 'alumno' ? '#fff' : 'rgba(255,255,255,0.5)', letterSpacing: '1px' }}>SOY ALUMNO</span>
                     </div>
                     <div 
                       onClick={() => setRole('profesor')}
-                      className={`role-option ${role === 'profesor' ? 'active' : ''}`}
+                      className={`role-option-box ${role === 'profesor' ? 'active' : ''}`}
                       style={{
                         flex: 1,
-                        padding: '16px 12px',
-                        borderRadius: '16px',
-                        border: `2px solid ${role === 'profesor' ? 'var(--accent-purple)' : 'rgba(255,255,255,0.05)'}`,
-                        background: role === 'profesor' ? 'rgba(197, 129, 255, 0.1)' : 'rgba(255,255,255,0.02)',
+                        padding: '16px 10px',
+                        borderRadius: '20px',
+                        border: `2px solid ${role === 'profesor' ? '#9c27b0' : 'rgba(255,255,255,0.1)'}`,
+                        background: role === 'profesor' ? 'rgba(156, 39, 176, 0.15)' : 'rgba(255,255,255,0.03)',
                         cursor: 'pointer',
                         textAlign: 'center',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'all 0.3s ease',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        boxShadow: role === 'profesor' ? '0 0 20px rgba(156, 39, 176, 0.2)' : 'none'
                       }}
                     >
-                      <Shield size={24} style={{ color: role === 'profesor' ? 'var(--accent-purple)' : '#8a8a9e' }} />
-                      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: role === 'profesor' ? 'white' : '#8a8a9e', letterSpacing: '1px' }}>SOY DOCENTE</div>
+                      <Shield size={24} style={{ color: role === 'profesor' ? '#9c27b0' : 'rgba(255,255,255,0.4)' }} />
+                      <span style={{ fontSize: '0.7rem', fontWeight: '800', color: role === 'profesor' ? '#fff' : 'rgba(255,255,255,0.5)', letterSpacing: '1px' }}>SOY DOCENTE</span>
                     </div>
                   </div>
-                  <input type="email" placeholder="Correo de un padre/tutor (opcional)" value={emailReal} onChange={(e) => setEmailReal(e.target.value)} className="auth-input" />
-                  <p className="input-hint">Tu Alias es tu identidad. El correo es opcional.</p>
-                </>
+                </div>
+              )}
+
+              {!isLogin && !isRecovering && (
+                <div style={{ marginBottom: '15px' }}>
+                  <input 
+                    type="email" 
+                    placeholder="Correo de recuperación (Opcional)" 
+                    value={emailReal} 
+                    onChange={(e) => setEmailReal(e.target.value)} 
+                    className="auth-input" 
+                  />
+                  <p className="input-hint" style={{ marginTop: '5px', opacity: 0.6 }}>Solo lo usaremos si olvidas tu contraseña.</p>
+                </div>
               )}
 
               {isLogin && !isRecovering && (

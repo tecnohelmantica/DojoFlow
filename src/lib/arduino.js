@@ -42,7 +42,7 @@ export const ARDUINO_CHALLENGES = {
     { numero: 36, titulo: "Práctica 07: Semáforo con tiempo decreciente", url: "https://makinando.github.io/practicas_arduino/prctica_07.html", descripcion: "[Makinando] Secuencia donde el tiempo de encendido disminuye en cada ciclo." },
     { numero: 37, titulo: "Práctica 08: El coche fantástico", url: "https://makinando.github.io/practicas_arduino/prctica_08.html", descripcion: "[Makinando] Secuencia cíclica de 6 ledes (ida y vuelta)." },
     { numero: 38, titulo: "Práctica 09: Coche fantástico con bucle for", url: "https://makinando.github.io/practicas_arduino/prctica_09.html", descripcion: "[Makinando] Optimización de la secuencia de ledes usando la sentencia for." },
-    { numero: 39, titulo: "Práctica 10: Efecto visual libre", url: "https://makinando.github.io/practicas_arduino/prctica_10.html", descripcion: "[Makinando] Reto creativo para diseñar un efecto visual propio con leds." },
+    { numero: 39, titulo: "Práctica 10: Efecto visual de leds", url: "https://makinando.github.io/practicas_arduino/prctica_10.html", descripcion: "[Makinando] Creación de un efecto de luces personalizado utilizando múltiples ledes." },
     { numero: 40, titulo: "Práctica 11: Monitor serie y potenciómetro", url: "https://makinando.github.io/practicas_arduino/prctica_11.html", descripcion: "[Makinando] Lectura de valores analógicos y visualización en el Monitor Serial del PC." },
     { numero: 41, titulo: "Práctica 12: Control de leds con potenciómetro", url: "https://makinando.github.io/practicas_arduino/prctica_12.html", descripcion: "[Makinando] Encendido progresivo de leds según el valor del potenciómetro." },
     { numero: 42, titulo: "Práctica 13: Sensor de luz (LDR)", url: "https://makinando.github.io/practicas_arduino/prctica_13.html", descripcion: "[Makinando] Control de iluminación automática según la intensidad de luz ambiental." },
@@ -78,13 +78,4 @@ export const ARDUINO_CHALLENGES = {
   ]
 };
 
-export const ARDUINO_TUTORIALS = [
-  { id: 1, numero: 1, title: "Introducción a Arduino", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Qué es Arduino y qué kit de iniciación elegir para empezar." },
-  { id: 2, numero: 2, title: "Entorno IDE y configuración", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Instalación y configuración del entorno de desarrollo oficial." },
-  { id: 3, numero: 3, title: "Variables y operaciones", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Fundamentos de programación: tipos de datos y matemáticas básicas." },
-  { id: 4, numero: 4, title: "Estructuras de control", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Toma de decisiones (if) y repetición de tareas (for/while)." },
-  { id: 5, numero: 5, title: "Entradas y Salidas Digitales", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Control básico de pines para encender componentes y leer botones." },
-  { id: 6, numero: 6, title: "Entradas y Salidas Analógicas", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Uso de PWM y lectura de sensores analógicos como potenciómetros." },
-  { id: 7, numero: 7, title: "Comunicación Serie", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Envío y recepción de datos entre Arduino y tu ordenador." },
-  { id: 8, numero: 8, title: "Sensores y Actuadores básicos", url: "https://www.luisllamas.es/roadmap-de-arduino/", description: "Primeros pasos con sensores de luz, temperatura y motores sencillos." }
-];
+export const ARDUINO_TUTORIALS = [];

@@ -74,8 +74,8 @@ export const RASPBERRY_SCRATCH_L2 = [
   { numero: 17, id: "flappy-parrot", titulo: "Flappy parrot", dificultad: "Intermedio", explicacion: "Guía a un loro a través de obstáculos móviles.", externalUrl: "https://projects.raspberrypi.org/es-ES/projects/flappy-parrot" },
   { numero: 18, id: "flower-generator", titulo: "Flower generator", dificultad: "Intermedio", explicacion: "Genera flores para crear fondos de pantalla o protectores.", externalUrl: "https://projects.raspberrypi.org/es-ES/projects/flower-generator" },
   { numero: 19, id: "magic-gift", titulo: "Magic gift", dificultad: "Intermedio", explicacion: "Crea un regalo mágico interactivo.", externalUrl: "https://projects.raspberrypi.org/es-ES/projects/magic-gift" },
-  { numero: 20, id: "mega-fruit-salad", titulo: "Mega fruit salad", dificultad: "Intermedio", explicacion: "Crea un tazón gigante de ensalada de frutas.", externalUrl: "https://projects.raspberrypi.org/es-ES/projects/mega-fruit-salad" },
-  { numero: 21, id: "on-the-hunt", titulo: "On the hunt", dificultad: "Intermedio", explicacion: "Crea un juego de búsqueda.", externalUrl: "https://projects.raspberrypi.org/es-ES/projects/on-the-hunt" }
+  { numero: 20, id: "mega-fruit-salad", titulo: "Mega fruit salad", dificultad: "Intermedio", explicacion: "Crea un tazón gigante de ensalada de frutas.", externalUrl: "https://projects.raspberrypi.org/en/projects/mega-fruit-salad" },
+  { numero: 21, id: "on-the-hunt", titulo: "On the hunt", dificultad: "Intermedio", explicacion: "Crea un juego de búsqueda.", externalUrl: "https://projects.raspberrypi.org/en/projects/on-the-hunt" }
 ];
 
 export const RASPBERRY_SCRATCH_CHALLENGES = [

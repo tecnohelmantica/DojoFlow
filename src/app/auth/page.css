@@ -155,6 +155,7 @@
 .auth-submit {
   margin-top: 10px;
   height: 54px;
+  width: 100%;
   font-size: 1.1rem !important;
   font-weight: 600 !important;
   border-radius: 14px !important;
@@ -245,7 +246,7 @@
   gap: 10px;
   transition: all 0.3s ease;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
   margin-bottom: 8px;
 }
 
@@ -275,4 +276,16 @@
   .brand-title {
     font-size: 2.5rem;
   }
+}
+
+.guest-btn-standard {
+  height: 54px !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  margin-top: 5px !important;
 }

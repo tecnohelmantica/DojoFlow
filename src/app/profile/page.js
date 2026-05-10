@@ -113,6 +113,12 @@ function ProfileContent() {
   const [activeResource, setActiveResource] = useState(null);
   const [isFullscreenResource, setIsFullscreenResource] = useState(false);
 
+  useEffect(() => {
+    // Reset itinerary to the leftmost option (null/default) when changing planets
+    setItinerary(null);
+    setAssessmentCompleted(false); // Reiniciar evaluación para el nuevo planeta si no está en localStorage
+  }, [activePlanet]);
+
   const handleFileUpload = async (event) => {
     try {
       const file = event.target.files?.[0];
@@ -643,6 +649,28 @@ function ProfileContent() {
                               onClick={handleUpdateEmail}
                               style={{ padding: '6px 12px', fontSize: '0.75rem' }}
                             >
+                                         <div className="flex gap-2 p-1 bg-white/10 rounded-xl">
+                                  <button
+                                    onClick={() => setItinerary('ACADEMIA')}
+                                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                                      itinerary === 'ACADEMIA'
+                                        ? 'bg-blue-500 text-white shadow-lg'
+                                        : 'text-blue-200 hover:bg-white/5'
+                                    }`}
+                                  >
+                                    ACADEMIA
+                                  </button>
+                                  <button
+                                    onClick={() => setItinerary('RETOS')}
+                                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                                      itinerary === 'RETOS'
+                                        ? 'bg-blue-500 text-white shadow-lg'
+                                        : 'text-blue-200 hover:bg-white/5'
+                                    }`}
+                                  >
+                                    RETOS
+                                  </button>
+                                </div>
                               Guardar
                             </GlowButton>
                             <button 
@@ -1038,10 +1066,12 @@ function ProfileContent() {
                   </div>
 
                   <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(2, 1fr)', 
+                    display: 'flex', 
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
                     gap: '12px',
-                    marginTop: '5px'
+                    marginTop: '5px',
+                    width: '100%'
                   }}>
                     {planet?.buttons && planet.buttons.length > 0 ? (
                       planet.buttons.map((btn, idx) => {
@@ -1049,29 +1079,25 @@ function ProfileContent() {
                         return (
                           <GlowButton 
                             key={idx}
-                            color={btn.color === 'pink' ? 'pink' : (btn.color === 'blue' ? 'blue' : 'teal')} 
+                            color={btn.color} 
                             onClick={() => window.open(btn.url, '_blank')} 
                             style={{ 
                               padding: '12px 10px', 
                               fontWeight: '900',
                               fontSize: '0.75rem',
-                              background: btn.color === 'black-outline' ? 'white' : undefined,
-                              border: btn.color === 'black-outline' ? '2px solid #1a1a2e' : undefined,
-                              color: btn.color === 'black-outline' ? '#1a1a2e' : undefined,
-                              boxShadow: btn.color === 'black-outline' ? 'none' : undefined,
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              width: '100%'
+                              flex: planet.buttons.length === 1 ? 'none' : '1',
+                              width: planet.buttons.length === 1 ? '300px' : 'calc(50% - 6px)',
+                              maxWidth: planet.buttons.length === 1 ? '300px' : 'none',
+                              margin: planet.buttons.length === 1 ? '0 auto' : '0'
                             }}
                           >
-                            <BtnIcon size={14} style={{ marginRight: '8px' }} /> {btn.label}
+                            <BtnIcon size={20} style={{ marginRight: '8px' }} /> {btn.label.toUpperCase()}
                           </GlowButton>
                         );
                       })
                     ) : (
-                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} style={{ gridColumn: 'span 2', padding: '15px', fontWeight: '900' }}>
-                        <ExternalLink size={14} style={{ marginRight: '10px' }} /> {planet?.name?.toUpperCase()} OFICIAL
+                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} style={{ width: '300px', maxWidth: '300px', padding: '15px', fontWeight: '900', margin: '0 auto' }}>
+                        <ExternalLink size={20} style={{ marginRight: '10px' }} /> {planet?.name?.toUpperCase()} OFICIAL
                       </GlowButton>
                     )}
                   </div>
@@ -1466,6 +1492,7 @@ function ProfileContent() {
                 <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
               </h3>
 
+
               {/* Selector de Itinerario (Específico para Tinkercad y otros) */}
               {activePlanet === 'tinkercad' && (
                 <div style={{ display: 'flex', gap: '10px' }}>
@@ -1597,35 +1624,7 @@ function ProfileContent() {
                 </div>
               )}
 
-              {activePlanet === 'arduino' && (
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {[
-                    { id: null, label: 'ACADEMIA' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '6px 15px',
-                        borderRadius: '20px',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+
 
               {activePlanet === 'html' && (
                 <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -1778,7 +1777,7 @@ function ProfileContent() {
               if (typeof window !== 'undefined') {
                 sessionStorage.setItem('dojoflow_navigating_to_signup', 'true');
               }
-              signOut(); 
+              signOut('/?mode=signup'); 
             }}
             style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', marginLeft: '12px', fontSize: '0.8rem' }}
           >

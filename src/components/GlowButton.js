@@ -10,6 +10,7 @@ export default function GlowButton({ children, color = 'teal', className = '', o
       case 'blue': return '#306998';
       case 'purple': return 'var(--accent-purple)';
       case 'pink': return '#d81b60';
+      case 'yellow': return '#ffc107';
       case 'gray': return 'var(--accent-gray)';
       case 'dark': return '#1a1a24';
       case 'black-outline': return 'transparent';
