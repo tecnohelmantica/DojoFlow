@@ -282,7 +282,7 @@ function AuthContent() {
             </form>
           ) : (
             <form onSubmit={handleAuth} className="auth-form">
-              <input type="text" placeholder="Tu Alias Ninja" value={alias} onChange={(e) => setAlias(e.target.value)} required className="auth-input" />
+              <input type="text" placeholder="Tu Alias Ninja (VERIFICANDO...)" value={alias} onChange={(e) => setAlias(e.target.value)} required className="auth-input" />
               
               {!isRecovering && !isUpdatingPassword && (
                 <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
