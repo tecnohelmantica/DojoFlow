@@ -6,8 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 import { 
   CODE_MODERN_COURSES, 
   CODE_HOUR_OF_CODE, 
-  CODE_HOUR_OF_AI,
-  Brain
+  CODE_HOUR_OF_AI
 } from '../lib/code';
 import { 
   HTML_CODE_ORG, 
