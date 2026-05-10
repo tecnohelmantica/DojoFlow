@@ -1611,6 +1611,37 @@ function ProfileContent() {
                 </div>
               )}
 
+              {activePlanet === 'scratch' && (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {[
+                    { id: null, label: '1. ACADEMIA' },
+                    { id: 'raspberry', label: '2. RASPBERRY PI' }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setItinerary(opt.id);
+                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                      }}
+                      style={{
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.7rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: itinerary === opt.id ? (planet?.barColor || '#ff9800') : 'white',
+                        color: itinerary === opt.id ? 'white' : '#64748b',
+                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#ff9800') : '#e2e8f0'}`,
+                        boxShadow: itinerary === opt.id ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {activePlanet === 'ia' && (
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {[

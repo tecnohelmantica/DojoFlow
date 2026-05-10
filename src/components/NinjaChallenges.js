@@ -171,12 +171,14 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
 
     // Sincronización de Pestaña Activa según Itinerario y Prioridad de Tab Izquierdo
     if (pid === 'html') {
-      if (!itinerary || itinerary === 'academy') {
-        setActiveTab('html_academy');
-      } else if (itinerary === 'raspberry') {
-        setActiveTab('raspberry_l1');
+      if (itinerary === 'raspberry') {
+        if (!activeTab || (!activeTab.startsWith('raspberry_') && activeTab !== 'expert')) {
+          setActiveTab('raspberry_l1');
+        }
       } else if (itinerary === 'javascript') {
         setActiveTab('js_basics');
+      } else {
+        setActiveTab('html_academy');
       }
     } 
     else if (pid === 'python') {
@@ -210,7 +212,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     else if (pid === 'scratch' || pid === 'makecode-microbit' || pid === 'makecode-arcade') {
       // Forzar siempre el itinerario más a la izquierda al entrar
       if (itinerary === 'raspberry') {
-        setActiveTab('raspberry_l1');
+        if (!activeTab || (!activeTab.startsWith('raspberry_') && activeTab !== 'expert')) {
+          setActiveTab('raspberry_l1');
+        }
       } else {
         // Por defecto Academia si existe, si no Robotix/Retos
         if (tutorials.length > 0) {
@@ -412,7 +416,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
             id: localItem.id || localItem.slug || `local-${idx}`,
             titulo: localItem.titulo || localItem.title,
             metadata: { ...localItem },
-            isLocalOnly: true
+            isLocalOnly: true,
+            category: category || localItem.category || 'General'
           };
         });
 
@@ -574,10 +579,10 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     // 2. Fallbacks específicos por planeta si no hay URL en metadata
     // IMPORTANTE: Solo reconstruir URL de Raspberry si el item pertenece a una categoría de Raspberry
     const itemCategory = item.category || '';
-    if ((pid.includes('scratch') || pid.includes('raspberry') || pid === 'html') && (itemCategory.includes('raspberry') || pid.includes('raspberry'))) {
+    if ((pid.includes('scratch') || pid.includes('raspberry') || pid === 'html') && (itemCategory.includes('raspberry') || pid.includes('raspberry') || tab?.startsWith('raspberry_') || tab === 'expert')) {
       // Si es Raspberry Pi Scratch, intentar reconstruir si tenemos el slug
       const slugToUse = meta.id || item.slug || (typeof item.id === 'string' && item.id.length < 40 && !/^\d+$/.test(item.id) ? item.id : null);
-      if (slugToUse && (slugToUse.startsWith('raspberry-') || slugToUse.length > 3)) {
+      if (slugToUse && (slugToUse.length > 3)) {
          const cleanSlug = slugToUse.replace('raspberry-', '');
          return `https://projects.raspberrypi.org/es-ES/projects/${cleanSlug}`;
       }
@@ -1463,7 +1468,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     ACADEMIA {planetId === 'python' ? 'PYTHON' : (planetId === 'arduino' ? 'ARDUINO' : (itinerary === '3d' ? '3D' : (itinerary === 'codeblocks' ? 'CÓDIGO' : (itinerary === 'blockscad' ? 'BLOCKSCAD' : ''))))} ({tutorialsCompleted}/{tutorialsList.length})
                   </button>
                 )}
-                {challenges.length > 0 && (planetId !== 'python' || itinerary !== 'academia') && (
+                {challenges.length > 0 && (planetId !== 'python' || itinerary !== 'academia') && planetId !== 'scratch' && (
                   <button 
                     onClick={() => setActiveTab('challenges')}
                     style={{ 
@@ -1475,13 +1480,16 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                       transition: 'all 0.2s', minWidth: 'fit-content'
                     }}
                   >
-                    {planetId === 'makecode-arcade' ? 'WE TEACH ROBOTICS' : planetId === 'scratch' ? 'RETOS ROBOTIX' : itinerary === 'blockscad' ? 'RETOS BLOCKSCAD' : planetId === 'python' ? (itinerary === 'codedex' ? 'PROYECTOS CODEDEX' : 'RETOS RASPBERRY PI') : planetId === 'appinventor' ? (itinerary === 'social' ? 'RETOS RASPBERRY PI' : 'RETOS APP INVENTOR') : 'RETOS NINJA'} {`(${challengesCompleted}/${challenges.length})`}
+                    {planetId === 'makecode-arcade' ? 'WE TEACH ROBOTICS' : itinerary === 'blockscad' ? 'RETOS BLOCKSCAD' : planetId === 'python' ? (itinerary === 'codedex' ? 'PROYECTOS CODEDEX' : 'RETOS RASPBERRY PI') : planetId === 'appinventor' ? (itinerary === 'social' ? 'RETOS RASPBERRY PI' : 'RETOS APP INVENTOR') : 'RETOS NINJA'} {`(${challengesCompleted}/${challenges.length})`}
                   </button>
                 )}
                 {planetId === 'scratch' && (
                   <>
                     <button 
-                      onClick={() => setActiveTab('raspberry_l1')}
+                      onClick={() => {
+                        setActiveTab('raspberry_l1');
+                        if (setItinerary) setItinerary('raspberry');
+                      }}
                       style={{ 
                         flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                         fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
@@ -1494,7 +1502,10 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                       RASPBERRY L1 {`(${l1Completed}/${raspberryL1.length})`}
                     </button>
                     <button 
-                      onClick={() => setActiveTab('raspberry_l2')}
+                      onClick={() => {
+                        setActiveTab('raspberry_l2');
+                        if (setItinerary) setItinerary('raspberry');
+                      }}
                       style={{ 
                         flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                         fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
@@ -1507,7 +1518,10 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                       RASPBERRY L2 {`(${l2Completed}/${raspberryL2.length})`}
                     </button>
                     <button 
-                      onClick={() => setActiveTab('expert')}
+                      onClick={() => {
+                        setActiveTab('expert');
+                        if (setItinerary) setItinerary('raspberry');
+                      }}
                       style={{ 
                         flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                         fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
