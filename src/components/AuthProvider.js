@@ -327,6 +327,18 @@ export default function AuthProvider({ children }) {
   };
 
   const handleGuestLogin = () => {
+    // Limpiar rastro de evaluaciones previas para que el invitado siempre vea el desafío del Sensei
+    if (typeof window !== 'undefined') {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('dojoflow_assessment_') || key.startsWith('dojoflow_level_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
+
     localStorage.setItem('dojoflow_guest', 'true');
     setIsGuest(true);
     setProfile({

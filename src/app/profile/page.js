@@ -477,7 +477,7 @@ function ProfileContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: session.user.id,
+          userId: isGuest ? 'guest_user' : session?.user?.id,
           mode: 'consulta',
           message: socraticInputText,
           history: socraticMessages.map(m => ({
@@ -982,7 +982,29 @@ function ProfileContent() {
             </div>
           </div>
 
-          {/* FILA 2: LANZADERAS Y PÁGINA OFICIAL */}
+          {/* CONTENIDO GATED: LANZADERAS, RECURSOS E ITINERARIO */}
+          {!assessmentCompleted ? (
+            <div style={{ marginBottom: '40px' }}>
+              <GlassCard style={{ padding: '60px 40px', textAlign: 'center', background: 'rgba(255,255,255,0.5)', border: '2px dashed rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: `${planet?.barColor || '#6366f1'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Brain size={40} color={planet?.barColor || '#6366f1'} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: '900', margin: '0 0 10px 0', color: '#1a1a2e' }}>Acceso Restringido: Evaluación Requerida</h3>
+                  <p style={{ color: '#64748b', fontSize: '1rem', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }}>
+                    Para desbloquear el Itinerario Ninja y las Misiones del Sensei en el planeta <strong>{planet?.name}</strong>, 
+                    debes completar primero el desafío diagnóstico con nuestro Tutor Socrático.
+                  </p>
+                </div>
+                <div style={{ padding: '15px 25px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Sparkles size={20} color="#ff9800" />
+                  <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '700', color: '#1a1a2e' }}>Completa el cuestionario en el panel superior derecho para continuar.</p>
+                </div>
+              </GlassCard>
+            </div>
+          ) : (
+            <>
+              {/* FILA 2: LANZADERAS Y PÁGINA OFICIAL */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' }}>
             
             {/* LANZADERAS */}
@@ -1503,232 +1525,205 @@ function ProfileContent() {
           )}
 
 
-          {/* FILA 5: ITINERARIO NINJA (FULL WIDTH) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-                <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
-              </h3>
+              {/* FILA 5: ITINERARIO NINJA */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+                    <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
+                  </h3>
+
+                  {/* Selector de Itinerario (Específico para Tinkercad y otros) */}
+                  {activePlanet === 'tinkercad' && (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      {[
+                        { id: null, label: '3D NORMAL' },
+                        { id: 'codeblocks', label: 'CÓDIGO (3D)' },
+                        { id: 'blockscad', label: 'BLOCKSCAD' }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setItinerary(opt.id);
+                            localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                          }}
+                          style={{
+                            padding: '6px 15px',
+                            borderRadius: '20px',
+                            fontSize: '0.65rem',
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
+                            color: itinerary === opt.id ? 'white' : '#64748b',
+                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
+                            boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {activePlanet === 'python' && (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      {[
+                        { id: null, label: 'ACADEMIA' },
+                        { id: 'kids', label: 'CODING KIDS' },
+                        { id: 'raspberry', label: 'RASPBERRY PI' },
+                        { id: 'codedex', label: 'CODÉDEX' },
+                        { id: 'picuino', label: 'PICUINO' },
+                        { id: 'freecodecamp', label: 'FREECODECAMP' }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setItinerary(opt.id);
+                            localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                          }}
+                          style={{
+                            padding: '6px 15px',
+                            borderRadius: '20px',
+                            fontSize: '0.65rem',
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            background: itinerary === opt.id ? (planet?.barColor || '#306998') : 'white',
+                            color: itinerary === opt.id ? 'white' : '#64748b',
+                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#306998') : '#e2e8f0'}`,
+                            boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {activePlanet === 'appinventor' && (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      {[
+                        { id: null, label: 'BÁSICO' },
+                        { id: 'intermediate', label: 'INTERMEDIO' },
+                        { id: 'social', label: 'RETOS RASPBERRY PI' }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setItinerary(opt.id);
+                            localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                          }}
+                          style={{
+                            padding: '6px 15px',
+                            borderRadius: '20px',
+                            fontSize: '0.65rem',
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            background: itinerary === opt.id ? (planet?.barColor || '#f57c00') : 'white',
+                            color: itinerary === opt.id ? 'white' : '#64748b',
+                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#f57c00') : '#e2e8f0'}`,
+                            boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Redundant Scratch buttons removed as they are handled in NinjaChallenges */}
 
 
-              {/* Selector de Itinerario (Específico para Tinkercad y otros) */}
-              {activePlanet === 'tinkercad' && (
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {[
-                    { id: null, label: '3D NORMAL' },
-                    { id: 'codeblocks', label: 'CÓDIGO (3D)' },
-                    { id: 'blockscad', label: 'BLOCKSCAD' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '6px 15px',
-                        borderRadius: '20px',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                  {activePlanet === 'ia' && (
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: null, label: 'LEARNINGML' },
+                        { id: 'mlforkids', label: 'ML FOR KIDS' }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setItinerary(opt.id);
+                            localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                          }}
+                          style={{
+                            padding: '6px 15px',
+                            borderRadius: '20px',
+                            fontSize: '0.65rem',
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            background: itinerary === opt.id ? (planet?.barColor || '#9c27b0') : 'white',
+                            color: itinerary === opt.id ? 'white' : '#64748b',
+                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#9c27b0') : '#e2e8f0'}`,
+                            boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {activePlanet === 'html' && (
+                    <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      {[
+                        { id: null, label: 'ACADEMIA (CODE.ORG)' },
+                        { id: 'raspberry', label: 'PROYECTOS (PI)' },
+                        { id: 'javascript', label: 'CURSO JS ⚡' }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setItinerary(opt.id);
+                            localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
+                          }}
+                          style={{
+                            padding: '8px 20px',
+                            borderRadius: '20px',
+                            fontSize: '0.7rem',
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            whiteSpace: 'nowrap',
+                            background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
+                            color: itinerary === opt.id ? 'white' : '#64748b',
+                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
+                            boxShadow: itinerary === opt.id ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <p style={{ fontSize: '0.75rem', color: '#8a8a9e', margin: '-10px 0 0 28px' }}>
+                  Supera los desafíos guiados para mejorar tus competencias técnicas y superar las validaciones de los Sensei de tu centro.
+                </p>
+                <NinjaChallenges 
+                  planetId={activePlanet} 
+                  userId={isGuest ? 'guest_user' : session?.user?.id} 
+                  accentColor={planet?.barColor || '#6366f1'}
+                  itinerary={itinerary}
+                  setItinerary={setItinerary}
+                  assessmentCompleted={assessmentCompleted}
+                  studentLevel={studentLevel}
+                />
+              </div>
+
+              {/* MISIONES DEL SENSEI (Excepto en Code.org) */}
+              {activePlanet !== 'code' && (
+                <div style={{ marginTop: '40px' }}>
+                  <SenseiMissions 
+                    planetId={activePlanet} 
+                    userId={isGuest ? 'guest_user' : session?.user?.id}
+                  />
                 </div>
               )}
-
-              {activePlanet === 'python' && (
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {[
-                    { id: null, label: 'ACADEMIA' },
-                    { id: 'kids', label: 'CODING KIDS' },
-                    { id: 'raspberry', label: 'RASPBERRY PI' },
-                    { id: 'codedex', label: 'CODÉDEX' },
-                    { id: 'picuino', label: 'PICUINO' },
-                    { id: 'freecodecamp', label: 'FREECODECAMP' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '6px 15px',
-                        borderRadius: '20px',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        background: itinerary === opt.id ? (planet?.barColor || '#306998') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#306998') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {activePlanet === 'appinventor' && (
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {[
-                    { id: null, label: 'BÁSICO' },
-                    { id: 'intermediate', label: 'INTERMEDIO' },
-                    { id: 'social', label: 'RETOS RASPBERRY PI' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '6px 15px',
-                        borderRadius: '20px',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        background: itinerary === opt.id ? (planet?.barColor || '#f57c00') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#f57c00') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {activePlanet === 'scratch' && (
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {[
-                    { id: null, label: '1. ACADEMIA' },
-                    { id: 'raspberry', label: '2. RASPBERRY PI' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '8px 20px',
-                        borderRadius: '20px',
-                        fontSize: '0.7rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        background: itinerary === opt.id ? (planet?.barColor || '#ff9800') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#ff9800') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {activePlanet === 'ia' && (
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {[
-                    { id: null, label: 'LEARNINGML' },
-                    { id: 'mlforkids', label: 'ML FOR KIDS' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '6px 15px',
-                        borderRadius: '20px',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        background: itinerary === opt.id ? (planet?.barColor || '#9c27b0') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#9c27b0') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-
-
-              {activePlanet === 'html' && (
-                <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                  {[
-                    { id: null, label: '1. ACADEMIA' },
-                    { id: 'raspberry', label: '2. RASPBERRY PI' },
-                    { id: 'javascript', label: '3. CURSO JS ⚡' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setItinerary(opt.id);
-                        localStorage.setItem(`dojoflow_itinerary_${activePlanet}`, opt.id || '');
-                      }}
-                      style={{
-                        padding: '8px 20px',
-                        borderRadius: '20px',
-                        fontSize: '0.7rem',
-                        fontWeight: '800',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap',
-                        background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
-                        color: itinerary === opt.id ? 'white' : '#64748b',
-                        border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
-                        boxShadow: itinerary === opt.id ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <p style={{ fontSize: '0.75rem', color: '#8a8a9e', margin: '-10px 0 0 28px' }}>
-              Supera los desafíos guiados para mejorar tus competencias técnicas y superar las validaciones de los Sensei de tu centro.
-            </p>
-            <NinjaChallenges 
-              planetId={activePlanet} 
-              userId={isGuest ? 'guest_user' : session?.user?.id} 
-              accentColor={planet?.barColor || '#6366f1'}
-              itinerary={itinerary}
-              setItinerary={setItinerary}
-            />
-          </div>
-
-          {/* MISIONES DEL SENSEI (Excepto en Code.org) */}
-          {activePlanet !== 'code' && (
-            <div style={{ marginTop: '40px' }}>
-              <SenseiMissions 
-                planetId={activePlanet} 
-                userId={isGuest ? 'guest_user' : session?.user?.id}
-              />
-            </div>
+            </>
           )}
 
         </main>

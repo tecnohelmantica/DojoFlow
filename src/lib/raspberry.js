@@ -18,7 +18,7 @@ export const RASPBERRY_SCRATCH_L1 = [
   { numero: 14, id: "count-the-creatures", titulo: "Cuenta las criaturas", dificultad: "Principiante" },
   { numero: 15, id: "cricket", titulo: "Cricket", dificultad: "Principiante" },
   { numero: 16, id: "drum-star", titulo: "Estrella de la batería", dificultad: "Principiante" },
-  { numero: 17, id: "find-the-bug", status: "En revisión", titulo: "Busca el error", dificultad: "Principiante" },
+  { numero: 17, id: "find-the-bug", titulo: "Busca el error", dificultad: "Principiante" },
   { numero: 18, id: "from-me-to-you", titulo: "De mí para ti", dificultad: "Principiante" },
   { numero: 19, id: "ghostbusters", titulo: "Cazafantasmas", dificultad: "Principiante" },
   { numero: 20, id: "green-goals", titulo: "Goles verdes", dificultad: "Principiante" },

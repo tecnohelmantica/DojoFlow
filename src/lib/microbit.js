@@ -133,9 +133,4 @@ export const MICROBIT_CHALLENGES = {
   ]
 };
 
-export const MICROBIT_TUTORIALS = [
-  { numero: 1, id: "hello-world", titulo: "Hola Mundo", plataforma: "MakeCode" },
-  { numero: 2, id: "variables", titulo: "Uso de Variables", plataforma: "MakeCode" },
-  { numero: 3, id: "loops", titulo: "Bucles Infinitos", plataforma: "MakeCode" },
-  { numero: 4, id: "logic", titulo: "Lógica y Condicionales", plataforma: "MakeCode" }
-];
+export const MICROBIT_TUTORIALS = [];

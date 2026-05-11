@@ -1,4 +1,8 @@
 export const diagnosticQuizzes = {
+  // Aliases for matching planet IDs
+  arcade: 'makecode-arcade',
+  microbit: 'makecode-microbit',
+
   code: [
     {
       pregunta: "¿Qué entorno de Code.org requiere evitar el modo de 'Navegación Privada' para cargar bien?",

@@ -69,13 +69,13 @@ import { PLANETS } from '../lib/planets';
 import { 
   Medal, Clock, CheckCircle2, Zap, Star, Trophy,
   ArrowRight, BookOpen, Loader2, Sparkles, AlertTriangle, Upload, X, Paperclip, FileText, XCircle, ExternalLink,
-  Code, Globe, Layout, Smartphone, Cpu, Brain, Rocket
+  Code, Globe, Layout, Smartphone, Cpu, Brain, Rocket, ClipboardCheck
 } from 'lucide-react';
 
 import { getPlanetById } from '../lib/planets';
 
-export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcfcf', targetLevel = 'Junior', onValidateChallenge, isAutodidact = true, itinerary, setItinerary, refreshTrigger }) {
-  const pid = (planetId || '').toLowerCase();
+export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcfcf', targetLevel = 'Junior', onValidateChallenge, isAutodidact = true, itinerary, setItinerary, refreshTrigger, assessmentCompleted, studentLevel }) {
+  const pid = planetId === 'tinkercad-arduino' ? 'arduino' : (planetId === 'makecode-microbit' ? 'microbit' : (planetId || '').toLowerCase());
   const searchParams = useSearchParams();
   const [challenges, setChallenges] = useState([]);
   const [expertChallenges, setExpertChallenges] = useState([]);
@@ -97,6 +97,13 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [mlForKidsBeginner, setMlForKidsBeginner] = useState([]);
   const [mlForKidsIntermediate, setMlForKidsIntermediate] = useState([]);
   const [mlForKidsAdvanced, setMlForKidsAdvanced] = useState([]);
+  const [arduinoBeginner, setArduinoBeginner] = useState([]);
+  const [arduinoIntermediate, setArduinoIntermediate] = useState([]);
+  const [arduinoAdvanced, setArduinoAdvanced] = useState([]);
+  const [arduinoTutorials, setArduinoTutorials] = useState([]);
+  const [microbitBeginner, setMicrobitBeginner] = useState([]);
+  const [microbitIntermediate, setMicrobitIntermediate] = useState([]);
+  const [microbitAdvanced, setMicrobitAdvanced] = useState([]);
   const [tutorials, setTutorials] = useState([]);
   const [htmlCodeOrg, setHtmlCodeOrg] = useState([]);
   const [jsCourse, setJsCourse] = useState([]);
@@ -107,8 +114,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [tinkercadCodeblocksTutorials, setTinkercadCodeblocksTutorials] = useState([]);
   const [blockscad, setBlockscad] = useState([]);
   const [blockscadTutorials, setBlockscadTutorials] = useState([]);
-  const [arduinoTutorials, setArduinoTutorials] = useState([]);
-
   const [userProgress, setUserProgress] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('challenges');
@@ -169,7 +174,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   useEffect(() => {
     if (!pid) return;
 
-    // Sincronización de Pestaña Activa según Itinerario y Prioridad de Tab Izquierdo
+    // Sincronización de Pestaña Activa según Planeta e Itinerario
     if (pid === 'html') {
       if (itinerary === 'raspberry') {
         if (!activeTab || (!activeTab.startsWith('raspberry_') && activeTab !== 'expert')) {
@@ -185,8 +190,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       if (itinerary === 'codedex') {
         setActiveTab('codedex_beginner');
       } else {
-        // Academia es el más a la izquierda
-        if (tutorials.length > 0) setActiveTab('tutorials');
+        if (tutorials && tutorials.length > 0) setActiveTab('tutorials');
         else setActiveTab('challenges');
       }
     }
@@ -200,40 +204,33 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     else if (pid === 'appinventor') {
       setActiveTab('challenges');
     }
-    else if (pid === 'tinkercad' || pid === '3d') {
-      if (itinerary === 'codeblocks') {
-        setActiveTab('challenges');
-      } else if (itinerary === 'blockscad') {
-        setActiveTab('challenges');
-      } else {
-        setActiveTab('tutorials'); // Academia 3D
-      }
+    else if (pid === 'code' || pid === 'code-org') {
+      setActiveTab('modern_courses');
     }
-    else if (pid === 'scratch' || pid === 'makecode-microbit' || pid === 'makecode-arcade') {
-      // Forzar siempre el itinerario más a la izquierda al entrar
-      if (itinerary === 'raspberry') {
-        if (!activeTab || (!activeTab.startsWith('raspberry_') && activeTab !== 'expert')) {
-          setActiveTab('raspberry_l1');
-        }
-      } else {
-        // Por defecto Academia si existe, si no Robotix/Retos
-        if (tutorials.length > 0) {
-          setActiveTab('tutorials');
-        } else {
-          setActiveTab('challenges');
-        }
-      }
+    else if (pid === 'scratch') {
+      setActiveTab('scratch_academia');
+    }
+    else if (pid === 'arduino' || pid === 'tinkercad-arduino') {
+      setActiveTab('arduino_beginner');
+    }
+    else if (pid.includes('microbit')) {
+      setActiveTab('microbit_beginner');
+    }
+    else if (pid === 'arcade' || pid === 'makecode-arcade') {
+      setActiveTab('challenges');
+    }
+    else if (pid === 'tinkercad' || pid === '3d') {
+      setActiveTab('tutorials');
     }
     else {
-      // Comportamiento genérico: preferir tutoriales/academia si existen
-      if (tutorials.length > 0) {
+      // Fallback genérico
+      if (tutorials && tutorials.length > 0) {
         setActiveTab('tutorials');
       } else {
         setActiveTab('challenges');
       }
     }
-  }, [pid, itinerary, tutorials.length, challenges.length]); // Incluimos longitudes para reaccionar cuando carguen los datos
-
+  }, [pid, planetId, itinerary, tutorials]);
 
   const loadData = async () => {
     setLoading(true);
@@ -289,14 +286,23 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); setChallenges(APP_INVENTOR_BASIC);
       } else if (pid === 'ia') {
         setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
-      } else if (pid === 'arduino') {
+      } else if (pid === 'arduino' || pid === 'tinkercad-arduino') {
         setDifficultyChallenges(ARDUINO_CHALLENGES);
-        setChallenges(ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner); setArduinoTutorials(ARDUINO_TUTORIALS); setTutorials(ARDUINO_TUTORIALS);
-      } else if (pid.includes('microbit')) {
+        setArduinoBeginner(ARDUINO_CHALLENGES.beginner);
+        setArduinoIntermediate(ARDUINO_CHALLENGES.intermediate);
+        setArduinoAdvanced(ARDUINO_CHALLENGES.advanced);
+        setChallenges(ARDUINO_CHALLENGES.beginner);
+        setTutorials(ARDUINO_TUTORIALS);
+      } else if (pid === 'microbit' || pid === 'makecode-microbit') {
         setDifficultyChallenges(MICROBIT_CHALLENGES);
-        setChallenges(MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner); setTutorials(MICROBIT_TUTORIALS);
+        setMicrobitBeginner(MICROBIT_CHALLENGES.beginner);
+        setMicrobitIntermediate(MICROBIT_CHALLENGES.intermediate);
+        setMicrobitAdvanced(MICROBIT_CHALLENGES.advanced);
+        setChallenges(MICROBIT_CHALLENGES.beginner);
+        setTutorials(MICROBIT_TUTORIALS);
       } else if (pid === 'makecode-arcade') {
-        setChallenges(ARCADE_CHALLENGES); setTutorials(ARCADE_TUTORIALS);
+        setChallenges(ARCADE_CHALLENGES); 
+        setTutorials(ARCADE_TUTORIALS);
       }
       
       // Intentar recuperar progreso local de invitados si existe
@@ -393,45 +399,51 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
 
         // 3. Empezar con el localFallback como base para asegurar que NUNCA desaparezcan los retos locales
         let finalResult = (localFallback || []).map((localItem, idx) => {
-          // Buscar si este item local existe en la DB para enriquecerlo con estado de validación
           const dbMatch = filteredDB.find(db => 
-            (localItem.id && (localItem.id === db.slug || localItem.id === db.id)) || 
-            (localItem.titulo && db.titulo && localItem.titulo.toLowerCase().trim() === db.titulo.toLowerCase().trim())
+            (localItem.id && (String(localItem.id) === String(db.slug) || String(localItem.id) === String(db.id))) || 
+            ((localItem.titulo || localItem.title) && db.titulo && (localItem.titulo || localItem.title).toLowerCase().trim() === db.titulo.toLowerCase().trim())
           );
 
           if (dbMatch) {
+            const isRaspberry = category?.includes('raspberry');
+            const pMatch = progressData.find(p => p.challenge_id === dbMatch.id);
+            
             return {
               ...dbMatch,
+              titulo: (isRaspberry && localItem.titulo) ? localItem.titulo : (dbMatch.titulo || localItem.titulo),
               metadata: { 
-                ...localItem, 
-                ...(typeof dbMatch.metadata === 'string' ? JSON.parse(dbMatch.metadata) : (dbMatch.metadata || {})) 
+                ...(typeof dbMatch.metadata === 'string' ? JSON.parse(dbMatch.metadata) : (dbMatch.metadata || {})),
+                ...localItem
               },
-              numero: dbMatch.numero || localItem.numero || idx + 1
+              ...pMatch,
+              completado: !!pMatch
             };
           }
 
-          // Si no hay match en DB, devolver el item local
           return {
             ...localItem,
             id: localItem.id || localItem.slug || `local-${idx}`,
             titulo: localItem.titulo || localItem.title,
             metadata: { ...localItem },
             isLocalOnly: true,
-            category: category || localItem.category || 'General'
+            category: category || localItem.category || 'General',
+            completado: false
           };
         });
 
-        // 4. Añadir items de la DB que NO estaban en el localFallback (retos nuevos creados en el panel)
         filteredDB.forEach(db => {
           const alreadyExists = finalResult.some(r => 
-            (r.id === db.id) || 
-            (r.titulo && db.titulo && r.titulo.toLowerCase().trim() === db.titulo.toLowerCase().trim())
+            (String(r.id) === String(db.id)) || 
+            ((r.titulo || r.title) && db.titulo && (r.titulo || r.title).toLowerCase().trim() === db.titulo.toLowerCase().trim())
           );
 
           if (!alreadyExists) {
+            const pMatch = progressData.find(p => p.challenge_id === db.id);
             finalResult.push({
               ...db,
-              metadata: typeof db.metadata === 'string' ? JSON.parse(db.metadata) : (db.metadata || {})
+              metadata: typeof db.metadata === 'string' ? JSON.parse(db.metadata) : (db.metadata || {}),
+              ...pMatch,
+              completado: !!pMatch
             });
           }
         });
@@ -481,20 +493,33 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setDifficultyChallenges(ARDUINO_CHALLENGES);
           setArduinoTutorials(ARDUINO_TUTORIALS);
           setTutorials(ARDUINO_TUTORIALS);
+          setArduinoBeginner(ARDUINO_CHALLENGES.beginner);
+          setArduinoIntermediate(ARDUINO_CHALLENGES.intermediate);
+          setArduinoAdvanced(ARDUINO_CHALLENGES.advanced);
           const currentLevelList = ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner;
           setChallenges(currentLevelList);
         } else if (pid.includes('microbit')) {
           setDifficultyChallenges(MICROBIT_CHALLENGES);
           setTutorials(MICROBIT_TUTORIALS);
-          const currentLevelList = MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner;
-          setChallenges(currentLevelList);
-        } else if (pid === 'makecode-arcade') {
+          setChallenges(MICROBIT_CHALLENGES.beginner);
+          setMicrobitBeginner(MICROBIT_CHALLENGES.beginner);
+          setMicrobitIntermediate(MICROBIT_CHALLENGES.intermediate);
+          setMicrobitAdvanced(MICROBIT_CHALLENGES.advanced);
+        } else if (pid === 'makecode-arcade' || pid === 'arcade') {
           setChallenges(ARCADE_CHALLENGES);
           setTutorials(ARCADE_TUTORIALS);
         }
       } else {
         // Map based on Planet
-        if (pid === 'scratch') {
+        if (pid === 'makecode-microbit' || pid === 'microbit') {
+          populateState(setMicrobitBeginner, dbChallenges, 'microbit-beginner', MICROBIT_CHALLENGES.beginner);
+          populateState(setMicrobitIntermediate, dbChallenges, 'microbit-intermediate', MICROBIT_CHALLENGES.intermediate);
+          populateState(setMicrobitAdvanced, dbChallenges, 'microbit-advanced', MICROBIT_CHALLENGES.advanced);
+          populateState(setTutorials, dbTutorials, 'microbit-tutorial', MICROBIT_TUTORIALS);
+        } else if (pid === 'makecode-arcade' || pid === 'arcade') {
+          populateState(setChallenges, dbChallenges, 'arcade-challenges', ARCADE_CHALLENGES);
+          populateState(setTutorials, dbTutorials, 'arcade-tutorial', ARCADE_TUTORIALS);
+        } else if (pid === 'scratch') {
           populateState(setChallenges, dbChallenges, 'robotix', ROBOTIX_CHALLENGES);
           populateState(setRaspberryL1, dbChallenges, 'raspberry-l1', RASPBERRY_SCRATCH_L1);
           populateState(setRaspberryL2, dbChallenges, 'raspberry-l2', RASPBERRY_SCRATCH_L2);
@@ -538,21 +563,19 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setMlForKidsAdvanced, dbChallenges, 'mlforkids', ML_FOR_KIDS.advanced, 'advanced');
         } else if (pid === 'arduino') {
           setDifficultyChallenges(ARDUINO_CHALLENGES);
-          populateState(setArduinoTutorials, dbTutorials, null, ARDUINO_TUTORIALS);
-          populateState(setTutorials, dbTutorials, null, ARDUINO_TUTORIALS);
+          populateState(setArduinoTutorials, dbTutorials, 'arduino-tutorial', ARDUINO_TUTORIALS);
+          populateState(setTutorials, dbTutorials, 'arduino-tutorial', ARDUINO_TUTORIALS);
+          populateState(setArduinoBeginner, dbChallenges, 'arduino-beginner', ARDUINO_CHALLENGES.beginner, 'beginner');
+          populateState(setArduinoIntermediate, dbChallenges, 'arduino-intermediate', ARDUINO_CHALLENGES.intermediate, 'intermediate');
+          populateState(setArduinoAdvanced, dbChallenges, 'arduino-advanced', ARDUINO_CHALLENGES.advanced, 'advanced');
           const currentLevelList = ARDUINO_CHALLENGES[difficultyLevel] || ARDUINO_CHALLENGES.beginner;
-          populateState(setChallenges, dbChallenges, null, currentLevelList, difficultyLevel);
-        } else if (pid.includes('microbit')) {
-          setDifficultyChallenges(MICROBIT_CHALLENGES);
-          const currentLevelList = MICROBIT_CHALLENGES[difficultyLevel] || MICROBIT_CHALLENGES.beginner;
-          populateState(setChallenges, dbChallenges, null, currentLevelList, difficultyLevel);
-          populateState(setTutorials, dbTutorials, null, []);
-        } else if (pid === 'makecode-arcade') {
-          populateState(setChallenges, dbChallenges, null, ARCADE_CHALLENGES);
-          populateState(setTutorials, dbTutorials, null, ARCADE_TUTORIALS);
+          populateState(setChallenges, dbChallenges, 'arduino-beginner', currentLevelList, difficultyLevel);
+        } else if (pid === 'makecode-arcade' || pid === 'arcade') {
+          populateState(setChallenges, dbChallenges, 'arcade-challenges', ARCADE_CHALLENGES);
+          populateState(setTutorials, dbTutorials, 'arcade-tutorial', ARCADE_TUTORIALS);
         } else {
-          setChallenges(dbChallenges.sort(sortFn));
-          setTutorials(dbTutorials.sort(sortFn));
+          populateState(setChallenges, dbChallenges, null, challenges);
+          populateState(setTutorials, dbTutorials, null, tutorialsList);
         }
       }
     } catch (err) {
@@ -562,85 +585,80 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     }
   };
 
-  // Helper para obtener la URL correcta según el planeta y el tipo de reto
   const getChallengeUrl = (item, tab) => {
     if (!item) return '#';
     const pid = (planetId || '').toLowerCase();
     
-    // 1. Prioridad absoluta: externalUrl en metadata (usado en Raspberry Pi y otros)
-    // Usamos encadenamiento opcional y múltiples fallbacks
+    // 1. Prioridad absoluta: externalUrl en metadata
     const meta = item.metadata || {};
-    // Detectar el mejor slug posible (evitando UUIDs de la base de datos)
     const detectedSlug = item.slug || meta.id || (typeof item.id === 'string' && item.id.length < 30 ? item.id : null);
 
     const externalUrl = meta.externalUrl || meta.external_url || item.externalUrl || item.external_url || meta.url || meta.url_guide;
     if (externalUrl) return externalUrl;
 
-    // 2. Fallbacks específicos por planeta si no hay URL en metadata
-    // IMPORTANTE: Solo reconstruir URL de Raspberry si el item pertenece a una categoría de Raspberry
+    // 2. Raspberry Pi Projects (Scratch / Python / HTML)
     const itemCategory = item.category || '';
-    if ((pid.includes('scratch') || pid.includes('raspberry') || pid === 'html') && (itemCategory.includes('raspberry') || pid.includes('raspberry') || tab?.startsWith('raspberry_') || tab === 'expert')) {
-      // Si es Raspberry Pi Scratch, intentar reconstruir si tenemos el slug
-      const slugToUse = meta.id || item.slug || (typeof item.id === 'string' && item.id.length < 40 && !/^\d+$/.test(item.id) ? item.id : null);
-      if (slugToUse && (slugToUse.length > 3)) {
-         const cleanSlug = slugToUse.replace('raspberry-', '');
+    const isRaspberryItem = itemCategory.includes('raspberry') || pid.includes('raspberry') || tab?.includes('raspberry') || tab === 'expert' || tab?.startsWith('scratch_raspberry');
+    
+    if ((pid.includes('scratch') || pid.includes('raspberry') || pid === 'html' || pid === 'python') && isRaspberryItem) {
+      const slugToUse = item.id || item.slug || meta.id;
+      if (slugToUse && typeof slugToUse === 'string' && slugToUse.length > 3) {
+         // Limpieza agresiva de prefijos
+         const cleanSlug = slugToUse.replace(/^raspberry-/, '').replace(/^scratch-/, '').replace(/^python-/, '').replace(/^html-/, '');
+         // Forzamos es-ES para proyectos de Raspberry Pi
          return `https://projects.raspberrypi.org/es-ES/projects/${cleanSlug}`;
       }
     }
     
-    // 2. URLs directas desde campos de la base de datos o constantes locales
-    if (item.url_guide) return item.url_guide;
-    if (item.url_sandbox) return item.url_sandbox;
-    if (item.url) return item.url;
-    if (item.editorUrl) return item.editorUrl;
-    if (item.pdfUrl) return item.pdfUrl;
-
-    // 2b. Reconstrucción para Microbit
+    // 3. Microbit Projects
     if (pid.includes('microbit')) {
-      if (detectedSlug) return `https://microbit.org/projects/make-it-code-it/${detectedSlug}/?lang=es`;
-      return `https://makecode.microbit.org/`;
-    }
-
-    // 3. Fallbacks para compatibilidad con itinerarios específicos de MakeCode y Scratch
-    if (tab?.startsWith('tutorials') || tab === 'tutorials') {
-      if (pid.includes('microbit')) return `https://makecode.microbit.org/#tutorial:/projects/${detectedSlug || 'all'}`;
-      if (pid === 'makecode-arcade') return `https://arcade.makecode.com/#tutorial:${detectedSlug}`;
-      if (pid === 'scratch') return `https://scratch.mit.edu/projects/editor/?tutorial=${detectedSlug || 'all'}`;
-    }
-
-    if (pid === 'scratch') {
-      // Si el id es numérico (Robotix), construimos la URL de Scratch
-      if (item.id && /^\d+$/.test(item.id)) {
-        return `https://scratch.mit.edu/projects/${item.id}/`;
-      }
-      // Si el metadata tiene un id numérico
-      if (item.metadata?.id && /^\d+$/.test(item.metadata.id)) {
-        return `https://scratch.mit.edu/projects/${item.metadata.id}/`;
-      }
-    }
-    
-    if (pid.includes('microbit')) {
-      // Priorizar URL en metadata si existe
-      const metaUrl = meta.externalUrl || meta.url_guide || meta.url || item.url_guide;
-      if (metaUrl) return metaUrl;
-      
       if (detectedSlug && typeof detectedSlug === 'string') {
-        // Si parece un share code de MakeCode (ej: _12345 o texto largo sin guiones)
+        // Si parece un share code de MakeCode (ej: _12345)
         if (detectedSlug.startsWith('_') || (detectedSlug.length >= 12 && !detectedSlug.includes('-'))) {
           return `https://makecode.microbit.org/${detectedSlug.startsWith('_') ? '' : '_'}${detectedSlug}`;
         }
-        // Si es un reto estándar (ej: 'dice', 'emojis'), va a microbit.org
-        return `https://microbit.org/projects/make-it-code-it/${detectedSlug.toLowerCase().replace('mb-', '')}/`;
+        // Si es un tutorial de MakeCode
+        if (tab?.startsWith('tutorials')) {
+           return `https://makecode.microbit.org/#tutorial:/projects/${detectedSlug}`;
+        }
+        // Reto estándar en microbit.org
+        const cleanMbSlug = detectedSlug.toLowerCase().replace(/^mb-/, '');
+        return `https://microbit.org/projects/make-it-code-it/${cleanMbSlug}/?lang=es`;
       }
       return 'https://makecode.microbit.org/';
     }
 
+    // 4. Scratch Planet (Standard Robotix / Academia)
+    if (pid === 'scratch' && !isRaspberryItem) {
+      if (detectedSlug && detectedSlug.length > 3) {
+        return `https://scratch.mit.edu/projects/${detectedSlug}/editor`;
+      }
+      return 'https://scratch.mit.edu/projects/editor';
+    }
+
+    // 5. MakeCode Arcade
+    if (pid === 'makecode-arcade') {
+      if (tab?.startsWith('tutorials')) {
+        return `https://arcade.makecode.com/#tutorial:${detectedSlug}`;
+      }
+      if (detectedSlug) return `https://arcade.makecode.com/${detectedSlug.startsWith('_') ? '' : '_'}${detectedSlug}`;
+      return 'https://arcade.makecode.com/';
+    }
+
+    // 6. Tinkercad
     if (pid?.startsWith('tinkercad')) {
       if (itinerary === 'codeblocks') return "https://www.tinkercad.com/codeblocks";
       return "https://www.tinkercad.com/dashboard";
     }
     
-    return item.url_guide || item.url || '#';
+    // 7. Fallbacks generales
+    if (item.url_guide) return item.url_guide;
+    if (item.url_sandbox) return item.url_sandbox;
+    if (item.url) return item.url;
+    if (item.editorUrl) return item.editorUrl;
+    if (item.link) return item.link;
+    
+    return '#';
   };
 
   const handleAction = async (challenge, type = 'challenge') => {
@@ -851,10 +869,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     }
   } else if (planetId?.toLowerCase().includes('microbit')) {
     activeMilestones = [
-      { reached: tutorialsCompleted >= 12, label: 'ACADEMIA COMPLETA', total: 12, type: 'big' },
-      { reached: difficultyProgress?.beginner === 51, label: 'PRINCIPIANTE PRO', total: 51, type: 'big' },
-      { reached: difficultyProgress?.intermediate === 32, label: 'INTERMEDIO PRO', total: 32, type: 'big' },
-      { reached: difficultyProgress?.advanced === 16, label: 'AVANZADO PRO', total: 16, type: 'big' }
+      { reached: challengesCompleted >= 57, label: 'PRINCIPIANTE PRO', total: 57, type: 'big' },
+      { reached: l1Completed >= 47, label: 'INTERMEDIO PRO', total: 47, type: 'big' },
+      { reached: l2Completed >= 19, label: 'AVANZADO PRO', total: 19, type: 'big' }
     ];
   } else if (planetId === 'makecode-arcade') {
     activeMilestones = [
@@ -938,8 +955,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   
   const hasLevelBadge = pid === 'scratch' ? (tutorialsCompleted === 27) : 
                         (pid === 'makecode-arcade' ? (challengesCompleted > 0) : 
+                        (pid.includes('microbit') ? (challengesCompleted + l1Completed + l2Completed > 0) :
                         (pid === 'appinventor' ? (appInventorBasicCompleted + appInventorIntermediateCompleted > 0) :
-                        (difficultyProgress && difficultyProgress.beginner > 0)));
+                        (difficultyProgress && difficultyProgress.beginner > 0))));
 
   const arcadeRank = pid === 'makecode-arcade' ? (
     challengesCompleted >= 16 ? { label: 'GAME MASTER', color: '#6c5ce7', icon: '👑' } :
@@ -987,7 +1005,56 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     const status = currentProgress?.status || 'No iniciado';
     const isSelected = selectedTutorial ? (isTutorialTab ? selectedTutorial.id === item.id : selectedTutorial.numero === item.numero) : false;
     
+    if (item.isAssessment) {
+      return (
+        <div 
+          key={`assessment-card-${pid}`}
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.dispatchEvent) {
+              const event = new CustomEvent('open_diagnostic_test', { detail: { planetId: pid } });
+              window.dispatchEvent(event);
+            }
+          }}
+          style={{ 
+            gridColumn: '1 / -1',
+            padding: '40px 30px',
+            borderRadius: '24px',
+            cursor: 'pointer',
+            background: 'linear-gradient(135deg, #FF6B00 0%, #FF8E3C 100%)',
+            color: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px',
+            textAlign: 'center',
+            boxShadow: '0 10px 30px rgba(255,107,0,0.4)',
+            transition: 'all 0.3s ease',
+            border: '2px solid rgba(255,255,255,0.3)'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 40px rgba(255,107,0,0.5)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(255,107,0,0.4)'; }}
+        >
+          <div style={{ background: 'white', borderRadius: '50%', padding: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}>
+            <ClipboardCheck size={40} color="#FF6B00" />
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '900', margin: 0, fontFamily: 'Outfit' }}>🛡️ EVALUACIÓN DE SELECCIÓN NINJA</h2>
+          <p style={{ fontSize: '0.9rem', opacity: 0.95, maxWidth: '400px', margin: 0 }}>
+            Para desbloquear tu entrenamiento personalizado y activar al **Sensei IA**, primero debemos conocer tus habilidades. 
+            ¡Haz clic aquí para empezar el desafío!
+          </p>
+          <div style={{ background: 'rgba(255,255,255,0.2)', padding: '8px 20px', borderRadius: '30px', fontWeight: 'bold', fontSize: '0.8rem', border: '1px solid rgba(255,255,255,0.4)' }}>
+            EMPEZAR PRUEBA AHORA
+          </div>
+        </div>
+      );
+    }
+
     if (item.id === 'socratic-tutor' || item.isIA) {
+      // Ocultar el tutor IA del planeta Code/Scratch si el diagnóstico no está hecho
+      // Ocultar el tutor IA si el diagnóstico no está hecho (solo para planetas con diagnóstico)
+      if (['code', 'scratch', 'microbit', 'arcade', 'makecode-arcade', 'arduino'].includes(pid) && !assessmentCompleted) {
+        return null;
+      }
       return (
         <div 
           key={`ia-tutor-${num}`}
@@ -1068,34 +1135,85 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   };
 
   const getActiveList = () => {
-    if (activeTab === 'tutorials') {
+    // 1. Tutorials/Academia logic
+    if (activeTab === 'tutorials' || activeTab === 'scratch_academia') {
       if (pid === 'arduino') return arduinoTutorials;
       if (pid === 'tinkercad') {
         if (itinerary === 'codeblocks') return tinkercadCodeblocksTutorials;
         if (itinerary === 'blockscad') return blockscadTutorials;
         return tinkercad3d;
       }
-      return tutorialsList;
+      return tutorials; // State variable populated in loadData
     }
+    
+    // 2. Tinkercad specific challenges
     if (pid === 'tinkercad') {
       if (itinerary === 'codeblocks') return tinkercadCodeblocks;
       if (itinerary === 'blockscad') return blockscad;
       return tinkercad3dChallenges;
     }
-    if (activeTab === 'expert') return expertChallenges;
-    if (activeTab === 'raspberry_l1') return raspberryL1;
-    if (activeTab === 'raspberry_l2') return raspberryL2;
-    if (activeTab === 'js_basics') return jsCourse;
-    if (activeTab === 'cursos_modernos') return codeModern;
-    if (activeTab === 'hora_codigo') return codeHourOfCode;
-    if (activeTab === 'hour_of_ai') return codeHourOfAI;
-    if (activeTab === 'codedex_beginner') return pythonCodedexBeginner;
-    if (activeTab === 'codedex_intermediate') return pythonCodedexIntermediate;
-    if (activeTab === 'codedex_advanced') return pythonCodedexAdvanced;
-    if (activeTab === 'mlfk_beginner') return mlForKidsBeginner;
-    if (activeTab === 'mlfk_intermediate') return mlForKidsIntermediate;
-    if (activeTab === 'mlfk_advanced') return mlForKidsAdvanced;
-    if (activeTab === 'html_academy') return htmlCodeOrg;
+
+    // 3. Planet-specific tab mapping
+    const tabMapping = {
+      // Code Planet
+      'cursos_modernos': codeModern,
+      'hora_codigo': codeHourOfCode,
+      'hora_del_codigo': codeHourOfCode,
+      'hour_of_ai': codeHourOfAI,
+      'ia_explorer': codeHourOfAI,
+      
+      // Scratch Planet
+      'scratch_robotix': challenges, // populated with ROBOTIX_CHALLENGES
+      'scratch_raspberry_l1': raspberryL1, // populated with RASPBERRY_SCRATCH_L1
+      'scratch_raspberry_l2': raspberryL2, // populated with RASPBERRY_SCRATCH_L2
+      'scratch_raspberry_l3': expertChallenges, // populated with RASPBERRY_SCRATCH_CHALLENGES
+      
+      // Arduino Planet
+      'arduino_beginner': arduinoBeginner,
+      'arduino_intermediate': arduinoIntermediate,
+      'arduino_advanced': arduinoAdvanced,
+
+      // Micro:bit Planet
+      'microbit_beginner': microbitBeginner,
+      'microbit_intermediate': microbitIntermediate,
+      'microbit_advanced': microbitAdvanced,
+      
+      // Python Planet
+      'codedex_beginner': pythonCodedexBeginner,
+      'codedex_intermediate': pythonCodedexIntermediate,
+      'codedex_advanced': pythonCodedexAdvanced,
+      
+      // IA Planet
+      'mlfk_beginner': mlForKidsBeginner,
+      'mlfk_intermediate': mlForKidsIntermediate,
+      'mlfk_advanced': mlForKidsAdvanced,
+      
+      // Other standard tabs
+      'raspberry_l1': raspberryL1,
+      'raspberry_l2': raspberryL2,
+      'expert': expertChallenges,
+      'js_basics': jsCourse,
+      'html_academy': htmlCodeOrg,
+      'tutorials': tutorials
+    };
+
+    if (tabMapping[activeTab]) {
+      return tabMapping[activeTab];
+    }
+    
+    // 4. Special Case: Assessment
+    if (activeTab === 'assessment') {
+      return [{
+        id: `assessment-${pid}`,
+        title: "🛡️ PRUEBA DE SELECCIÓN NINJA",
+        description: "Completa este diagnóstico para que el Sensei pueda desbloquear tu entrenamiento personalizado y habilitar el Tutor IA.",
+        level: "Diagnóstico",
+        category: "assessment",
+        isAssessment: true
+      }];
+    }
+    
+    // Fallback to primary challenges list
     return challenges;
   };
 
@@ -1176,7 +1294,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       )}
 
       {/* 🔮 DIFFICULTY LEVEL SELECTORS */}
-      {difficultyChallenges && itinerary !== 'codeblocks' && (
+      {difficultyChallenges && itinerary !== 'codeblocks' && 
+       !['scratch', 'microbit', 'arduino', 'arcade', 'makecode-arcade', 'code', 'python', 'ia', 'appinventor', 'html'].includes(pid) && (
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${itinerary === 'blockscad' ? 2 : 3}, 1fr)`, gap: '15px', marginBottom: '10px' }}>
           {[
             { id: 'beginner', label: 'PRINCIPIANTE', color: '#4cd137', icon: '🌱' },
@@ -1210,10 +1329,37 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           })}
         </div>
       )}
+      
+      {/* Microbit empty state */}
+      {pid?.includes('microbit') && !activeTab && (
+          <div style={{ marginTop: '20px', textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.5)', borderRadius: '24px' }}>
+            <Cpu size={60} color={accentColor} style={{ marginBottom: '20px', opacity: 0.8 }} />
+            <h2 style={{ fontSize: '1.8rem', color: '#1a1a2e', marginBottom: '10px' }}>¡Bienvenido a Micro:bit!</h2>
+            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '30px' }}>Selecciona un nivel de dificultad para comenzar tus retos oficiales de Make It Code It.</p>
+            <button onClick={() => setActiveTab('microbit_beginner')} style={{ padding: '15px 40px', fontSize: '1.1rem', background: accentColor, color: 'white', borderRadius: '30px', border: 'none', cursor: 'pointer' }}>COMENZAR NIVEL PRINCIPIANTE</button>
+          </div>
+      )}
 
-      {/* TABS SELECTOR (Solo si hay más de una pestaña disponible o es un planeta complejo) */}
-      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'tinkercad' || pid === 'code' || pid === 'arduino' || pid === 'html' || (pid === 'python' && (tutorialsList.length > 0 || expertChallenges.length > 0 || itinerary === 'codedex')) || (pid === 'ia' && itinerary === 'mlforkids')) && (
-        <div style={{ display: 'flex', gap: '10px', background: 'rgba(0,0,0,0.03)', padding: '5px', borderRadius: '12px', overflowX: 'auto', marginBottom: '20px' }}>
+      {/* TABS SELECTOR */}
+      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'arcade' || pid === 'tinkercad' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html' || pid === 'ia') && (
+        <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' }}>
+          
+          {/* Ocultar pestaña CURSO en Arduino si está vacía */}
+          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'tinkercad' || pid === 'python' || pid === 'ia' || pid === 'arduino') && (
+            <button 
+              onClick={() => { setActiveTab(pid === 'scratch' ? 'scratch_academia' : 'tutorials'); setSelectedTutorial(null); }}
+              style={{ 
+                flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                background: (activeTab === 'tutorials' || activeTab === 'scratch_academia') ? 'white' : 'transparent',
+                color: (activeTab === 'tutorials' || activeTab === 'scratch_academia') ? accentColor : '#666',
+                boxShadow: (activeTab === 'tutorials' || activeTab === 'scratch_academia') ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                transition: 'all 0.2s', minWidth: 'fit-content'
+              }}
+            >
+              {pid === 'arduino' ? 'CURSO ARDUINO' : 'ACADEMIA'}
+            </button>
+          )}
             {pid === 'code' ? (
               <>
                 <button 
@@ -1227,33 +1373,265 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  CURSOS MODERNOS ({codeModernCompleted}/{codeModern.length})
+                  CURSOS MODERNOS (5)
                 </button>
                 <button 
-                  onClick={() => { setActiveTab('hora_codigo'); setSelectedTutorial(null); }}
+                  onClick={() => { setActiveTab('hora_del_codigo'); setSelectedTutorial(null); }}
                   style={{ 
                     flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                     fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'hora_codigo' ? 'white' : 'transparent',
-                    color: activeTab === 'hora_codigo' ? accentColor : '#666',
-                    boxShadow: activeTab === 'hora_codigo' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    background: activeTab === 'hora_del_codigo' ? 'white' : 'transparent',
+                    color: activeTab === 'hora_del_codigo' ? accentColor : '#666',
+                    boxShadow: activeTab === 'hora_del_codigo' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  HORA DEL CÓDIGO ({codeHourOfCodeCompleted}/{codeHourOfCode.length})
+                  HORA DEL CÓDIGO (22)
                 </button>
                 <button 
-                  onClick={() => { setActiveTab('hour_of_ai'); setSelectedTutorial(null); }}
+                  onClick={() => { setActiveTab('ia_explorer'); setSelectedTutorial(null); }}
                   style={{ 
                     flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                     fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'hour_of_ai' ? 'white' : 'transparent',
-                    color: activeTab === 'hour_of_ai' ? accentColor : '#666',
-                    boxShadow: activeTab === 'hour_of_ai' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    background: activeTab === 'ia_explorer' ? 'white' : 'transparent',
+                    color: activeTab === 'ia_explorer' ? accentColor : '#666',
+                    boxShadow: activeTab === 'ia_explorer' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  IA EXPLORER
+                  IA EXPLORER (1)
+                </button>
+              </>
+            ) : pid === 'scratch' ? (
+              <>
+                {!assessmentCompleted && (
+                  <button 
+                    onClick={() => { setActiveTab('assessment'); setSelectedTutorial(null); }}
+                    style={{ 
+                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.7rem', fontWeight: '900', fontFamily: 'Outfit',
+                      background: activeTab === 'assessment' ? accentColor : 'white',
+                      color: activeTab === 'assessment' ? 'white' : '#FF6B00',
+                      boxShadow: '0 4px 12px rgba(255,107,0,0.2)',
+                      transition: 'all 0.2s', minWidth: 'fit-content',
+                      border: activeTab === 'assessment' ? 'none' : '1px solid #FF6B00'
+                    }}
+                  >
+                    🎯 DESAFÍO NINJA
+                  </button>
+                )}
+                <button 
+                  onClick={() => { setActiveTab('tutorials'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'tutorials' ? 'white' : 'transparent',
+                    color: activeTab === 'tutorials' ? accentColor : '#666',
+                    boxShadow: activeTab === 'tutorials' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  ACADEMIA (27)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('scratch_robotix'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'scratch_robotix' ? 'white' : 'transparent',
+                    color: activeTab === 'scratch_robotix' ? accentColor : '#666',
+                    boxShadow: activeTab === 'scratch_robotix' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  ROBOTIX (78)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('scratch_raspberry_l1'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'scratch_raspberry_l1' ? 'white' : 'transparent',
+                    color: activeTab === 'scratch_raspberry_l1' ? accentColor : '#666',
+                    boxShadow: activeTab === 'scratch_raspberry_l1' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  PI PRINCIPIANTE (53)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('scratch_raspberry_l2'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'scratch_raspberry_l2' ? 'white' : 'transparent',
+                    color: activeTab === 'scratch_raspberry_l2' ? accentColor : '#666',
+                    boxShadow: activeTab === 'scratch_raspberry_l2' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  PI INTERMEDIO (21)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('scratch_raspberry_l3'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'scratch_raspberry_l3' ? 'white' : 'transparent',
+                    color: activeTab === 'scratch_raspberry_l3' ? accentColor : '#666',
+                    boxShadow: activeTab === 'scratch_raspberry_l3' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  PI AVANZADO (9)
+                </button>
+              </>
+            ) : (pid === 'microbit' || pid === 'makecode-microbit') ? (
+              <>
+                {!assessmentCompleted && (
+                  <button 
+                    onClick={() => { setActiveTab('assessment'); setSelectedTutorial(null); }}
+                    style={{ 
+                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.7rem', fontWeight: '900', fontFamily: 'Outfit',
+                      background: activeTab === 'assessment' ? accentColor : 'white',
+                      color: activeTab === 'assessment' ? 'white' : '#FF6B00',
+                      boxShadow: '0 4px 12px rgba(255,107,0,0.2)',
+                      transition: 'all 0.2s', minWidth: 'fit-content',
+                      border: activeTab === 'assessment' ? 'none' : '1px solid #FF6B00'
+                    }}
+                  >
+                    🎯 DESAFÍO NINJA
+                  </button>
+                )}
+                <button 
+                  onClick={() => { setActiveTab('microbit_beginner'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'microbit_beginner' ? 'white' : 'transparent',
+                    color: activeTab === 'microbit_beginner' ? accentColor : '#666',
+                    boxShadow: activeTab === 'microbit_beginner' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  PRINCIPIANTE (57)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('microbit_intermediate'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'microbit_intermediate' ? 'white' : 'transparent',
+                    color: activeTab === 'microbit_intermediate' ? accentColor : '#666',
+                    boxShadow: activeTab === 'microbit_intermediate' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  INTERMEDIO (47)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('microbit_advanced'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'microbit_advanced' ? 'white' : 'transparent',
+                    color: activeTab === 'microbit_advanced' ? accentColor : '#666',
+                    boxShadow: activeTab === 'microbit_advanced' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  AVANZADO (19)
+                </button>
+              </>
+            ) : (pid === 'makecode-arcade' || pid === 'arcade') ? (
+                <>
+                {!assessmentCompleted && (
+                  <button 
+                    onClick={() => { setActiveTab('assessment'); setSelectedTutorial(null); }}
+                    style={{ 
+                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.7rem', fontWeight: '900', fontFamily: 'Outfit',
+                      background: activeTab === 'assessment' ? accentColor : 'white',
+                      color: activeTab === 'assessment' ? 'white' : '#FF6B00',
+                      boxShadow: '0 4px 12px rgba(255,107,0,0.2)',
+                      transition: 'all 0.2s', minWidth: 'fit-content',
+                      border: activeTab === 'assessment' ? 'none' : '1px solid #FF6B00'
+                    }}
+                  >
+                    🎯 DESAFÍO NINJA
+                  </button>
+                )}
+                <button 
+                  onClick={() => { setActiveTab('challenges'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'challenges' ? 'white' : 'transparent',
+                    color: activeTab === 'challenges' ? accentColor : '#666',
+                    boxShadow: activeTab === 'challenges' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  WE TEACH ROBOTICS (18)
+                </button>
+              </>
+            ) : pid === 'arduino' ? (
+              <>
+                {!assessmentCompleted && (
+                  <button 
+                    onClick={() => { setActiveTab('assessment'); setSelectedTutorial(null); }}
+                    style={{ 
+                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.7rem', fontWeight: '900', fontFamily: 'Outfit',
+                      background: activeTab === 'assessment' ? accentColor : 'white',
+                      color: activeTab === 'assessment' ? 'white' : '#FF6B00',
+                      boxShadow: '0 4px 12px rgba(255,107,0,0.2)',
+                      transition: 'all 0.2s', minWidth: 'fit-content',
+                      border: activeTab === 'assessment' ? 'none' : '1px solid #FF6B00'
+                    }}
+                  >
+                    🎯 DESAFÍO NINJA
+                  </button>
+                )}
+                <button 
+                  onClick={() => { setActiveTab('arduino_beginner'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'arduino_beginner' ? 'white' : 'transparent',
+                    color: activeTab === 'arduino_beginner' ? accentColor : '#666',
+                    boxShadow: activeTab === 'arduino_beginner' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  PRINCIPIANTE (5)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('arduino_intermediate'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'arduino_intermediate' ? 'white' : 'transparent',
+                    color: activeTab === 'arduino_intermediate' ? accentColor : '#666',
+                    boxShadow: activeTab === 'arduino_intermediate' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  INTERMEDIO (24)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('arduino_advanced'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'arduino_advanced' ? 'white' : 'transparent',
+                    color: activeTab === 'arduino_advanced' ? accentColor : '#666',
+                    boxShadow: activeTab === 'arduino_advanced' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  AVANZADO (42)
                 </button>
               </>
             ) : pid === 'html' ? (
@@ -1453,101 +1831,35 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
               </>
             ) : (
               <>
-                {tutorialsList.length > 0 && (
+                {/* FALLBACK TABS */}
+                {tutorials.length > 0 && (
                   <button 
                     onClick={() => setActiveTab('tutorials')}
                     style={{ 
-                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                      fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                      background: activeTab === 'tutorials' ? 'white' : 'transparent',
+                      flex: 1, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.75rem', fontWeight: '800', fontFamily: 'Outfit',
+                      background: activeTab === 'tutorials' ? 'white' : 'rgba(0,0,0,0.05)',
                       color: activeTab === 'tutorials' ? accentColor : '#666',
-                      boxShadow: activeTab === 'tutorials' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                      transition: 'all 0.2s', minWidth: 'fit-content'
+                      boxShadow: activeTab === 'tutorials' ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
+                      transition: 'all 0.2s', minWidth: 'fit-content', border: activeTab === 'tutorials' ? `2px solid ${accentColor}` : '2px solid transparent'
                     }}
                   >
-                    ACADEMIA {planetId === 'python' ? 'PYTHON' : (planetId === 'arduino' ? 'ARDUINO' : (itinerary === '3d' ? '3D' : (itinerary === 'codeblocks' ? 'CÓDIGO' : (itinerary === 'blockscad' ? 'BLOCKSCAD' : ''))))} ({tutorialsCompleted}/{tutorialsList.length})
+                    🎓 ACADEMIA {`(${tutorialsCompleted}/${tutorials.length})`}
                   </button>
                 )}
-                {challenges.length > 0 && (planetId !== 'python' || itinerary !== 'academia') && planetId !== 'scratch' && (
+                {challenges.length > 0 && (
                   <button 
                     onClick={() => setActiveTab('challenges')}
                     style={{ 
-                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                      fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                      background: activeTab === 'challenges' ? 'white' : 'transparent',
+                      flex: 1, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.75rem', fontWeight: '800', fontFamily: 'Outfit',
+                      background: activeTab === 'challenges' ? 'white' : 'rgba(0,0,0,0.05)',
                       color: activeTab === 'challenges' ? accentColor : '#666',
-                      boxShadow: activeTab === 'challenges' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                      transition: 'all 0.2s', minWidth: 'fit-content'
+                      boxShadow: activeTab === 'challenges' ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
+                      transition: 'all 0.2s', minWidth: 'fit-content', border: activeTab === 'challenges' ? `2px solid ${accentColor}` : '2px solid transparent'
                     }}
                   >
-                    {planetId === 'makecode-arcade' ? 'WE TEACH ROBOTICS' : itinerary === 'blockscad' ? 'RETOS BLOCKSCAD' : planetId === 'python' ? (itinerary === 'codedex' ? 'PROYECTOS CODEDEX' : 'RETOS RASPBERRY PI') : planetId === 'appinventor' ? (itinerary === 'social' ? 'RETOS RASPBERRY PI' : 'RETOS APP INVENTOR') : 'RETOS NINJA'} {`(${challengesCompleted}/${challenges.length})`}
-                  </button>
-                )}
-                {planetId === 'scratch' && (
-                  <>
-                    <button 
-                      onClick={() => {
-                        setActiveTab('raspberry_l1');
-                        if (setItinerary) setItinerary('raspberry');
-                      }}
-                      style={{ 
-                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                        background: activeTab === 'raspberry_l1' ? 'white' : 'transparent',
-                        color: activeTab === 'raspberry_l1' ? accentColor : '#666',
-                        boxShadow: activeTab === 'raspberry_l1' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                        transition: 'all 0.2s', minWidth: 'fit-content'
-                      }}
-                    >
-                      RASPBERRY L1 {`(${l1Completed}/${raspberryL1.length})`}
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setActiveTab('raspberry_l2');
-                        if (setItinerary) setItinerary('raspberry');
-                      }}
-                      style={{ 
-                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                        background: activeTab === 'raspberry_l2' ? 'white' : 'transparent',
-                        color: activeTab === 'raspberry_l2' ? accentColor : '#666',
-                        boxShadow: activeTab === 'raspberry_l2' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                        transition: 'all 0.2s', minWidth: 'fit-content'
-                      }}
-                    >
-                      RASPBERRY L2 {`(${l2Completed}/${raspberryL2.length})`}
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setActiveTab('expert');
-                        if (setItinerary) setItinerary('raspberry');
-                      }}
-                      style={{ 
-                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                        background: activeTab === 'expert' ? 'white' : 'transparent',
-                        color: activeTab === 'expert' ? accentColor : '#666',
-                        boxShadow: activeTab === 'expert' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                        transition: 'all 0.2s', minWidth: 'fit-content'
-                      }}
-                    >
-                      RASPBERRY L3 ({expertChallengesCompleted}/{expertChallenges.length})
-                    </button>
-                  </>
-                )}
-                {expertChallenges.length > 0 && pid !== 'scratch' && (
-                  <button 
-                    onClick={() => setActiveTab('expert')}
-                    style={{ 
-                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                      fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                      background: activeTab === 'expert' ? 'white' : 'transparent',
-                      color: activeTab === 'expert' ? accentColor : '#666',
-                      boxShadow: activeTab === 'expert' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                      transition: 'all 0.2s', minWidth: 'fit-content'
-                    }}
-                  >
-                    PROYECTOS EXPERTOS ({expertChallengesCompleted}/{expertChallenges.length})
+                    🚀 RETOS ({challengesCompleted}/{challenges.length})
                   </button>
                 )}
               </>
@@ -1654,18 +1966,19 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         boxShadow: `0 4px 12px ${accentColor}40`
                       }}>
                         {!isTutorial ? (
-                           activeTab === 'raspberry_l1' ? `RASPBERRY NIVEL 1` :
-                           activeTab === 'raspberry_l2' ? `RASPBERRY NIVEL 2` :
-                           activeTab === 'expert' ? `RASPBERRY NIVEL 3` :
+                           (activeTab === 'raspberry_l1' || activeTab === 'scratch_raspberry_l1') ? `RASPBERRY NIVEL 1` :
+                           (activeTab === 'raspberry_l2' || activeTab === 'scratch_raspberry_l2') ? `RASPBERRY NIVEL 2` :
+                           (activeTab === 'expert' || activeTab === 'scratch_raspberry_l3') ? `RASPBERRY NIVEL 3` :
                            activeTab === 'js_basics' ? `⚡ JS - LEARN JAVASCRIPT` :
                            (planetId === 'code' ? 'ACTIVIDAD CODE.ORG' :
-                            planetId === 'scratch' ? 'RETO ROBOTIX' : 
+                            (planetId === 'scratch' && activeTab === 'scratch_robotix') ? 'RETO ROBOTIX' : 
+                            (planetId === 'scratch' && activeTab === 'scratch_academia') ? 'ACADEMIA' :
                             planetId === 'appinventor' ? 'RETO APP INVENTOR' :
                             (planetId === 'makecode-arcade' ? 'RETO WE TEACH ROBOTICS' : 'RETO NINJA')) + ` ${currentItem.numero || ''}`
                          ) : 
-                         activeTab === 'raspberry_l1' ? `RASPBERRY NIVEL 1 - RETO ${currentItem.numero}` :
-                         activeTab === 'raspberry_l2' ? `RASPBERRY NIVEL 2 - RETO ${currentItem.numero}` :
-                         activeTab === 'expert' ? `RASPBERRY NIVEL 3 - RETO ${currentItem.numero}` : 
+                         (activeTab === 'raspberry_l1' || activeTab === 'scratch_raspberry_l1') ? `RASPBERRY NIVEL 1 - RETO ${currentItem.numero}` :
+                         (activeTab === 'raspberry_l2' || activeTab === 'scratch_raspberry_l2') ? `RASPBERRY NIVEL 2 - RETO ${currentItem.numero}` :
+                         (activeTab === 'expert' || activeTab === 'scratch_raspberry_l3') ? `RASPBERRY NIVEL 3 - RETO ${currentItem.numero}` : 
                          (planetId === 'scratch' ? 'ACADEMIA' : (planetId === 'makecode-arcade' ? 'ACADEMIA' : (planetId?.startsWith('tinkercad') ? `ACADEMIA ${currentItem.category?.toUpperCase() || ''}` : 'ACADEMIA')))}
                       </span>
                     </div>
@@ -1782,7 +2095,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                                 </p>
                               </div>
                             </>
-                          ) : activeTab === 'expert' || activeTab.startsWith('raspberry_') ? (
+                          ) : (activeTab === 'expert' || activeTab.startsWith('raspberry_') || activeTab.startsWith('scratch_raspberry_')) ? (
                             <>
                               <div style={{ marginBottom: '20px' }}>
                                 <GlowButton 
@@ -1802,7 +2115,15 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                                   <ExternalLink size={18} /> ACCEDER AL PROYECTO RASPBERRY PI
                                 </GlowButton>
                               </div>
-                              <div style={{ display: 'flex', gap: '15px' }}>
+                              
+                              <div style={{ marginBottom: '24px', padding: '15px', background: 'rgba(0,0,0,0.03)', borderRadius: '12px' }}>
+                                <span style={{ fontSize: '0.65rem', fontWeight: '900', color: accentColor, textTransform: 'uppercase' }}>Descripción:</span>
+                                <p style={{ margin: '5px 0 0 0', fontSize: '0.95rem', color: '#666', lineHeight: '1.5' }}>
+                                  {currentItem.descripcion || currentItem.description || "Proyecto oficial de la Raspberry Pi Foundation."}
+                                </p>
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
                                   Sigue la guía oficial de la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Raspberry Pi Foundation</a> para completar este proyecto.
