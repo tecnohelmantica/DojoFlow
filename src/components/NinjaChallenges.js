@@ -1345,7 +1345,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' }}>
           
           {/* Ocultar pestaña CURSO en Arduino si está vacía */}
-          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'tinkercad' || pid === 'python' || pid === 'ia' || pid === 'arduino') && (
+          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'python' || pid === 'ia' || pid === 'arduino') && (
             <button 
               onClick={() => { setActiveTab(pid === 'scratch' ? 'scratch_academia' : 'tutorials'); setSelectedTutorial(null); }}
               style={{ 

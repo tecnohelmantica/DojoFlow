@@ -1,57 +1,34 @@
-export const TINKERCAD_3D_ACADEMY = [
-  { numero: 1, titulo: "Place It", url: "https://www.tinkercad.com/learn/overview/O20OX7OJJOJZJL2?type=designs", descripcion: "Aprende a colocar formas en el plano de trabajo." },
-  { numero: 2, titulo: "View It", url: "https://www.tinkercad.com/learn/overview/OVKT9D2JK2UHRK0?type=designs", descripcion: "Descubre cómo mover la cámara para ver tu diseño desde todos los ángulos." },
-  { numero: 3, titulo: "Move It", url: "https://www.tinkercad.com/learn/overview/O4J3W65JJOJZSRI?type=designs", descripcion: "Aprende a desplazar formas por el plano de trabajo." },
-  { numero: 4, titulo: "Rotate It", url: "https://www.tinkercad.com/learn/overview/OIOV5J4JK10UYFU?type=designs", descripcion: "Aprende a girar formas en los tres ejes." },
-  { numero: 5, titulo: "Size It", url: "https://www.tinkercad.com/learn/overview/OW5JHUFJJSUCGPF?type=designs", descripcion: "Cambia las dimensiones de tus objetos con precisión." },
-  { numero: 6, titulo: "Group It", url: "https://www.tinkercad.com/learn/overview/O4IKGUSJK2UJMSU?type=designs", descripcion: "Combina varias formas para crear un único objeto sólido." },
-  { numero: 7, titulo: "Copy It", url: "https://www.tinkercad.com/learn/overview/OXOJB5RL1W5N9DG?type=designs", descripcion: "Aprende a copiar y pegar objetos en tu diseño." },
-  { numero: 8, titulo: "Duplicate It", url: "https://www.tinkercad.com/learn/overview/ODD3HGBL1W5N9DK?type=designs", descripcion: "Usa la duplicación inteligente para crear patrones." },
-  { numero: 9, titulo: "Hide It", url: "https://www.tinkercad.com/learn/overview/OOP3QEML1W5N9DN?type=designs", descripcion: "Oculta y muestra objetos para trabajar mejor en diseños complejos." },
-  { numero: 10, titulo: "Align It", url: "https://www.tinkercad.com/learn/overview/OF8ZOFPL1W5N9DS?type=designs", descripcion: "Alinea varios objetos perfectamente." },
-  { numero: 11, titulo: "Introduction to Primitive Shapes", url: "https://www.tinkercad.com/learn/overview/OXPM7A5IRXTLYOA?type=designs", descripcion: "Explora las formas básicas disponibles en Tinkercad." },
-  { numero: 12, titulo: "Creating Holes", url: "https://www.tinkercad.com/learn/overview/OM50MYLL1W5N54A?type=designs", descripcion: "Aprende a usar huecos para crear formas complejas." }
-];
+export const TINKERCAD_3D_ACADEMY = [];
 
 export const TINKERCAD_3D_CHALLENGES = {
   beginner: [
-    { numero: 1, titulo: "Basic Ring", url: "https://www.tinkercad.com/learn/overview/OEFU95SIYKFZ0ZY", descripcion: "Diseña un anillo básico personalizado." },
-    { numero: 2, titulo: "Simple Heart Ring", url: "https://www.tinkercad.com/learn/overview/O1LA9G5IYKFZ15B", descripcion: "Crea un anillo con un corazón." },
-    { numero: 3, titulo: "Diamond Ring", url: "https://www.tinkercad.com/learn/overview/OVSX6OGIYKFZ1E9", descripcion: "Diseña un anillo con un diamante." },
-    { numero: 4, titulo: "Monogrammed Ring", url: "https://www.tinkercad.com/learn/overview/monogrammed-ring", descripcion: "Anillo con tus iniciales." },
-    { numero: 5, titulo: "Basic Button", url: "https://www.tinkercad.com/learn/overview/OQW3E48IYB2HI9X", descripcion: "Diseña un botón funcional." },
-    { numero: 6, titulo: "Duffel Button", url: "https://www.tinkercad.com/learn/overview/OYGK7F8IYEQ4BP0", descripcion: "Crea un botón tipo duffel." },
-    { numero: 7, titulo: "Flower Button", url: "https://www.tinkercad.com/learn/overview/OAU63KAIYEQ4MUD", descripcion: "Botón con forma de flor." },
-    { numero: 8, titulo: "Heart Button", url: "https://www.tinkercad.com/learn/overview/OM2W146IYEQ50DG", descripcion: "Botón con forma de corazón." },
-    { numero: 9, titulo: "Skull Button", url: "https://www.tinkercad.com/learn/overview/OLMADDIIYEQ7SUQ", descripcion: "Botón con forma de calavera." },
-    { numero: 10, titulo: "Cylinder Earrings", url: "https://www.tinkercad.com/learn/overview/OGIJNS6IYKFZ1SH", descripcion: "Diseña unos pendientes cilíndricos." },
-    { numero: 11, titulo: "Twist Earrings", url: "https://www.tinkercad.com/learn/overview/OSEBRKOIYKFZ1XC", descripcion: "Pendientes con efecto de torsión." },
-    { numero: 12, titulo: "Key Ring Letters", url: "https://www.tinkercad.com/learn/overview/O21M5TXL1W5N54P", descripcion: "Crea un llavero con letras." },
-    { numero: 13, titulo: "Luggage Tag", url: "https://www.tinkercad.com/learn/overview/O0XHVHMIXGFO1D6", descripcion: "Diseña una etiqueta para tu equipaje." }
+    { numero: 1, titulo: "Ej.1 - Paralelepípedo", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Crea un paralelepípedo básico siguiendo las instrucciones." },
+    { numero: 2, titulo: "Ej.2 - Polígonos", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Explora la creación y modificación de polígonos." },
+    { numero: 3, titulo: "Ej.3 - Escaleras", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Aprende a construir estructuras de escaleras." },
+    { numero: 4, titulo: "Ej.4 - Pirámides", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Diseña diferentes tipos de pirámides." },
+    { numero: 5, titulo: "Ej.5 - Copa", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Modelado de una copa usando formas básicas." }
   ],
   intermediate: [
-    { numero: 14, titulo: "Saw Shaped Wrench", url: "https://www.tinkercad.com/learn/overview/OHKF387IY4Q7TC6", descripcion: "Modela una llave inglesa funcional." },
-    { numero: 15, titulo: "Make a Gear", url: "https://www.tinkercad.com/learn/overview/OLB40A7J0COYFJ6", descripcion: "Diseña un engranaje mecánico." },
-    { numero: 16, titulo: "Chess Pawn", url: "https://www.tinkercad.com/learn/overview/O698ZZXIXGFTSXU", descripcion: "Modela un peón de ajedrez." },
-    { numero: 17, titulo: "Die From Scratch", url: "https://www.tinkercad.com/learn/overview/OMPFUS5IYC6JRMP", descripcion: "Crea un dado desde cero." },
-    { numero: 18, titulo: "Custom Candy Mold", url: "https://www.tinkercad.com/learn/overview/OQ81Q1UJ0SEN74Q", descripcion: "Diseña un molde para caramelos." },
-    { numero: 19, titulo: "Spork Utensil", url: "https://www.tinkercad.com/learn/overview/spork-utensil", descripcion: "Híbrido de cuchara y tenedor." },
-    { numero: 20, titulo: "Personal Locking Container", url: "https://www.tinkercad.com/learn/overview/O3IQ4KSJ0COYUNV", descripcion: "Contenedor con cierre de seguridad." },
-    { numero: 21, titulo: "Minecraft Party Glasses", url: "https://www.tinkercad.com/learn/overview/O03N1PKJ0SEN4DG", descripcion: "Gafas de fiesta estilo Minecraft." },
-    { numero: 22, titulo: "Name That Keychain", url: "https://www.tinkercad.com/learn/overview/O221E4PIRXTO4GT", descripcion: "Llavero personalizado con nombre." },
-    { numero: 23, titulo: "Bobbleheads", url: "https://www.tinkercad.com/learn/overview/O0H6NEYIRXTO5IU", descripcion: "Diseña figuras con cabeza móvil." }
+    { numero: 6, titulo: "TK1 - Figuras", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EZoOt54DFThNmp0BiPSN3OcBSbTcCGZtWmCZJ2g0kvyfaA?e=0R6xFX", descripcion: "Práctica de creación de figuras complejas." },
+    { numero: 7, titulo: "TK2 - Combinar", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/ESdVZCeoV0FNq3Acii_2ywIBp1_d0DXSI108hsHjIqPAGw?e=QSskh9", descripcion: "Aprende a combinar múltiples objetos." },
+    { numero: 8, titulo: "TK3 - Huecos", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/Efm4mAmy_7ZEv5oWqqR2C98Bh_v27aslSpxZi8A6ZN9SCw?e=nZpArc", descripcion: "Uso de huecos para sustraer volúmenes." },
+    { numero: 9, titulo: "TK4 - Polígonos", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EVYKLo2wJXlPpSilxBimqY8BKME0FzoTNrqi-skGlnkk2A?e=p1gUQ1", descripcion: "Diseño avanzado con polígonos." },
+    { numero: 10, titulo: "TK5 - Llaveros", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EcreVpKTW4JLg2y8-AllzUQBobIanNLvwOoGFTCNLtDBwg?e=Cf7d56", descripcion: "Diseño de llaveros personalizados." },
+    { numero: 11, titulo: "TK6 - Copa", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/Ea6siVqaNKZFiLbSeiyiJZ4B-1-Uzb7SzKaRPqFr4_GZJw?e=hQNYNJ", descripcion: "Modelado detallado de una copa." },
+    { numero: 12, titulo: "TK7 - Taza", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EQVbfUP5WmtInGq0a6hR1i4BL3CxKrLTqAdnHj22DeGqjQ?e=rR2Nts", descripcion: "Diseño de una taza funcional." },
+    { numero: 13, titulo: "TK8 - Dado", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EUavSrfX88ZKgRO01hDGKXYBgXOvQaxfzBzqviG_e8Ttbw?e=iepavJ", descripcion: "Creación de un dado con todas sus caras." },
+    { numero: 14, titulo: "TK9 - Ensamblar", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EUnsJ2f56PdBmrcwU9I-uxIBYYgtPygvxzaHi1vuMGtcsQ?e=YPMARo", descripcion: "Técnicas de ensamblaje de piezas." },
+    { numero: 15, titulo: "TK10 - Escalera", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/ERIDo1j9fitKrom_0Yqt5pMB4aXwvLMa9FNTsFEjp6WF_w?e=ZiFKPt", descripcion: "Diseño de escaleras arquitectónicas." },
+    { numero: 16, titulo: "TK11 - Poleas", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EQUQywj0h0NHruK9UPGT2zQB2w06vN595SKNE-4iMX2KFQ?e=A0rCxZ", descripcion: "Diseño de sistemas de poleas mecánicas." },
+    { numero: 17, titulo: "TK12 - Engranajes", url: "https://educastur-my.sharepoint.com/:b:/g/personal/pedronr_educastur_org/EeYxtNIVHIdPocQDTDsJAGcBkZBuGpW5HlLAyNDqWh-JTQ?e=JcGGUQ", descripcion: "Modelado de engranajes técnicos." }
   ],
   advanced: [
-    { numero: 24, titulo: "Balloon Powered Car", url: "https://www.tinkercad.com/learn/overview/OIU0ZY1IRXTXIP3", descripcion: "Coche propulsado por un globo." },
-    { numero: 25, titulo: "3D Printed Penny Whistle", url: "https://www.tinkercad.com/learn/overview/O3XILPZJ6CG757E", descripcion: "Crea un silbato funcional." },
-    { numero: 26, titulo: "Build a Tinkercad House", url: "https://www.tinkercad.com/learn/overview/OG2TEUVIQFHI7DT", descripcion: "Arquitectura completa de una casa." },
-    { numero: 27, titulo: "Mobile Amplifier", url: "https://www.tinkercad.com/learn/overview/O7MB883IRXTO4QX", descripcion: "Amplificador acústico para móvil." },
-    { numero: 28, titulo: "Suspension Bridge", url: "https://www.tinkercad.com/learn/overview/suspension-bridge", descripcion: "Ingeniería de un puente colgante." },
-    { numero: 29, titulo: "Build a Spaceship", url: "https://www.tinkercad.com/learn/overview/OJEIEJ7IRXTM0KM", descripcion: "Nave espacial detallada." },
-    { numero: 30, titulo: "Space Station", url: "https://www.tinkercad.com/learn/overview/OJ7NTHAIRXTO6B2", descripcion: "Diseño de estación espacial modular." },
-    { numero: 31, titulo: "Airbus - Living on the Moon", url: "https://www.tinkercad.com/learn/overview/airbus-living-on-the-moon", descripcion: "Hábitat lunar avanzado." },
-    { numero: 32, titulo: "Airbus - Habitat on the Moon", url: "https://www.tinkercad.com/learn/overview/airbus-habitat-on-the-moon", descripcion: "Complejo de investigación lunar." },
-    { numero: 33, titulo: "Airbus - Driving on the Moon", url: "https://www.tinkercad.com/learn/overview/airbus-driving-on-the-moon", descripcion: "Rover de exploración lunar." }
+    { numero: 18, titulo: "Desafío 1 - Agujeros", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Domina la técnica de perforación." },
+    { numero: 19, titulo: "Desafío 2 - Silla", url: "https://www.educa2.madrid.org/web/educamadrid/principal/files/e32f0dc2-7939-404c-8e24-602b2eb96eee/3%C2%BAeso%20practica%20tinkercad%202018_19.pdf", descripcion: "Diseña un mueble (silla) con proporciones correctas." },
+    { numero: 20, titulo: "Desafío 3 - Bola enjaulada", url: "https://www.educa2.madrid.org/web/jsanzleyva/bola-en-jaula", descripcion: "Crea una estructura de bola atrapada en una jaula." },
+    { numero: 21, titulo: "Desafío 4 - Spinner 2 brazos", url: "https://www.educa2.madrid.org/web/jsanzleyva/spinner-2", descripcion: "Diseña un Fidget Spinner básico de dos brazos." },
+    { numero: 22, titulo: "Desafío 5 - Spinner 3 brazos", url: "https://www.educa2.madrid.org/web/jsanzleyva/spinner-3", descripcion: "Diseña un Fidget Spinner de tres brazos más complejo." },
+    { numero: 23, titulo: "Desafío 6 - Soporte Ultrasonidos", url: "https://www.educa2.madrid.org/web/jsanzleyva/soporte-para-sensor-de-ultrasonidos-del-coche-robot", descripcion: "Diseña un soporte técnico para el sensor HC-SR04." }
   ]
 };
 
