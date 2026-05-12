@@ -1,6 +1,6 @@
 // src/lib/appinventor.js
 
-export const APP_INVENTOR_BASIC = [
+export const APP_INVENTOR_ACADEMIA = [
   {
     id: 'ai-basic-1',
     numero: 1,
@@ -90,10 +90,7 @@ export const APP_INVENTOR_BASIC = [
     url: 'https://www.profedeinformatica.es/app-inventor/b%C3%A1sico-bloque-1#h.bx3bkcu67yo8',
     difficulty: 'Básico',
     points: 25
-  }
-];
-
-export const APP_INVENTOR_INTERMEDIATE = [
+  },
   {
     id: 'ai-int-11',
     numero: 11,
@@ -170,3 +167,7 @@ export const APP_INVENTOR_SOCIAL = [
     points: 25
   }
 ];
+
+// Fallback exports for backward compatibility during migration
+export const APP_INVENTOR_BASIC = APP_INVENTOR_ACADEMIA.slice(0, 10);
+export const APP_INVENTOR_INTERMEDIATE = APP_INVENTOR_ACADEMIA.slice(10);

@@ -61,8 +61,7 @@ import {
   ARCADE_CHALLENGES 
 } from '../lib/arcade';
 import { 
-  APP_INVENTOR_BASIC,
-  APP_INVENTOR_INTERMEDIATE,
+  APP_INVENTOR_ACADEMIA,
   APP_INVENTOR_SOCIAL
 } from '../lib/appinventor';
 import { PLANETS } from '../lib/planets';
@@ -91,8 +90,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [pythonCodedexAdvanced, setPythonCodedexAdvanced] = useState([]);
   const [pythonFreeCodeCamp, setPythonFreeCodeCamp] = useState([]);
   const [pythonPicuino, setPythonPicuino] = useState([]);
-  const [appInventorBasic, setAppInventorBasic] = useState([]);
-  const [appInventorIntermediate, setAppInventorIntermediate] = useState([]);
+  const [appInventorAcademia, setAppInventorAcademia] = useState([]);
   const [appInventorSocial, setAppInventorSocial] = useState([]);
   const [mlForKidsBeginner, setMlForKidsBeginner] = useState([]);
   const [mlForKidsIntermediate, setMlForKidsIntermediate] = useState([]);
@@ -292,7 +290,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       } else if (pid === 'python') {
         setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
       } else if (pid === 'appinventor') {
-        setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); setChallenges(APP_INVENTOR_BASIC);
+        setAppInventorAcademia(APP_INVENTOR_ACADEMIA); 
+        setAppInventorSocial(APP_INVENTOR_SOCIAL); 
+        setChallenges(itinerary === 'social' ? APP_INVENTOR_SOCIAL : APP_INVENTOR_ACADEMIA);
       } else if (pid === 'ia') {
         setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
       } else if (pid === 'arduino' || pid === 'tinkercad-arduino') {
@@ -552,10 +552,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setPythonCodedexIntermediate, dbChallenges, 'codedex', PYTHON_CODEDEX_INTERMEDIATE, 'intermediate');
           populateState(setPythonCodedexAdvanced, dbChallenges, 'codedex', PYTHON_CODEDEX_ADVANCED, 'advanced');
         } else if (pid === 'appinventor') {
-          const basic = populateState(setAppInventorBasic, dbChallenges, 'basic', APP_INVENTOR_BASIC);
-          const inter = populateState(setAppInventorIntermediate, dbChallenges, 'intermediate', APP_INVENTOR_INTERMEDIATE);
+          const academia = populateState(setAppInventorAcademia, dbChallenges, 'academia', APP_INVENTOR_ACADEMIA);
           const social = populateState(setAppInventorSocial, dbChallenges, 'social', APP_INVENTOR_SOCIAL);
-          setChallenges(itinerary === 'social' ? social : (itinerary === 'intermediate' ? inter : basic));
+          setChallenges(itinerary === 'social' ? social : academia);
         } else if (pid === 'ia') {
           populateState(setLearningML, dbChallenges, 'learningml', ML_LEARNINGML);
           populateState(setMlForKidsBeginner, dbChallenges, 'mlforkids', ML_FOR_KIDS.beginner, 'beginner');

@@ -1603,9 +1603,8 @@ function ProfileContent() {
                   {activePlanet === 'appinventor' && (
                     <div style={{ display: 'flex', gap: '10px' }}>
                       {[
-                        { id: null, label: 'BÁSICO' },
-                        { id: 'intermediate', label: 'INTERMEDIO' },
-                        { id: 'social', label: 'RETOS RASPBERRY PI' }
+                        { id: null, label: 'ACADEMIA' },
+                        { id: 'social', label: 'SOCIAL ENTERPRISE' }
                       ].map(opt => (
                         <button
                           key={opt.id}
