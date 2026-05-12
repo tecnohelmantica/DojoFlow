@@ -817,8 +817,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const pythonCodedexAdvancedCompleted = pythonCodedexAdvanced.filter(c => userProgress[`${pid}-reto-codedex-adv-${c.id}`]?.status === 'Validado').length;
   const pythonFreeCodeCampCompleted = pythonFreeCodeCamp.filter(c => userProgress[`${pid}-reto-fcc-${c.id}`]?.status === 'Validado').length;
   const pythonPicuinoCompleted = pythonPicuino.filter(c => userProgress[`${pid}-picuino-reto-${c.id}`]?.status === 'Validado').length;
-  const appInventorBasicCompleted = appInventorBasic.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-basic-reto-${c.id}`]?.status === 'Validado').length;
-  const appInventorIntermediateCompleted = appInventorIntermediate.filter(c => userProgress[`${pid}-intermediate-reto-${c.id}`]?.status === 'Validado').length;
+  const appInventorAcademiaCompleted = appInventorAcademia.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-academia-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-basic-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-intermediate-reto-${c.id}`]?.status === 'Validado').length;
   const appInventorSocialCompleted = appInventorSocial.filter(c => userProgress[`${pid}-social-reto-${c.id}`]?.status === 'Validado').length;
 
   const htmlCodeOrgCompleted = htmlCodeOrg.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado').length;
@@ -924,9 +923,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     ];
   } else if (planetId === 'appinventor') {
     activeMilestones = [
-      { reached: appInventorBasicCompleted >= 10, label: 'BÁSICO', total: 10, type: 'big' },
-      { reached: appInventorIntermediateCompleted >= 5, label: 'INTERMEDIO', total: 5, type: 'big' },
-      { reached: appInventorSocialCompleted >= 3, label: 'RASPBERRY PI', total: 3, type: 'big' }
+      { reached: appInventorAcademiaCompleted >= 15, label: 'ACADEMIA', total: 15, type: 'big' },
+      { reached: appInventorSocialCompleted >= 3, label: 'SOCIAL ENTERPRISE', total: 3, type: 'big' }
     ];
   } else if (pid === 'html') {
     activeMilestones = [
