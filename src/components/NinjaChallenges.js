@@ -256,8 +256,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setPythonCodedexBeginner([]);
       setPythonCodedexIntermediate([]);
       setPythonCodedexAdvanced([]);
-      setAppInventorBasic([]);
-      setAppInventorIntermediate([]);
+      setAppInventorAcademia([]);
       setAppInventorSocial([]);
       setMlForKidsBeginner([]);
       setMlForKidsIntermediate([]);
