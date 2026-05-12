@@ -2331,7 +2331,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                               <div style={{ display: 'flex', gap: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Abre la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Guía del Reto</a> de Justo Rodríguez para ver los pasos.
+                                  Abre la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Guía del Reto</a> de {itinerary === 'social' ? 'Raspberry Pi Foundation' : 'Justo Rodríguez'} para ver los pasos.
                                 </p>
                               </div>
                               <div style={{ display: 'flex', gap: '15px' }}>
