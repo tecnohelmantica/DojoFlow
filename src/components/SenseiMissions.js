@@ -48,13 +48,19 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
 
   const loadData = async () => {
     setLoading(true);
+    // Reset state for the new planet
+    setMission(null);
+    setStats({ completed: 0, xp: 0, streak: 0, medals: [] });
+    setHints([]);
+
     try {
       if (userId === 'guest_user') {
         const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
-        const activeMission = guestMissions.find(m => m.status === 'active');
+        // Filter by both status AND planetId to avoid leakage between planets
+        const activeMission = guestMissions.find(m => m.status === 'active' && m.planet_id === planetId);
         if (activeMission) setMission(activeMission);
 
-        const completed = guestMissions.filter(m => m.status === 'completed');
+        const completed = guestMissions.filter(m => m.status === 'completed' && m.planet_id === planetId);
         const totalXp = completed.reduce((acc, m) => acc + (m.reward_xp || 50), 0);
         
         setStats({
@@ -80,6 +86,8 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
 
       if (missionData) {
         setMission(missionData);
+      } else {
+        setMission(null);
       }
 
       // 2. Load stats (completed missions)

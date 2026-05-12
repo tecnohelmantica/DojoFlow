@@ -54,6 +54,23 @@ export async function POST(req) {
       console.warn(`[Tutor API] No se pudo cargar el conocimiento de Supabase:`, kError.message);
     }
 
+    // --- NUEVA PRIORIDAD 2: CONOCIMIENTO LOCAL (Fallback si no hay en Supabase) ---
+    if (!masterKnowledge) {
+      try {
+        // Intentamos cargar el JSON local dinámicamente
+        const localKnowledge = await import(`@/data/${planetId}_knowledge.json`)
+          .then(m => m.default)
+          .catch(() => null);
+        
+        if (localKnowledge) {
+          masterKnowledge = localKnowledge.knowledge_base;
+          console.log(`[Tutor API] Conocimiento cargado desde JSON LOCAL para ${planetId}`);
+        }
+      } catch (lError) {
+        console.warn(`[Tutor API] No hay fallback local para ${planetId}`);
+      }
+    }
+
     // --- NUEVA PRIORIDAD: CONTEXTO DE RETO (Para validación) ---
     let challengeContext = "";
     if (mode === 'validador' && userId) {

@@ -186,7 +186,13 @@ function AuthContent() {
         const { data, error } = await supabase.auth.signUp({
           email: internalAuthEmail,
           password,
-          options: { data: { alias: alias, email_real: emailReal || null } }
+          options: { 
+            data: { 
+              alias: alias, 
+              email_real: emailReal || null,
+              role: role 
+            } 
+          }
         });
         
         if (error) {
@@ -195,16 +201,14 @@ function AuthContent() {
         }
 
         if (data.user) {
-          await supabase.from('profiles').insert([{ 
-            id: data.user.id, 
-            alias: alias, 
-            email_real: emailReal || null,
-            role: role, 
-            xp: 100, 
-            level: 1, 
-            avatar_url: role === 'profesor' ? 'profesor.png' : 'alumno.png'
-          }]);
-          await supabase.auth.signInWithPassword({ email: internalAuthEmail, password });
+          // El perfil se crea automáticamente mediante el trigger de Supabase (handle_new_user)
+          // Solo necesitamos iniciar sesión para establecer la sesión correctamente
+          const { error: signInError } = await supabase.auth.signInWithPassword({ 
+            email: internalAuthEmail, 
+            password 
+          });
+          
+          if (signInError) throw signInError;
           
           if (role === 'profesor') {
             router.push('/');
