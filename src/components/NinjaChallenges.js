@@ -92,9 +92,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [pythonPicuino, setPythonPicuino] = useState([]);
   const [appInventorAcademia, setAppInventorAcademia] = useState([]);
   const [appInventorSocial, setAppInventorSocial] = useState([]);
-  const [mlForKidsBeginner, setMlForKidsBeginner] = useState([]);
-  const [mlForKidsIntermediate, setMlForKidsIntermediate] = useState([]);
-  const [mlForKidsAdvanced, setMlForKidsAdvanced] = useState([]);
+  const [mlForKids, setMlForKids] = useState([]);
   const [arduinoBeginner, setArduinoBeginner] = useState([]);
   const [arduinoIntermediate, setArduinoIntermediate] = useState([]);
   const [arduinoAdvanced, setArduinoAdvanced] = useState([]);
@@ -119,6 +117,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [selectedTutorial, setSelectedTutorial] = useState(null);
   const [evidenceUrl, setEvidenceUrl] = useState('');
   const [evidenceFile, setEvidenceFile] = useState(null);
+  const [mlfkChallengeName, setMlfkChallengeName] = useState('');
+  const [mlfkDifficulty, setMlfkDifficulty] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [difficultyLevel, setDifficultyLevel] = useState('beginner');
   const [milestoneProgress, setMilestoneProgress] = useState({});
@@ -194,7 +194,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     }
     else if (pid === 'ia') {
       if (itinerary === 'mlforkids') {
-        setActiveTab('mlfk_beginner');
+        setActiveTab('mlfk_challenges');
       } else {
         setActiveTab('challenges');
       }
@@ -258,9 +258,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setPythonCodedexAdvanced([]);
       setAppInventorAcademia([]);
       setAppInventorSocial([]);
-      setMlForKidsBeginner([]);
-      setMlForKidsIntermediate([]);
-      setMlForKidsAdvanced([]);
+      setMlForKids([]);
     };
 
     resetLists();
@@ -293,7 +291,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         setAppInventorSocial(APP_INVENTOR_SOCIAL); 
         setChallenges(itinerary === 'social' ? APP_INVENTOR_SOCIAL : APP_INVENTOR_ACADEMIA);
       } else if (pid === 'ia') {
-        setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
+        setLearningML(ML_LEARNINGML); setMlForKids(ML_FOR_KIDS); setChallenges(ML_LEARNINGML);
       } else if (pid === 'arduino' || pid === 'tinkercad-arduino') {
         setDifficultyChallenges(ARDUINO_CHALLENGES);
         setArduinoBeginner(ARDUINO_CHALLENGES.beginner);
@@ -495,7 +493,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); 
           setChallenges(itinerary === 'social' ? APP_INVENTOR_SOCIAL : (itinerary === 'intermediate' ? APP_INVENTOR_INTERMEDIATE : APP_INVENTOR_BASIC));
         } else if (pid === 'ia') {
-          setLearningML(ML_LEARNINGML); setMlForKidsBeginner(ML_FOR_KIDS.beginner || []); setChallenges(ML_LEARNINGML);
+          setLearningML(ML_LEARNINGML); setMlForKids(ML_FOR_KIDS); setChallenges(ML_LEARNINGML);
         } else if (pid === 'arduino') {
           setDifficultyChallenges(ARDUINO_CHALLENGES);
           setArduinoTutorials(ARDUINO_TUTORIALS);
@@ -556,9 +554,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setChallenges(itinerary === 'social' ? social : academia);
         } else if (pid === 'ia') {
           populateState(setLearningML, dbChallenges, 'learningml', ML_LEARNINGML);
-          populateState(setMlForKidsBeginner, dbChallenges, 'mlforkids', ML_FOR_KIDS.beginner, 'beginner');
-          populateState(setMlForKidsIntermediate, dbChallenges, 'mlforkids', ML_FOR_KIDS.intermediate, 'intermediate');
-          populateState(setMlForKidsAdvanced, dbChallenges, 'mlforkids', ML_FOR_KIDS.advanced, 'advanced');
+          populateState(setMlForKids, dbChallenges, 'mlforkids', ML_FOR_KIDS);
         } else if (pid === 'arduino') {
           setDifficultyChallenges(ARDUINO_CHALLENGES);
           populateState(setArduinoTutorials, dbTutorials, 'arduino-tutorial', ARDUINO_TUTORIALS);
@@ -747,6 +743,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
             status: 'En revisión',
             evidence_url: evidenceUrl,
             evidence_file_url: uploadedFileUrl || userProgress[challengeId]?.evidence_file_url,
+            challenge_name: itinerary === 'mlforkids' ? mlfkChallengeName : null,
+            difficulty: itinerary === 'mlforkids' ? mlfkDifficulty : null,
             updated_at: new Date().toISOString()
           }, { onConflict: 'student_id, challenge_id' });
 
@@ -762,6 +760,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setSelectedTutorial(null); // Cerrar modal de reto o tutorial
       setEvidenceUrl('');
       setEvidenceFile(null);
+      setMlfkChallengeName('');
+      setMlfkDifficulty('');
     } catch (err) {
       console.error("Error submitting challenge:", err);
       alert("Error al enviar el reto. Inténtalo de nuevo.");
@@ -825,9 +825,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
 
 
   const iaLearningMLCompleted = challenges.filter(c => userProgress[`ia-reto-${c.id || c.order_index}`]?.status === 'Validado' || userProgress[`ia-learningml-reto-${c.id || c.order_index}`]?.status === 'Validado').length;
-  const iaMlfkBeginnerCompleted = mlForKidsBeginner.filter(c => userProgress[`ia-mlforkids-reto-${c.id || c.order_index}`]?.status === 'Validado').length;
-  const iaMlfkIntermediateCompleted = mlForKidsIntermediate.filter(c => userProgress[`ia-mlforkids-reto-${c.id || c.order_index}`]?.status === 'Validado').length;
-  const iaMlfkAdvancedCompleted = mlForKidsAdvanced.filter(c => userProgress[`ia-mlforkids-reto-${c.id || c.order_index}`]?.status === 'Validado').length;
+  const iaMlfkCompleted = mlForKids.filter(c => userProgress[`ia-mlforkids-reto-${c.id || c.order_index}`]?.status === 'Validado').length;
 
   const milestoneDivisor = (pid === 'tinkercad' && itinerary === 'codeblocks') ? 5 : (pid === 'makecode-arcade' ? 3 : 10);
   
@@ -917,9 +915,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   } else if (planetId === 'ia') {
     activeMilestones = [
       { reached: iaLearningMLCompleted >= 6, label: 'LEARNINGML', total: 6, type: 'big' },
-      { reached: iaMlfkBeginnerCompleted >= 8, label: 'MLFK PRINCIPIANTE', total: 8, type: 'big' },
-      { reached: iaMlfkIntermediateCompleted >= 10, label: 'MLFK INTERMEDIO', total: 10, type: 'big' },
-      { reached: iaMlfkAdvancedCompleted >= 8, label: 'MLFK AVANZADO', total: 8, type: 'big' }
+      { reached: iaMlfkCompleted >= 1, label: 'MLFK COMPLETO', total: 1, type: 'big' }
     ];
   } else if (planetId === 'appinventor') {
     activeMilestones = [
@@ -1184,9 +1180,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       'codedex_advanced': pythonCodedexAdvanced,
       
       // IA Planet
-      'mlfk_beginner': mlForKidsBeginner,
-      'mlfk_intermediate': mlForKidsIntermediate,
-      'mlfk_advanced': mlForKidsAdvanced,
+      'mlfk_challenges': mlForKids,
       
       // Other standard tabs
       'raspberry_l1': raspberryL1,
@@ -1345,7 +1339,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' }}>
           
           {/* Ocultar pestaña CURSO en Arduino si está vacía */}
-          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'python' || pid === 'ia' || pid === 'arduino') && (
+          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'python' || pid === 'arduino') && (
             <button 
               onClick={() => { setActiveTab(pid === 'scratch' ? 'scratch_academia' : 'tutorials'); setSelectedTutorial(null); }}
               style={{ 
@@ -1790,49 +1784,23 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
             ) : pid === 'ia' && itinerary === 'mlforkids' ? (
               <>
                 <button
-                  onClick={() => { setActiveTab('mlfk_beginner'); setSelectedTutorial(null); }}
+                  onClick={() => { setActiveTab('mlfk_challenges'); setSelectedTutorial(null); }}
                   style={{
                     flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                     fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'mlfk_beginner' ? 'white' : 'transparent',
-                    color: activeTab === 'mlfk_beginner' ? accentColor : '#666',
-                    boxShadow: activeTab === 'mlfk_beginner' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    background: activeTab === 'mlfk_challenges' ? 'white' : 'transparent',
+                    color: activeTab === 'mlfk_challenges' ? accentColor : '#666',
+                    boxShadow: activeTab === 'mlfk_challenges' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  🌱 PRINCIPIANTE ({mlForKidsBeginner.filter(c => userProgress[`ia-mlforkids-reto-${c.id}`]?.status === 'Validado').length}/{mlForKidsBeginner.length})
-                </button>
-                <button
-                  onClick={() => { setActiveTab('mlfk_intermediate'); setSelectedTutorial(null); }}
-                  style={{
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'mlfk_intermediate' ? 'white' : 'transparent',
-                    color: activeTab === 'mlfk_intermediate' ? accentColor : '#666',
-                    boxShadow: activeTab === 'mlfk_intermediate' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  ⚔️ INTERMEDIO ({mlForKidsIntermediate.filter(c => userProgress[`ia-mlforkids-reto-${c.id}`]?.status === 'Validado').length}/{mlForKidsIntermediate.length})
-                </button>
-                <button
-                  onClick={() => { setActiveTab('mlfk_advanced'); setSelectedTutorial(null); }}
-                  style={{
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'mlfk_advanced' ? 'white' : 'transparent',
-                    color: activeTab === 'mlfk_advanced' ? accentColor : '#666',
-                    boxShadow: activeTab === 'mlfk_advanced' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  🏆 AVANZADO ({mlForKidsAdvanced.filter(c => userProgress[`ia-mlforkids-reto-${c.id}`]?.status === 'Validado').length}/{mlForKidsAdvanced.length})
+                  🚀 RETOS MLFK ({mlForKids.filter(c => userProgress[`ia-mlforkids-reto-${c.id}`]?.status === 'Validado').length}/{mlForKids.length})
                 </button>
               </>
             ) : (
               <>
                 {/* FALLBACK TABS */}
-                {tutorials.length > 0 && pid !== 'tinkercad' && pid !== '3d' && (
+                {tutorials.length > 0 && pid !== 'tinkercad' && pid !== '3d' && pid !== 'ia' && (
                   <button 
                     onClick={() => setActiveTab('tutorials')}
                     style={{ 
@@ -1847,7 +1815,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     🎓 ACADEMIA {`(${tutorialsCompleted}/${tutorials.length})`}
                   </button>
                 )}
-                {challenges.length > 0 && pid !== 'tinkercad' && pid !== '3d' && (
+                {challenges.length > 0 && pid !== 'tinkercad' && pid !== '3d' && pid !== 'ia' && (
                   <button 
                     onClick={() => setActiveTab('challenges')}
                     style={{ 
@@ -2462,6 +2430,49 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     )}
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        {itinerary === 'mlforkids' && (
+                          <div style={{ display: 'flex', gap: '10px' }}>
+                            <div style={{ flex: 1 }}>
+                              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#666', marginBottom: '8px', textTransform: 'uppercase' }}>
+                                Nombre del Reto
+                              </label>
+                              <input 
+                                type="text" 
+                                placeholder="Ej: Smart Classroom..."
+                                value={mlfkChallengeName}
+                                onChange={(e) => setMlfkChallengeName(e.target.value)}
+                                style={{ 
+                                  width: '100%', padding: '12px', borderRadius: '12px', border: '2px solid #ddd',
+                                  fontSize: '0.9rem', outline: 'none', transition: 'border-color 0.2s',
+                                  fontFamily: 'inherit'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = accentColor}
+                                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                              />
+                            </div>
+                            <div style={{ width: '120px' }}>
+                              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#666', marginBottom: '8px', textTransform: 'uppercase' }}>
+                                Dificultad
+                              </label>
+                              <select 
+                                value={mlfkDifficulty}
+                                onChange={(e) => setMlfkDifficulty(e.target.value)}
+                                style={{ 
+                                  width: '100%', padding: '12px', borderRadius: '12px', border: '2px solid #ddd',
+                                  fontSize: '0.9rem', outline: 'none', transition: 'border-color 0.2s',
+                                  fontFamily: 'inherit', background: 'white'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = accentColor}
+                                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                              >
+                                <option value="">Nivel...</option>
+                                <option value="Básico">Básico</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Avanzado">Avanzado</option>
+                              </select>
+                            </div>
+                          </div>
+                        )}
                         <div>
                           <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#666', marginBottom: '8px', textTransform: 'uppercase' }}>
                             Opción A: URL de tu proyecto

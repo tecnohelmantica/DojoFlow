@@ -62,7 +62,7 @@ function ProfileContent() {
     { role: 'tutor', text: `Saludos, Explorer. Iniciando sistemas de acompañamiento socrático...` }
   ]);
   const [socraticInputText, setSocraticInputText] = useState('');
-  const [validationMessages, setValidationMessages] = useState([]);
+  const [isValidationSuccess, setIsValidationSuccess] = useState(false);
   const [validationInputText, setValidationInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isNinjaValidator, setIsNinjaValidator] = useState(false);
@@ -468,8 +468,10 @@ function ProfileContent() {
     if (e) e.preventDefault();
     if (!socraticInputText.trim()) return;
 
-    const userMsg = { role: 'user', content: socraticInputText };
-    setSocraticMessages(prev => [...prev, { role: 'user', text: socraticInputText }]);
+    const currentMode = isNinjaValidator ? 'validador' : 'consulta';
+    const userMsgText = socraticInputText;
+    
+    setSocraticMessages(prev => [...prev, { role: 'user', text: userMsgText }]);
     setSocraticInputText('');
     setIsTyping(true);
 
@@ -479,8 +481,8 @@ function ProfileContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: isGuest ? 'guest_user' : session?.user?.id,
-          mode: 'consulta',
-          message: socraticInputText,
+          mode: currentMode,
+          message: userMsgText,
           history: socraticMessages.map(m => ({
             role: m.role === 'user' ? 'user' : 'model',
             content: m.text
@@ -496,6 +498,18 @@ function ProfileContent() {
           role: 'tutor', 
           text: data.text 
         }]);
+
+        // Si el Sensei incluye el tag de validación, celebramos
+        if (data.text.includes('[VALIDADO]')) {
+          setIsValidationSuccess(true);
+          setTimeout(() => {
+            setIsValidationSuccess(false);
+            setIsNinjaValidator(false); // Salir del modo validador tras el éxito
+          }, 4000);
+          
+          // Refrescar datos para que el reto aparezca como validado
+          loadData();
+        }
       } else {
         throw new Error(data.error || 'Error del Sensei');
       }
@@ -507,6 +521,28 @@ function ProfileContent() {
       }]);
     } finally {
       setIsTyping(false);
+    }
+  };
+
+  const handleValidateChallenge = (challenge, evidenceUrl, challengeId) => {
+    setIsNinjaValidator(true);
+    
+    const planetName = getPlanetById(activePlanet)?.name || activePlanet;
+    const challengeName = challenge.nombre || challenge.title || "este reto";
+
+    // Limpiar mensajes previos o añadir uno nuevo de sistema
+    setSocraticMessages(prev => [
+      ...prev,
+      { 
+        role: 'tutor', 
+        text: `--- MODO VALIDACIÓN ACTIVADO ---\n¡Hola! He recibido tu entrega para **${challengeName}**. \n\nPara validarlo, cuéntame: ¿Qué ha sido lo más difícil de este proyecto o cómo funciona la lógica principal que has aplicado?` 
+      }
+    ]);
+
+    // Hacer scroll suave hacia el tutor
+    const tutorSection = document.getElementById('socratic-tutor-section');
+    if (tutorSection) {
+      tutorSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -920,11 +956,36 @@ function ProfileContent() {
 
             {/* TUTOR SOCRÁTICO (NotebookLM) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '30px', height: '30px', background: planet?.barColor || '#6366f1', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                  <Sparkles size={16} />
+              <div id="socratic-tutor-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '30px', height: '30px', background: isNinjaValidator ? '#f59e0b' : (planet?.barColor || '#6366f1'), borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', transition: 'all 0.3s' }}>
+                    {isNinjaValidator ? <Award size={16} /> : <Sparkles size={16} />}
+                  </div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '900', color: '#1a1a2e', margin: 0 }}>
+                    {isNinjaValidator ? 'Sensei IA: Validador de Retos' : 'NotebookLM Socratic Tutor'}
+                  </h3>
                 </div>
-                <h3 style={{ fontSize: '1rem', fontWeight: '900', color: '#1a1a2e', margin: 0 }}>NotebookLM Socratic Tutor</h3>
+                
+                {isNinjaValidator && (
+                  <button 
+                    onClick={() => setIsNinjaValidator(false)}
+                    style={{
+                      background: 'rgba(0,0,0,0.05)',
+                      border: 'none',
+                      padding: '4px 12px',
+                      borderRadius: '15px',
+                      fontSize: '0.65rem',
+                      fontWeight: '800',
+                      color: '#64748b',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <X size={12} /> SALIR DE VALIDACIÓN
+                  </button>
+                )}
               </div>
               {!assessmentCompleted ? (
                 <TutorExperience 
@@ -978,6 +1039,29 @@ function ProfileContent() {
                       <Send size={18} />
                     </GlowButton>
                   </form>
+
+                  {/* Overlay de Éxito en Validación */}
+                  {isValidationSuccess && (
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                      background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      zIndex: 10, borderRadius: '20px', animation: 'fadeIn 0.5s ease',
+                      textAlign: 'center', padding: '20px'
+                    }}>
+                      <div style={{ 
+                        width: '80px', height: '80px', background: '#22c55e', borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
+                        boxShadow: '0 10px 25px rgba(34, 197, 94, 0.4)', marginBottom: '20px'
+                      }}>
+                        <CheckCircle2 size={40} />
+                      </div>
+                      <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: '#1a1a2e', margin: '0 0 10px 0' }}>¡RETO VALIDADO!</h2>
+                      <p style={{ fontSize: '0.9rem', color: '#666', maxWidth: '80%', margin: '0 auto' }}>
+                        El Sensei ha verificado tus conocimientos. ¡Sigue así, Ninja!
+                      </p>
+                    </div>
+                  )}
                 </GlassCard>
               )}
             </div>
@@ -1710,6 +1794,7 @@ function ProfileContent() {
                   setItinerary={setItinerary}
                   assessmentCompleted={assessmentCompleted}
                   studentLevel={studentLevel}
+                  onValidateChallenge={handleValidateChallenge}
                 />
               </div>
 

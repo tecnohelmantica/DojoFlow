@@ -54,6 +54,28 @@ export async function POST(req) {
       console.warn(`[Tutor API] No se pudo cargar el conocimiento de Supabase:`, kError.message);
     }
 
+    // --- NUEVA PRIORIDAD: CONTEXTO DE RETO (Para validación) ---
+    let challengeContext = "";
+    if (mode === 'validador' && userId) {
+      try {
+        const { data: cData } = await supabase
+          .from('user_challenges')
+          .select('challenge_id, challenge_name, difficulty, evidence_url')
+          .eq('student_id', userId)
+          .eq('planet_id', planetId)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (cData) {
+          challengeContext = `\nRETO A VALIDAR:\n- ID: ${cData.challenge_id}\n- Nombre: ${cData.challenge_name || 'No especificado'}\n- Dificultad: ${cData.difficulty || 'No especificada'}\n- Evidencia: ${cData.evidence_url || 'No proporcionada'}\n`;
+          console.log(`[Tutor API] Contexto de reto cargado para ${userId}`);
+        }
+      } catch (cError) {
+        console.warn(`[Tutor API] No se pudo cargar el contexto del reto:`, cError.message);
+      }
+    }
+
     // --- PRIORIDAD 2: NOTEBOOKLM (Si estamos en local y hay ID configurado) ---
     const isLocal = process.env.NODE_ENV === 'development' || process.env.HOSTNAME === 'localhost';
     const notebookId = NOTEBOOK_MAP[planetId];
@@ -91,12 +113,14 @@ Usa exclusivamente el conocimiento de este cuaderno y el contexto de referencia 
           promptTemplate = `Contexto: El alumno está en el planeta ${planetName}. 
 Nivel del alumno: ${studentLevel}.
 Modo: ${mode === 'validador' ? 'Validación de reto' : 'Consulta general'}.
+${challengeContext}
 Historial reciente: ${JSON.stringify(history?.slice(-3))}
 ${knowledgeContext}
 Pregunta: ${message}
 
 Responde como el Sensei de DojoFlow. Sé socrático y usa analogías.
 REGLA DE VALIDACIÓN:
+- Si el modo es 'Validación de reto', concéntrate en el reto '${challengeContext.match(/Nombre: (.*)/)?.[1] || 'actual'}'.
 - Si el nivel es 'Junior', NO pidas explicaciones técnicas profundas. Haz una única pregunta sencilla sobre qué hace su código o por qué eligió un bloque.
 - NUNCA hagas más de una pregunta a la vez.
 - Si la explicación es razonable para su nivel, incluye el comando [VALIDADO] al final.
@@ -129,14 +153,16 @@ REGLA DE VALIDACIÓN:
     const systemPromptBase = `Eres el Sensei de DojoFlow, un tutor experto en programación inspirado en la pedagogía de @tecnohelmantica.
          PLANETA ACTUAL: ${planetName}.
          NIVEL DEL ALUMNO: ${studentLevel}.
+         ${challengeContext}
          ${masterContextPrompt}
          REGLAS CRÍTICAS: 
          1. Nunca des el código directo. 
          2. Usa pistas graduadas y analogías. 
-         3. Si el alumno es '${studentLevel}' y es Junior, haz preguntas muy simples.
-         4. NO hagas cuestionarios de varias preguntas. Haz una sola pregunta clara.
-         5. Si el alumno demuestra entender lo básico de su reto, incluye [VALIDADO] en tu respuesta.
-         6. Si es Arduino (Pro), usa C++ textual.`;
+         3. Si el modo es 'validador', concéntrate en el reto mencionado arriba.
+         4. Si el alumno es '${studentLevel}' y es Junior, haz preguntas muy simples.
+         5. NO hagas cuestionarios de varias preguntas. Haz una sola pregunta clara.
+         6. Si el alumno demuestra entender lo básico de su reto, incluye [VALIDADO] en tu respuesta.
+         7. Si es Arduino (Pro), usa C++ textual.`;
 
     const model = genAI.getGenerativeModel({ 
       model: "gemini-flash-latest", 
