@@ -953,7 +953,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const hasLevelBadge = pid === 'scratch' ? (tutorialsCompleted === 27) : 
                         (pid === 'makecode-arcade' ? (challengesCompleted > 0) : 
                         (pid.includes('microbit') ? (challengesCompleted + l1Completed + l2Completed > 0) :
-                        (pid === 'appinventor' ? (appInventorBasicCompleted + appInventorIntermediateCompleted > 0) :
+                        (pid === 'appinventor' ? (appInventorAcademiaCompleted > 0) :
                         (difficultyProgress && difficultyProgress.beginner > 0))));
 
   const arcadeRank = pid === 'makecode-arcade' ? (
