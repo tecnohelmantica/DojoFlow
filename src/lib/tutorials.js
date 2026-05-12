@@ -61,7 +61,9 @@ export const ARCADE_TUTORIALS = [
   { id: 15, title: "Free Throw", slug: "free-throw", description: "Perfecciona tu tiro libre y haz un mate en este juego de baloncesto." }
 ];
 
-export const TINKERCAD_3D_TUTORIALS = [
+export const TINKERCAD_3D_TUTORIALS = [];
+
+export const TINKERCAD_3D_TUTORIALS_LEGACY = [
   { id: 1, title: "Place It!", category: "3D", url: "https://www.tinkercad.com/learn/overview/O20OX7OJJOJZJL2?type=designs", description: "Aprende a colocar formas en el plano de trabajo." },
   { id: 2, title: "View It!", category: "3D", url: "https://www.tinkercad.com/learn/overview/OVKT9D2JK2UHRK0?type=designs", description: "Descubre cómo mover la cámara para ver tu diseño desde todos los ángulos." },
   { id: 3, title: "Move It!", category: "3D", url: "https://www.tinkercad.com/learn/overview/O4J3W65JJOJZSRI?type=designs", description: "Aprende a desplazar formas por el plano de trabajo." },
@@ -76,26 +78,8 @@ export const TINKERCAD_3D_TUTORIALS = [
   { id: 12, title: "Creating Holes", category: "3D", url: "https://www.tinkercad.com/learn/overview/OM50MYLL1W5N54A?type=designs", description: "Aprende a usar huecos para crear formas complejas." }
 ];
 
-export const TINKERCAD_CODEBLOCKS_TUTORIALS = [
-  { id: 1, title: "Intro to Codeblocks", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=gChbybratG7", description: "Conoce la interfaz de programación por bloques de Tinkercad." },
-  { id: 2, title: "Table", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=aGNNh8wTAwB", description: "Crea una mesa paramétrica usando bloques de código." },
-  { id: 3, title: "Rocket to Mars", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=7vXu5UBIrnG", description: "Construye un cohete espacial paso a paso con código." },
-  { id: 4, title: "Basket", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=6O0Pm7BIbMm", description: "Diseña estructuras complejas como una cesta mediante algoritmos." },
-  { id: 5, title: "Set Color", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=hAWo5QOtTgs", description: "Aprende a manipular los colores de tus diseños dinámicamente." },
-  { id: 6, title: "Position", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=5ebg60cQY7G", description: "Controla la ubicación exacta de cada pieza usando coordenadas XYZ." },
-  { id: 7, title: "Shape Math", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=4Oajmq9Vbc2", description: "Usa operaciones matemáticas para definir el tamaño de tus figuras." },
-  { id: 8, title: "Variables", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=4Oajmq9Vbc2", description: "Aprende a usar variables para hacer diseños adaptables." },
-  { id: 9, title: "Create a Ring", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=gChbybratG7", description: "Programa la creación de un anillo usando variables de radio." },
-  { id: 10, title: "Snowflake Pattern", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=2FJDxW9EGTV", description: "Usa rotación repetitiva para generar un copo de nieve procedural." },
-  { id: 11, title: "Name Tag", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?activity=kTUjYPpHnur", description: "Genera una etiqueta con tu nombre ajustando la posición del texto." },
-  { id: 12, title: "Woven Basket", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=6O0Pm7BIbMm", description: "Crea un patrón entrelazado avanzado mediante bucles." },
-  { id: 13, title: "Repeat Loops", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=jsafE2Fga85", description: "Domina el bucle 'Repetir' para crear escaleras y patrones." },
-  { id: 14, title: "Gear Design", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=gzA8G3b4UvE", description: "Programa un engranaje calculando matemáticamente sus dientes." },
-  { id: 15, title: "Random Generator", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=5Spdpd1UDWi", description: "Usa números aleatorios para generar ciudades abstractas." },
-  { id: 16, title: "Staircase", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=gtoVgiaaaXY", description: "Construye una escalera de caracol incrementando Z y la rotación." },
-  { id: 17, title: "Brick Wall", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=iTQK3hJwm2H", description: "Aprende a generar muros alternando la posición de los bloques." },
-  { id: 18, title: "Castle Tower", category: "Bloques de Código", url: "https://www.tinkercad.com/codeblocks/edit?doc=jsafE2Fga85", description: "Construye la torre de un castillo combinando bucles y cilindros." }
-];
+export const TINKERCAD_CODEBLOCKS_TUTORIALS = [];
+
 
 export const BLOCKSCAD_TUTORIALS = [
   { id: 1, title: "Editor BlocksCAD", category: "BlocksCAD", description: "Accede al editor online de BlocksCAD para empezar a programar tus diseños 3D." }

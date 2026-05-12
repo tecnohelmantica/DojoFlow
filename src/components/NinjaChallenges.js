@@ -220,7 +220,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setActiveTab('challenges');
     }
     else if (pid === 'tinkercad' || pid === '3d') {
-      setActiveTab('tutorials');
+      setActiveTab('challenges');
     }
     else {
       // Fallback genérico
@@ -278,8 +278,17 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       } else if (pid === 'scratch') {
         setChallenges(ROBOTIX_CHALLENGES); setRaspberryL1(RASPBERRY_SCRATCH_L1); setRaspberryL2(RASPBERRY_SCRATCH_L2); setExpertChallenges(RASPBERRY_SCRATCH_CHALLENGES); setTutorials(SCRATCH_TUTORIALS);
       } else if (pid === 'tinkercad' || pid === '3d') {
-        setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
-        setTinkercad3d(TINKERCAD_3D_ACADEMY); setTinkercad3dChallenges(TINKERCAD_3D_CHALLENGES[difficultyLevel] || []); setTinkercadCodeblocks(TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || []); setBlockscad(BLOCKSCAD_CHALLENGES[difficultyLevel] || []); setChallenges(TINKERCAD_3D_CHALLENGES[difficultyLevel] || []);
+        setDifficultyChallenges(null);
+        setTinkercad3d(TINKERCAD_3D_ACADEMY); 
+        setTinkercad3dChallenges(TINKERCAD_3D_CHALLENGES); 
+        setTinkercadCodeblocks(TINKERCAD_CODEBLOCKS_CHALLENGES.beginner || []); 
+        setBlockscad(BLOCKSCAD_CHALLENGES); 
+        
+        if (itinerary === 'blockscad') {
+          setChallenges(BLOCKSCAD_CHALLENGES);
+        } else {
+          setChallenges(TINKERCAD_3D_CHALLENGES);
+        }
       } else if (pid === 'python') {
         setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
       } else if (pid === 'appinventor') {
@@ -465,22 +474,21 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         } else if (pid === 'scratch') {
           setChallenges(ROBOTIX_CHALLENGES); setRaspberryL1(RASPBERRY_SCRATCH_L1); setRaspberryL2(RASPBERRY_SCRATCH_L2); setExpertChallenges(RASPBERRY_SCRATCH_CHALLENGES); setTutorials(SCRATCH_TUTORIALS);
         } else if (pid === 'tinkercad' || pid === '3d') {
-          const c3d = TINKERCAD_3D_CHALLENGES[difficultyLevel] || [];
+          const c3d = TINKERCAD_3D_CHALLENGES;
           const ccb = TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || [];
-          const cbc = BLOCKSCAD_CHALLENGES[difficultyLevel] || [];
+          const cbc = BLOCKSCAD_CHALLENGES;
           
           setTinkercad3d(TINKERCAD_3D_ACADEMY); 
           setTinkercad3dChallenges(c3d); 
           setTinkercadCodeblocks(ccb); 
           setBlockscad(cbc);
           
-          if (itinerary === 'codeblocks') setChallenges(ccb);
-          else if (itinerary === 'blockscad') setChallenges(cbc);
+          if (itinerary === 'blockscad') setChallenges(cbc);
           else setChallenges(c3d);
           
           if (itinerary === 'codeblocks') setDifficultyChallenges(TINKERCAD_CODEBLOCKS_CHALLENGES);
-          else if (itinerary === 'blockscad') setDifficultyChallenges(BLOCKSCAD_CHALLENGES);
-          else setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
+          else if (itinerary === 'blockscad') setDifficultyChallenges(null);
+          else setDifficultyChallenges(null);
           
         } else if (pid === 'python') {
           setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
@@ -526,25 +534,17 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setExpertChallenges, dbChallenges, 'raspberry-l3', RASPBERRY_SCRATCH_CHALLENGES);
           populateState(setTutorials, dbTutorials, null, SCRATCH_TUTORIALS);
         } else if (pid === 'tinkercad' || pid === '3d') {
-          const list3d = populateState(setTinkercad3dChallenges, dbChallenges, '3d-design', TINKERCAD_3D_CHALLENGES[difficultyLevel] || [], difficultyLevel);
-          const listCb = populateState(setTinkercadCodeblocks, dbChallenges, 'codeblocks', TINKERCAD_CODEBLOCKS_CHALLENGES[difficultyLevel] || [], difficultyLevel);
-          const listBc = populateState(setBlockscad, dbChallenges, 'blockscad', BLOCKSCAD_CHALLENGES[difficultyLevel] || [], difficultyLevel);
+          const list3d = populateState(setTinkercad3dChallenges, dbChallenges, '3d-design', TINKERCAD_3D_CHALLENGES);
+          const listBc = populateState(setBlockscad, dbChallenges, 'blockscad', BLOCKSCAD_CHALLENGES);
           
-          populateState(setTinkercad3d, dbTutorials, 'academy', TINKERCAD_3D_TUTORIALS);
-          populateState(setTinkercadCodeblocksTutorials, dbTutorials, 'codeblocks', TINKERCAD_CODEBLOCKS_TUTORIALS);
-          populateState(setBlockscadTutorials, dbTutorials, 'blockscad', BLOCKSCAD_TUTORIALS);
-          
-          if (itinerary === 'codeblocks') setChallenges(listCb);
-          else if (itinerary === 'blockscad') setChallenges(listBc);
-          else setChallenges(list3d);
-
-          if (itinerary === 'academy' || !itinerary) {
-            setDifficultyChallenges(TINKERCAD_3D_CHALLENGES);
-          } else if (itinerary === 'codeblocks') {
-            setDifficultyChallenges(null); // Simple UI
-          } else if (itinerary === 'blockscad') {
-            setDifficultyChallenges(BLOCKSCAD_CHALLENGES);
+          if (itinerary === 'blockscad') {
+            setChallenges(listBc);
+          } else {
+            setChallenges(list3d);
           }
+          
+          setDifficultyChallenges(null);
+          setTutorials([]);
         } else if (pid === 'python') {
           populateState(setChallenges, dbChallenges, 'academia', PYTHON_ACADEMIA);
           populateState(setPythonAcademiaRaspberry, dbChallenges, 'raspberry', PYTHON_RASPBERRY);
@@ -646,7 +646,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     }
 
     // 6. Tinkercad
-    if (pid?.startsWith('tinkercad')) {
+    if (pid?.startsWith('tinkercad') || pid === '3d') {
+      if (item.url) return item.url;
       if (itinerary === 'codeblocks') return "https://www.tinkercad.com/codeblocks";
       return "https://www.tinkercad.com/dashboard";
     }
@@ -1138,19 +1139,22 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     // 1. Tutorials/Academia logic
     if (activeTab === 'tutorials' || activeTab === 'scratch_academia') {
       if (pid === 'arduino') return arduinoTutorials;
-      if (pid === 'tinkercad') {
+      // Especial Tinkercad
+      if (pid === 'tinkercad' || pid === '3d') {
         if (itinerary === 'codeblocks') return tinkercadCodeblocksTutorials;
         if (itinerary === 'blockscad') return blockscadTutorials;
         return tinkercad3d;
       }
-      return tutorials; // State variable populated in loadData
+      if (pid === 'scratch') return tutorials;
+      if (pid === 'html') return htmlCodeOrg;
+      if (pid === 'python') return pythonAcademia;
+      if (pid === 'ia') return mlLearningML;
+      return tutorials; 
     }
     
-    // 2. Tinkercad specific challenges
-    if (pid === 'tinkercad') {
-      if (itinerary === 'codeblocks') return tinkercadCodeblocks;
-      if (itinerary === 'blockscad') return blockscad;
-      return tinkercad3dChallenges;
+    // 2. Tinkercad specific challenges - Unified flat list
+    if (pid === 'tinkercad' || pid === '3d') {
+      return challenges;
     }
 
     // 3. Planet-specific tab mapping
@@ -1223,7 +1227,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* BADGES SECTION */}
-      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'tinkercad' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html') && (
+      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'tinkercad' || pid === '3d' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html') && (
         <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
           <div style={{ 
             minWidth: '150px', padding: '12px', borderRadius: '12px', textAlign: 'center',
@@ -1294,8 +1298,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       )}
 
       {/* 🔮 DIFFICULTY LEVEL SELECTORS */}
-      {difficultyChallenges && itinerary !== 'codeblocks' && 
-       !['scratch', 'microbit', 'arduino', 'arcade', 'makecode-arcade', 'code', 'python', 'ia', 'appinventor', 'html'].includes(pid) && (
+      {difficultyChallenges && itinerary !== 'codeblocks' && pid !== 'tinkercad' && pid !== '3d' && 
+       !['scratch', 'microbit', 'arduino', 'arcade', 'makecode-arcade', 'code', 'python', 'ia', 'appinventor', 'html', 'tinkercad', '3d'].includes(pid) && (
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${itinerary === 'blockscad' ? 2 : 3}, 1fr)`, gap: '15px', marginBottom: '10px' }}>
           {[
             { id: 'beginner', label: 'PRINCIPIANTE', color: '#4cd137', icon: '🌱' },
@@ -1341,7 +1345,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       )}
 
       {/* TABS SELECTOR */}
-      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'arcade' || pid === 'tinkercad' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html' || pid === 'ia') && (
+      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'arcade' || pid === 'tinkercad' || pid === '3d' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html' || pid === 'ia') && (
         <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' }}>
           
           {/* Ocultar pestaña CURSO en Arduino si está vacía */}
@@ -1832,7 +1836,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
             ) : (
               <>
                 {/* FALLBACK TABS */}
-                {tutorials.length > 0 && (
+                {tutorials.length > 0 && pid !== 'tinkercad' && pid !== '3d' && (
                   <button 
                     onClick={() => setActiveTab('tutorials')}
                     style={{ 
@@ -1847,7 +1851,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     🎓 ACADEMIA {`(${tutorialsCompleted}/${tutorials.length})`}
                   </button>
                 )}
-                {challenges.length > 0 && (
+                {challenges.length > 0 && pid !== 'tinkercad' && pid !== '3d' && (
                   <button 
                     onClick={() => setActiveTab('challenges')}
                     style={{ 
@@ -1979,7 +1983,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                          (activeTab === 'raspberry_l1' || activeTab === 'scratch_raspberry_l1') ? `RASPBERRY NIVEL 1 - RETO ${currentItem.numero}` :
                          (activeTab === 'raspberry_l2' || activeTab === 'scratch_raspberry_l2') ? `RASPBERRY NIVEL 2 - RETO ${currentItem.numero}` :
                          (activeTab === 'expert' || activeTab === 'scratch_raspberry_l3') ? `RASPBERRY NIVEL 3 - RETO ${currentItem.numero}` : 
-                         (planetId === 'scratch' ? 'ACADEMIA' : (planetId === 'makecode-arcade' ? 'ACADEMIA' : (planetId?.startsWith('tinkercad') ? `ACADEMIA ${currentItem.category?.toUpperCase() || ''}` : 'ACADEMIA')))}
+                         (planetId === 'scratch' ? 'ACADEMIA' : (planetId === 'makecode-arcade' ? 'ACADEMIA' : (planetId?.startsWith('tinkercad') ? `DISEÑO 3D` : 'ACADEMIA')))}
                       </span>
                     </div>
 
@@ -2666,7 +2670,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                   <a href="https://www.learningml.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>LearningML.org</a> y <a href="https://machinelearningforkids.co.uk/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Machine Learning for Kids</a>.
                 </>
               ) :
-              planetId?.startsWith('tinkercad') ? <a href="https://www.tinkercad.com/learn" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Fuente: Autodesk Tinkercad</a> : 'Fuentes educativas oficiales'
+              (planetId?.startsWith('tinkercad') || planetId === '3d') ? (
+                <>
+                  <a href="https://www.tinkercad.com/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Autodesk Tinkercad</a>, <a href="https://www.picuino.com/es/blockscad-index.html" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Picuino</a>, <a href="https://infoytic.blogspot.com/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>infoytic.blogspot.com</a> y <a href="https://www.educa2.madrid.org/web/jsanzleyva/tinkercad" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>educa2.madrid.org</a>.
+                </>
+              ) : 'Fuentes educativas oficiales'
             }), respetando en todo momento sus condiciones de uso y derechos de autor. Siempre que ha sido posible, se ha indicado la autoría correspondiente. 
             Si algún contenido vulnera derechos de propiedad intelectual, puede solicitarse su retirada.
           </p>

@@ -114,8 +114,9 @@ function ProfileContent() {
   const [isFullscreenResource, setIsFullscreenResource] = useState(false);
 
   useEffect(() => {
-    // Reset itinerary to the leftmost option (null/default) when changing planets
-    setItinerary(null);
+    // Cargar itinerario guardado para este planeta o resetear al default (null)
+    const saved = localStorage.getItem(`dojoflow_itinerary_${activePlanet}`);
+    setItinerary(saved || null);
   }, [activePlanet]);
 
   const handleFileUpload = async (event) => {
@@ -902,7 +903,7 @@ function ProfileContent() {
               )}
               
               <p style={{ fontSize: '0.65rem', color: '#8a8a9e', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '25px' }}>
-                FASE: DESAFÍO {activePlanet.toUpperCase()}
+                FASE: DESAFÍO {activePlanet?.toUpperCase() || 'EXPLORACIÓN'}
               </p>
               
               <div style={{ display: 'flex', gap: '15px', width: '100%', marginBottom: '20px' }}>
@@ -1529,16 +1530,15 @@ function ProfileContent() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-                    <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name.toUpperCase()}
+                    <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name?.toUpperCase() || 'PLANETA'}
                   </h3>
 
                   {/* Selector de Itinerario (Específico para Tinkercad y otros) */}
                   {activePlanet === 'tinkercad' && (
                     <div style={{ display: 'flex', gap: '10px' }}>
                       {[
-                        { id: null, label: '3D NORMAL' },
-                        { id: 'codeblocks', label: 'CÓDIGO (3D)' },
-                        { id: 'blockscad', label: 'BLOCKSCAD' }
+                        { id: null, label: 'DISEÑO 3D' },
+                        { id: 'blockscad', label: 'BLOCKSCAD (CÓDIGO)' }
                       ].map(opt => (
                         <button
                           key={opt.id}
@@ -1553,9 +1553,9 @@ function ProfileContent() {
                             fontWeight: '800',
                             cursor: 'pointer',
                             transition: 'all 0.2s',
-                            background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
+                            background: itinerary === opt.id ? (planet?.barColor || '#0dcfcf') : 'white',
                             color: itinerary === opt.id ? 'white' : '#64748b',
-                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
+                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#0dcfcf') : '#e2e8f0'}`,
                             boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
                           }}
                         >

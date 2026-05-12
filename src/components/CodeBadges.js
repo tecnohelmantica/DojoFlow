@@ -49,6 +49,12 @@ const CodeBadges = ({ userId, onValidateBadge, refreshTrigger = 0 }) => {
   }, [userId, refreshTrigger]);
 
   const fetchBadges = async () => {
+    if (userId === 'guest_user') {
+      const localBadges = JSON.parse(localStorage.getItem('guest_code_badges') || '{}');
+      setBadgeData(localBadges);
+      setLoading(false);
+      return;
+    }
     const { data, error } = await supabase
       .from('badges')
       .select('badge_name, status, teacher_feedback')

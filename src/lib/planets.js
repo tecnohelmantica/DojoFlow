@@ -120,7 +120,8 @@ export const PLANETS = [
       "La tecla 'W' activa el plano de trabajo auxiliar para colocar objetos en caras inclinadas.",
       "Agrupa objetos (Ctrl+G) para crear formas complejas a partir de piezas simples.",
       "Usa la regla (tecla 'R') para posicionar tus objetos con precisión milimétrica."
-    ]
+    ],
+    attribution: "Los contenidos y recursos utilizados en este cuaderno tienen carácter educativo y están destinados al apoyo del proceso de enseñanza-aprendizaje. Parte de los materiales han sido obtenidos de fuentes externas (Fuente: Autodesk Tinkercad, infoytic.blogspot.com, educa2.madrid.org y picuino.com), respetando en todo momento sus condiciones de uso y derechos de autor. Siempre que ha sido posible, se ha indicado la autoría correspondiente. Si algún contenido vulnera derechos de propiedad intelectual, puede solicitarse su retirada."
   },
   { 
     id: 'arduino', 

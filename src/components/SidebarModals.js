@@ -28,6 +28,12 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
     setLoading(true);
     try {
       if (activeModal === 'Retos') {
+        if (userId === 'guest_user') {
+          const localProg = JSON.parse(localStorage.getItem('guest_user_challenges') || '[]');
+          setData(localProg.filter(p => p.status === 'Validado'));
+          setLoading(false);
+          return;
+        }
         // Cargar todos los retos validados del alumno
         const { data: challenges, error } = await supabase
           .from('user_challenges')
@@ -39,6 +45,13 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
         if (error) throw error;
         setData(challenges || []);
       } else if (activeModal === 'Tutor') {
+        if (userId === 'guest_user') {
+          // Para invitados, el historial del tutor se guarda localmente en SenseiMissions
+          const guestChats = JSON.parse(localStorage.getItem('guest_tutor_chats') || '[]');
+          setData(guestChats);
+          setLoading(false);
+          return;
+        }
         // Cargar historias de chat (reutilizamos recursos_docentes con tipo 'conversacion_tutor')
         const { data: chats, error } = await supabase
           .from('recursos_docentes')
