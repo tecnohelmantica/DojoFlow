@@ -125,7 +125,7 @@ export default function JoinPage() {
                 marginBottom: '24px', border: '1px solid #eff6ff'
               }}>
                 <span style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '800', display:'block', marginBottom:'4px' }}>AULA ACTUAL</span>
-                <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b' }}>{claseInfo?.nombre_clase}</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b' }}>{claseInfo?.nombre}</span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'flex', alignItems:'center', gap:'6px', justifyContent:'center' }}>
                 <Sparkles size={14} /> Redirigiendo a tu Galaxia Educativa...

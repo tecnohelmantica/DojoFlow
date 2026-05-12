@@ -9,7 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
 async function upsertRetos(data) {
@@ -53,9 +53,8 @@ async function main() {
   // MACHINE LEARNING
   const { ML_LEARNINGML, ML_FOR_KIDS } = await import('../src/lib/machinelearning.js');
   await upsertRetos(mapChallenge('machinelearning', 'beginner', ML_LEARNINGML, 'learningml'));
-  for (const level in ML_FOR_KIDS) {
-    await upsertRetos(mapChallenge('machinelearning', level, ML_FOR_KIDS[level], 'mlforkids'));
-  }
+  await upsertRetos(mapChallenge('machinelearning', 'beginner', ML_FOR_KIDS, 'mlforkids'));
+
 
   // APP INVENTOR
   const { APP_INVENTOR_BASIC, APP_INVENTOR_INTERMEDIATE, APP_INVENTOR_SOCIAL } = await import('../src/lib/appinventor.js');

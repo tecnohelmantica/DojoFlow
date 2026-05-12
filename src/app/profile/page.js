@@ -380,7 +380,7 @@ function ProfileContent() {
         const { data: globalRes } = await supabase
           .from('recursos_docentes')
           .select('*')
-          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->meta->isGlobal.eq.true,contenido->isMaster.eq.true`);
+          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->>isGlobal.eq.true,contenido->>isMaster.eq.true`);
         
         (globalRes || []).forEach(r => allResourcesMap.set(r.id, r));
 
@@ -855,6 +855,15 @@ function ProfileContent() {
       (r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
     );
     
+    // Helper para renderizar markdown básico (negritas y saltos de línea)
+    const formatMarkdown = (text) => {
+      if (!text) return '';
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: inherit; font-weight: 800;">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>')
+        .replace(/\n/g, '<br />');
+    };
+
     return (
       <div className="layout-container" style={{ minHeight: '100vh', background: '#f8fafb' }}>
         <TopHeader />
@@ -995,39 +1004,89 @@ function ProfileContent() {
                   onComplete={handleAssessmentComplete}
                 />
               ) : (
-                <GlassCard style={{ padding: '25px', display: 'flex', flexDirection: 'column', gap: '20px', height: '400px', background: '#fcfdff', border: '1px solid rgba(0,0,0,0.05)' }}>
-                  <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', paddingRight: '10px' }}>
+                <GlassCard style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '550px', background: '#ffffff', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
+                  <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', padding: '25px' }}>
                     {socraticMessages.map((msg, i) => (
                       <div key={i} style={{ 
-                        alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                        maxWidth: '85%',
-                        padding: '12px 16px',
-                        borderRadius: msg.role === 'user' ? '18px 18px 0 18px' : '18px 18px 18px 0',
-                        background: msg.role === 'user' ? (planet?.barColor || '#6366f1') : '#f1f5f9',
-                        color: msg.role === 'user' ? 'white' : '#1a1a2e',
-                        fontSize: '0.85rem',
-                        lineHeight: '1.5',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-                        border: msg.role === 'user' ? 'none' : '1px solid rgba(0,0,0,0.05)'
+                        display: 'flex',
+                        gap: '12px',
+                        flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
+                        alignItems: 'flex-end',
+                        marginBottom: '8px',
+                        animation: 'fadeIn 0.3s ease-out'
                       }}>
-                        {msg.text}
+                        {/* Avatar en el mensaje */}
+                        <div style={{ 
+                          width: '32px', 
+                          height: '32px', 
+                          borderRadius: '50%', 
+                          background: msg.role === 'user' ? '#e2e8f0' : 'linear-gradient(135deg, #0dcfcf, #9c27b0)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                          overflow: 'hidden'
+                        }}>
+                          {msg.role === 'user' ? 
+                            <img src={profile?.avatar_url || "/alumno.png"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 
+                            <Brain size={16} color="white" />
+                          }
+                        </div>
+
+                        <div style={{ 
+                          background: msg.role === 'user' ? (planet?.barColor || '#6366f1') : '#ffffff',
+                          color: msg.role === 'user' ? 'white' : '#334155',
+                          padding: '14px 18px',
+                          borderRadius: msg.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                          maxWidth: '80%',
+                          fontSize: '0.9rem',
+                          lineHeight: '1.6',
+                          boxShadow: msg.role === 'user' ? '0 4px 12px rgba(0,0,0,0.1)' : '0 4px 15px rgba(0,0,0,0.05)',
+                          border: msg.role === 'user' ? 'none' : '1px solid #f1f5f9',
+                          fontFamily: 'Inter, sans-serif'
+                        }}>
+                          {msg.role !== 'user' && (
+                            <div style={{ fontSize: '0.65rem', fontWeight: '900', color: planet?.barColor || '#6366f1', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                              Sensei IA
+                            </div>
+                          )}
+                          <div 
+                            dangerouslySetInnerHTML={{ __html: formatMarkdown(msg.text) }} 
+                            style={{ wordBreak: 'break-word' }}
+                          />
+                        </div>
                       </div>
                     ))}
                     {isTyping && (
-                      <div style={{ alignSelf: 'flex-start', padding: '10px', color: '#8a8a9e', fontSize: '0.75rem', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Brain size={14} className="animate-pulse" /> El tutor está analizando tu lógica...
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', marginBottom: '8px' }}>
+                        <div style={{ 
+                          width: '32px', height: '32px', borderRadius: '50%', 
+                          background: 'linear-gradient(135deg, #0dcfcf, #9c27b0)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                        }}>
+                          <Brain size={16} color="white" className="animate-pulse" />
+                        </div>
+                        <div style={{ 
+                          background: '#f8fafc', color: '#64748b', padding: '10px 18px', 
+                          borderRadius: '20px 20px 20px 4px', fontSize: '0.85rem', fontStyle: 'italic',
+                          border: '1px solid #f1f5f9'
+                        }}>
+              El Sensei está redactando su consejo...
+                        </div>
                       </div>
                     )}
                   </div>
-                  <form onSubmit={handleSocraticSubmit} style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <input 
-                      type="text" 
+                  <div style={{ padding: '20px', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '12px', alignItems: 'center', background: 'white', borderRadius: '0 0 25px 25px' }}>
+                    <input
+                      type="text"
                       value={socraticInputText}
                       onChange={(e) => setSocraticInputText(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSocraticSubmit()}
                       placeholder="Haz una consulta socrática..."
                       style={{ 
                         flex: 1, 
-                        padding: '12px 20px', 
+                        padding: '14px 20px', 
                         borderRadius: '25px', 
                         border: '1px solid #e2e8f0',
                         fontSize: '0.85rem',
@@ -1035,10 +1094,25 @@ function ProfileContent() {
                         background: 'white'
                       }}
                     />
-                    <GlowButton color="teal" type="submit" style={{ borderRadius: '50%', width: '45px', height: '45px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '45px' }}>
+                    <button 
+                      onClick={handleSocraticSubmit}
+                      style={{ 
+                        background: planet?.barColor || '#0dcfcf', 
+                        color: 'white', 
+                        border: 'none', 
+                        width: '42px', 
+                        height: '42px', 
+                        borderRadius: '50%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                      }}
+                    >
                       <Send size={18} />
-                    </GlowButton>
-                  </form>
+                    </button>
+                  </div>
 
                   {/* Overlay de Éxito en Validación */}
                   {isValidationSuccess && (

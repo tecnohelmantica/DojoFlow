@@ -30,7 +30,7 @@ export async function POST(req) {
 
         if (action === 'unirse_con_codigo') {
             const { codigo, alumnoId } = body;
-            const { data: clase } = await supabase.from('clases').select('id, nombre_clase').ilike('codigo_invitacion', codigo.trim()).single();
+            const { data: clase } = await supabase.from('clases').select('id, nombre, nombre_clase').ilike('codigo_invitacion', codigo.trim()).single();
             if (!clase) return NextResponse.json({ error: 'Codigo invalido' }, { status: 404 });
             const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId });
             

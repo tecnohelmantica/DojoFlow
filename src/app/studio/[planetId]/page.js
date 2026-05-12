@@ -257,7 +257,7 @@ export default function PlanetStudioPage() {
     if (!currentUser) return;
     const { data } = await supabase
       .from('clases')
-      .select('id, nombre_clase')
+      .select('id, nombre, nombre_clase')
       .eq('profesor_id', currentUser.id);
     setUserClases(data || []);
   }, [currentUser]);
@@ -874,7 +874,7 @@ Audiencia objetivo: ${audiencia || 'Exploradores de DojoFlow.'}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <Users size={16} color={isAssigned ? 'var(--accent-teal)' : '#8a8a9e'} />
-                                        <span style={{ fontSize: '0.9rem', fontWeight: '600', color: isAssigned ? 'var(--accent-teal)' : '#1a1a2e' }}>{clase.nombre_clase}</span>
+                                        <span style={{ fontSize: '0.9rem', fontWeight: '600', color: isAssigned ? 'var(--accent-teal)' : '#1a1a2e' }}>{clase.nombre}</span>
                                     </div>
                                     {isAssigned ? <CheckCircle size={18} color="var(--accent-teal)" /> : <div style={{ width: 18, height: 18, borderRadius: '50%', border: '1.5px solid #ddd' }} />}
                                 </button>

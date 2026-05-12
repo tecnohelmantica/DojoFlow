@@ -23,7 +23,7 @@ const NOTEBOOK_MAP = {
 export async function POST(req) {
   const startTime = Date.now();
   try {
-    const { userId, mode, message, history, planet, level, missionType, missionTheme } = await req.json();
+    const { userId, mode, message, history, planet, level, missionType, missionTheme, randomSeed, excludeList } = await req.json();
     const studentLevel = level || 'Junior';
     const searchPlanet = (planet || "scratch").toLowerCase();
     
@@ -113,18 +113,21 @@ export async function POST(req) {
 - Planeta: ${planetName}
 - Tipo de Reto: ${missionType || 'Aleatorio'}
 - Tema: ${missionTheme || 'Cualquiera'}
+- Semilla Aleatoria (Seed): ${randomSeed || Date.now()}
+- EVITAR REPETIR ESTOS TÍTULOS: ${JSON.stringify(excludeList || [])}
 ${knowledgeContext}
 La respuesta DEBE ser exclusivamente un objeto JSON válido con estos campos:
 {
-  "title": "Título épico",
-  "description": "Narrativa espacial/dojo",
-  "objective": "Reto práctico concreto",
+  "title": "Título épico Y DIFERENTE A LA LISTA DE EXCLUIDOS",
+  "description": "Narrativa espacial/dojo variada y original",
+  "objective": "Reto práctico concreto y diferente a misiones previas",
   "learning_objectives": ["obj1", "obj2"],
   "sensei_tips": "Breve consejo socrático (sin solución)",
   "estimated_time": "Tiempo estimado (ej: 20 min)",
   "reward_xp": 50,
   "recommended_resources": ["recurso1", "recurso2"]
 }
+IMPORTANTE: Cambia la estructura narrativa y el objetivo técnico en cada generación. Usa la Semilla ${randomSeed} para variar tu creatividad.
 Usa exclusivamente el conocimiento de este cuaderno y el contexto de referencia proporcionado. No entregues código.`;
         } else {
           promptTemplate = `Contexto: El alumno está en el planeta ${planetName}. 
@@ -185,9 +188,11 @@ REGLA DE VALIDACIÓN:
       model: "gemini-flash-latest", 
       systemInstruction: mode === 'mission_generator' ? 
         `Eres el Sensei de DojoFlow. Genera una Misión Especial en JSON para nivel ${studentLevel}, planeta ${planetName}.
+         Semilla de aleatoriedad: ${randomSeed}.
+         EVITAR REPETIR TEMAS O TÍTULOS DE: ${JSON.stringify(excludeList || [])}.
          ${masterContextPrompt}
          Campos obligatorios: title, description, objective, learning_objectives (array), sensei_tips, estimated_time, reward_xp, recommended_resources (array).
-         No des código. Sé socrático y creativo.` :
+         No des código. Sé socrático y extremadamente creativo para no repetirte.` :
         systemPromptBase
     });
 

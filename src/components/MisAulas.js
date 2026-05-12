@@ -97,7 +97,7 @@ function ClaseCard({ clase, onSelect, onDelete }) {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
         <div>
-          <h3 style={{ fontFamily: 'Outfit', fontSize: '1.05rem', fontWeight: '700', color: '#1a1a2e', marginBottom: '4px' }}>{clase.nombre_clase}</h3>
+          <h3 style={{ fontFamily: 'Outfit', fontSize: '1.05rem', fontWeight: '700', color: '#1a1a2e', marginBottom: '4px' }}>{clase.nombre}</h3>
           <span style={{ fontSize: '0.75rem', color: '#8a8a9e' }}>Creada {fmtDate(clase.fecha_creacion)}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--planet-bg, #ede7f6)', padding: '5px 11px', borderRadius: '20px' }}>
@@ -434,7 +434,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
           <ChevronLeft size={17}/> Volver a Mis Aulas
         </button>
         <span style={{ color: '#ccc' }}>›</span>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: '1.2rem', fontWeight: '800', color: '#1a1a2e', margin: 0 }}>🏫 {clase.nombre_clase}</h2>
+        <h2 style={{ fontFamily: 'Outfit', fontSize: '1.2rem', fontWeight: '800', color: '#1a1a2e', margin: 0 }}>🏫 {clase.nombre}</h2>
         <span style={{ padding: '3px 11px', borderRadius: '20px', background: '#ede7f6', color: '#9c27b0', fontSize: '0.78rem', fontWeight: '800', fontFamily: 'monospace' }}>🔑 {clase.codigo_invitacion}</span>
         <button 
           onClick={onRefresh}
@@ -654,7 +654,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <GlowButton color="cyan" onClick={() => downloadCredentials(generatedResult, clase.nombre_clase)} style={{ width: '100%', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <GlowButton color="cyan" onClick={() => downloadCredentials(generatedResult, clase.nombre)} style={{ width: '100%', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <Download size={18} /> DESCARGAR LISTADO (.TXT)
                   </GlowButton>
                   <button 
@@ -828,7 +828,7 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
 
   const crearClase = async () => {
     if (!nombreClase.trim()) return;
-    const { data, error } = await supabase.from('clases').insert({ profesor_id: currentUser.id, nombre_clase: nombreClase.trim() }).select().single();
+    const { data, error } = await supabase.from('clases').insert({ profesor_id: currentUser.id, nombre: nombreClase.trim(), nombre_clase: nombreClase.trim() }).select().single();
     if (error) return msg('err', error.message);
     setShowCrear(false); setNombreClase(''); loadClases();
   };

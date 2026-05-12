@@ -80,12 +80,12 @@ export default function HomePage() {
   const [studentAulas, setStudentAulas] = useState([]);
 
   const fetchStudentData = async () => {
-    if (!session?.user?.id || role !== 'alumno') return;
+    if (!session?.user?.id || role !== 'alumno' || session?.user?.id === 'guest_user') return;
 
     // 1. Obtener IDs y Nombres de las clases en las que está el alumno
     const { data: vincs } = await supabase
       .from('clase_alumnos')
-      .select('clase_id, clases(id, nombre_clase)')
+      .select('clase_id, clases(id, nombre)')
       .eq('alumno_id', session.user.id);
     
     const aulas = (vincs || []).map(v => v.clases).filter(Boolean);
@@ -203,7 +203,7 @@ export default function HomePage() {
       const data = await response.json();
 
       if (data.success) {
-        showToast('ok', data.message || `¡Genial! Ya eres parte de ${data.clase.nombre_clase}`);
+        showToast('ok', data.message || `¡Genial! Ya eres parte de ${data.clase.nombre}`);
         setIsJoinModalOpen(false);
         fetchStudentData(); // Recargar datos del alumno
       } else {
@@ -285,7 +285,7 @@ export default function HomePage() {
                       fontSize: '0.8rem',
                       fontWeight: '800'
                     }}>
-                      <Castle size={14} /> AULA ACTIVA: {aula.nombre_clase.toUpperCase()}
+                      <Castle size={14} /> AULA ACTIVA: {aula.nombre.toUpperCase()}
                     </div>
                   ))}
                 </div>

@@ -36,7 +36,7 @@ export default function AuthProvider({ children }) {
         // 1. Obtener IDs de las clases del profesor
         const { data: clases } = await supabase
           .from('clases')
-          .select('id, nombre_clase')
+          .select('id, nombre, nombre_clase')
           .eq('profesor_id', userId);
         
         if (!clases || clases.length === 0) {

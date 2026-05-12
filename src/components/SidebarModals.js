@@ -276,9 +276,9 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {resources.map((item) => {
-                      const isMaster = item.profesor_id === '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
+                      const isMaster = item.profesor_id === '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6' || item.contenido?.isMaster === true;
                       const isLink = item.tipo_recurso === 'enlace';
-                      const content = item.contenido.markdown || '';
+                      const content = item.contenido.markdown || item.contenido.url || '';
                       
                       return (
                         <div key={item.id} style={{ 
@@ -361,7 +361,23 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
                   </button>
                   <h2 style={{ marginBottom: '20px', paddingRight: '40px' }}>{selectedItem.nombre_recurso}</h2>
                   <div style={{ color: '#1e293b', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
-                    {selectedItem.contenido.markdown}
+                    {selectedItem.contenido.markdown || (
+                      <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <p>Este recurso es un archivo externo.</p>
+                        <a href={selectedItem.contenido.url} target="_blank" rel="noreferrer" style={{ 
+                          display: 'inline-block',
+                          marginTop: '10px',
+                          padding: '10px 20px',
+                          background: '#0dcfcf',
+                          color: 'white',
+                          borderRadius: '8px',
+                          textDecoration: 'none',
+                          fontWeight: '800'
+                        }}>
+                          DESCARGAR / VER ARCHIVO
+                        </a>
+                      </div>
+                    )}
                   </div>
                   <div style={{ marginTop: '30px', textAlign: 'center' }}>
                     <GlowButton color="teal" onClick={() => setSelectedItem(null)}>CERRAR DOCUMENTO</GlowButton>

@@ -118,6 +118,24 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const generateNewMission = async () => {
     setRequesting(true);
     try {
+      // Get previous mission titles to avoid repetition
+      let excludeList = [];
+      try {
+        if (userId === 'guest_user') {
+          const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
+          excludeList = guestMissions.slice(-3).map(m => m.title);
+        } else {
+          const { data: prevMissions } = await supabase
+            .from('sensei_missions')
+            .select('title')
+            .eq('student_id', userId)
+            .eq('planet_id', planetId)
+            .order('created_at', { ascending: false })
+            .limit(3);
+          if (prevMissions) excludeList = prevMissions.map(m => m.title);
+        }
+      } catch (e) { console.warn("Could not load exclude list", e); }
+
       const response = await fetch('/api/tutor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -127,7 +145,9 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           planet: planetId,
           level: config.level,
           missionType: config.type,
-          missionTheme: config.theme
+          missionTheme: config.theme,
+          randomSeed: Date.now(),
+          excludeList: excludeList
         })
       });
 

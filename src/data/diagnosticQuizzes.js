@@ -21,6 +21,24 @@ export const diagnosticQuizzes = {
       opciones: ["Entrenamiento", "Atención (Attention)", "Limpiar datos"],
       correcta: 1,
       explicacion: "La 'Atención' ayuda a la IA a decidir qué partes de la información son más importantes antes de responder."
+    },
+    {
+      pregunta: "¿Qué bloque de Code.org se usa para repetir una acción un número específico de veces?",
+      opciones: ["Si", "Repetir", "Mientras"],
+      correcta: 1,
+      explicacion: "El bloque 'Repetir' (bucle for) es ideal cuando sabes exactamente cuántas veces quieres que algo ocurra."
+    },
+    {
+      pregunta: "¿Qué es un 'Algoritmo' en programación?",
+      opciones: ["Un robot inteligente", "Una lista de pasos para resolver un problema", "Un tipo de monitor"],
+      correcta: 1,
+      explicacion: "Un algoritmo es como una receta de cocina: pasos ordenados para llegar a un resultado."
+    },
+    {
+      pregunta: "¿Para qué sirve el botón 'Paso a paso' en Code.org?",
+      opciones: ["Para ir más rápido", "Para ver cómo se ejecuta cada bloque uno por uno", "Para borrar el código"],
+      correcta: 1,
+      explicacion: "Es genial para encontrar errores (debugging), ya que ves exactamente qué hace cada bloque."
     }
   ],
   scratch: [
@@ -41,6 +59,24 @@ export const diagnosticQuizzes = {
       opciones: ["Para que el juego pese menos", "Para que los clones desaparezcan", "Para calcular movimientos de forma invisible y rápida"],
       correcta: 2,
       explicacion: "¡Muy bien! Permite hacer cálculos complejos sin que se vea el 'parpadeo' en la pantalla."
+    },
+    {
+      pregunta: "¿Cuál es el límite máximo de clones activos en un proyecto de Scratch?",
+      opciones: ["No hay límite", "300 clones", "1000 clones"],
+      correcta: 1,
+      explicacion: "Scratch limita a 300 los clones para que el navegador no se bloquee. ¡Gestiona bien tus recursos!"
+    },
+    {
+      pregunta: "¿Para qué sirve el bloque '¿Tocando color?'?",
+      opciones: ["Para pintar el fondo", "Para detectar colisiones con elementos de un color específico", "Para cambiar el disfraz"],
+      correcta: 1,
+      explicacion: "Es muy útil para juegos de plataformas, como detectar si tocas lava (rojo) o hierba (verde)."
+    },
+    {
+      pregunta: "¿Qué sucede si usas un bucle 'Por siempre' sin ningún bloque de movimiento dentro?",
+      opciones: ["El programa se detiene", "El objeto no se moverá pero el bucle seguirá funcionando", "Scratch se cierra"],
+      correcta: 1,
+      explicacion: "El bucle sigue 'trabajando' en segundo plano, aunque no veas cambios visuales inmediatos."
     }
   ],
   arduino: [
@@ -61,6 +97,24 @@ export const diagnosticQuizzes = {
       opciones: ["Una resistencia", "Un puente H (como el L293D)", "Un condensador"],
       correcta: 1,
       explicacion: "El puente H permite que el motor gire hacia adelante o hacia atrás. ¡Es el motor de tus robots!"
+    },
+    {
+      pregunta: "¿Cuál es el voltaje estándar de salida de la mayoría de pines digitales de un Arduino Uno?",
+      opciones: ["1.5V", "5V", "12V"],
+      correcta: 1,
+      explicacion: "La mayoría de placas Arduino trabajan a 5V, aunque algunas modernas usan 3.3V."
+    },
+    {
+      pregunta: "¿Qué función se ejecuta solo una vez al encender el Arduino?",
+      opciones: ["loop()", "setup()", "start()"],
+      correcta: 1,
+      explicacion: "setup() es para configurar los pines. loop() se repite infinitamente después."
+    },
+    {
+      pregunta: "¿Para qué sirve una resistencia en serie con un LED?",
+      opciones: ["Para que brille más", "Para limitar la corriente y que el LED no se queme", "Para cambiar el color"],
+      correcta: 1,
+      explicacion: "Los LEDs son muy sensibles. Sin resistencia, ¡podrían absorber demasiada energía y fundirse!"
     }
   ],
   python: [
@@ -81,46 +135,24 @@ export const diagnosticQuizzes = {
       opciones: ["Una función secreta", "Una función de una sola línea y sin nombre", "Una función para borrar archivos"],
       correcta: 1,
       explicacion: "Lambda es muy útil para funciones rápidas y cortas que solo hacen una cosa."
-    }
-  ],
-  html: [
-    {
-      pregunta: "¿Qué atributo usamos en <img> para poner la ruta de la imagen?",
-      opciones: ["href", "src", "link"],
-      correcta: 1,
-      explicacion: "src significa 'source' (fuente). ¡Sin eso, el navegador no sabe qué imagen mostrar!"
     },
     {
-      pregunta: "En CSS, ¿cómo se llama el espacio entre el texto y el borde de su caja?",
-      opciones: ["Border", "Margin", "Padding"],
+      pregunta: "¿Cómo se llama el operador para saber el resto de una división?",
+      opciones: ["/", "//", "%"],
       correcta: 2,
-      explicacion: "El padding es el relleno interior. ¡Es lo que evita que el texto choque con el borde!"
+      explicacion: "El operador módulo (%) te da lo que sobra. ¡Útil para saber si un número es par o impar!"
     },
     {
-      pregunta: "¿Qué hace el atributo 'defer' en una etiqueta <script>?",
-      opciones: ["Carga el código más tarde para no frenar la página", "Borra el código", "Cambia el color de la página"],
-      correcta: 0,
-      explicacion: "¡Correcto! Ayuda a que la página cargue más rápido mientras el código se prepara en segundo plano."
-    }
-  ],
-  appinventor: [
-    {
-      pregunta: "¿Qué componente de App Inventor se usa para 'hablar' o convertir texto a voz?",
-      opciones: ["Etiqueta", "Reproductor", "Texto a voz"],
-      correcta: 2,
-      explicacion: "¡Fácil! El componente 'Texto a voz' hace que tu móvil hable."
-    },
-    {
-      pregunta: "En App Inventor, ¿dónde se programa el comportamiento de los botones?",
-      opciones: ["En la Vista Diseñador", "En el Editor de Bloques", "En la Tienda de Apps"],
+      pregunta: "¿Qué significa la 'sangría' (indentación) en Python?",
+      opciones: ["Es solo para que quede bonito", "Define qué bloques de código pertenecen a un bucle o función", "Es un error"],
       correcta: 1,
-      explicacion: "La lógica siempre se hace en el Editor de Bloques. El Diseñador es solo para lo visual."
+      explicacion: "En Python, el espacio al inicio de la línea es obligatorio. ¡Le dice al programa dónde empieza y acaba un bloque!"
     },
     {
-      pregunta: "¿Cuál es la forma más rápida de probar tu app en un móvil real?",
-      opciones: ["Subiéndola a la Play Store", "Usando el AI Companion y escaneando el código QR", "Enviándola por correo"],
+      pregunta: "¿Qué hace el comando 'import'?",
+      opciones: ["Borra una variable", "Trae herramientas y funciones de otras librerías", "Cierra el programa"],
       correcta: 1,
-      explicacion: "¡Exacto! El AI Companion te permite ver los cambios en tiempo real mientras programas."
+      explicacion: "Permite usar el trabajo de otros, como 'random' para azar o 'math' para mates complejas."
     }
   ],
   ia: [
@@ -141,46 +173,24 @@ export const diagnosticQuizzes = {
       opciones: ["La IA se vuelve más inteligente", "La IA aprenderá prejuicios y cometerá errores injustos", "No pasa nada"],
       correcta: 1,
       explicacion: "¡Importante! Si solo le enseñas fotos de perros blancos, la IA no sabrá reconocer a un perro negro. ¡La calidad de los datos es clave!"
-    }
-  ],
-  'makecode-microbit': [
-    {
-      pregunta: "¿Qué sensor del micro:bit detecta si lo estamos agitando o inclinando?",
-      opciones: ["Termómetro", "Acelerómetro", "Brújula"],
-      correcta: 1,
-      explicacion: "El acelerómetro mide el movimiento y la inclinación en tres ejes. ¡Ideal para juegos de agitar!"
     },
     {
-      pregunta: "¿Cuántos botones programables tiene el micro:bit en su parte frontal?",
-      opciones: ["Solo 1", "2 (A y B)", "5 botones"],
+      pregunta: "¿Qué es una 'Red Neuronal'?",
+      opciones: ["Un cerebro artificial", "Un sistema matemático inspirado en las neuronas humanas", "Un cable de internet"],
       correcta: 1,
-      explicacion: "Tiene dos botones principales, A y B, que puedes usar para activar cualquier acción en tu código."
+      explicacion: "Son capas de cálculos que aprenden a reconocer patrones muy complejos, como caras o voces."
     },
     {
-      pregunta: "¿Cómo se llama el bloque que se ejecuta una sola vez al encender el micro:bit?",
-      opciones: ["Para siempre", "Al iniciar", "Si entonces"],
+      pregunta: "¿Cuál es la principal diferencia entre IA y un programa tradicional?",
+      opciones: ["La IA usa más electricidad", "La IA aprende de los datos en lugar de seguir reglas fijas escritas a mano", "La IA es un robot físico"],
       correcta: 1,
-      explicacion: "El bloque 'Al iniciar' es perfecto para configurar variables o mostrar un mensaje de bienvenida."
-    }
-  ],
-  'makecode-arcade': [
-    {
-      pregunta: "¿Qué es un 'Sprite' en MakeCode Arcade?",
-      opciones: ["Una bebida gaseosa", "Un personaje u objeto que puede moverse e interactuar", "Un tipo de fuente de texto"],
-      correcta: 1,
-      explicacion: "Los sprites son el corazón de tus juegos: jugadores, enemigos, proyectiles o comida."
+      explicacion: "En la programación normal das las reglas. En la IA, das los ejemplos y ella deduce las reglas."
     },
     {
-      pregunta: "¿Cuál es el bloque más rápido para hacer que tu personaje se mueva con el simulador?",
-      opciones: ["Mover con botones", "Cambiar X por 10", "Seguir al ratón"],
-      correcta: 0,
-      explicacion: "El bloque 'mover sprite con botones' configura automáticamente el control básico por ti."
-    },
-    {
-      pregunta: "¿Qué sucede si no usas el bloque 'Establecer color de fondo'?",
-      opciones: ["El juego no funciona", "El fondo será negro por defecto", "La pantalla parpadeará"],
+      pregunta: "¿Qué es el 'Aprendizaje Supervisado'?",
+      opciones: ["Un profesor mirando a la IA", "Entrenar con datos que ya tienen la respuesta correcta (etiquetas)", "Hackear un servidor"],
       correcta: 1,
-      explicacion: "Por defecto la pantalla está vacía (negra). ¡Dale color o pon una imagen para que tu mundo cobre vida!"
+      explicacion: "Es como estudiar con un libro de soluciones: la IA intenta adivinar y luego comprueba si acertó."
     }
   ],
   tinkercad: [
@@ -201,6 +211,176 @@ export const diagnosticQuizzes = {
       opciones: ["Cambiar el color", "Unir varias formas en una sola pieza", "Duplicar el objeto"],
       correcta: 1,
       explicacion: "Agrupar fusiona las formas. Es esencial para crear diseños complejos a partir de piezas simples."
+    },
+    {
+      pregunta: "¿Cómo se llama la herramienta para alinear perfectamente dos objetos?",
+      opciones: ["Regla", "Alinear (L)", "Espejo"],
+      correcta: 1,
+      explicacion: "La herramienta 'Alinear' permite centrar o ajustar piezas con precisión profesional."
+    },
+    {
+      pregunta: "¿Qué sucede al pulsar la tecla 'D' con un objeto seleccionado?",
+      opciones: ["Se borra", "Se duplica", "Cae (Drop) al plano de trabajo"],
+      correcta: 2,
+      explicacion: "La 'D' es un atajo genial para 'aterrizar' piezas que han quedado flotando en el aire."
+    },
+    {
+      pregunta: "¿Para qué sirve el comando 'Duplicar y repetir' (Ctrl+D)?",
+      opciones: ["Solo para copiar", "Para crear patrones repetidos (como escaleras) automáticamente", "Para cambiar el tamaño"],
+      correcta: 1,
+      explicacion: "Es mágico: si mueves el primer duplicado, los siguientes repetirán ese mismo movimiento."
+    }
+  ],
+  'makecode-microbit': [
+    {
+      pregunta: "¿Qué sensor del micro:bit detecta si lo estamos agitando o inclinando?",
+      opciones: ["Termómetro", "Acelerómetro", "Brújula"],
+      correcta: 1,
+      explicacion: "El acelerómetro mide el movimiento y la inclinación en tres ejes. ¡Ideal para juegos de agitar!"
+    },
+    {
+      pregunta: "¿Cuántos botones programables tiene el micro:bit en su parte frontal?",
+      opciones: ["Solo 1", "2 (A y B)", "5 botones"],
+      correcta: 1,
+      explicacion: "Tiene dos botones principales, A y B, que puedes usar para activar cualquier acción en tu código."
+    },
+    {
+      pregunta: "¿Cómo se llama el bloque que se ejecuta una sola vez al encender el micro:bit?",
+      opciones: ["Para siempre", "Al iniciar", "Si entonces"],
+      correcta: 1,
+      explicacion: "El bloque 'Al iniciar' es perfecto para configurar variables o mostrar un mensaje de bienvenida."
+    },
+    {
+      pregunta: "¿Qué componente del micro:bit sirve para mostrar dibujos o mensajes?",
+      opciones: ["Un altavoz", "La matriz de 25 LEDs rojos", "La antena Bluetooth"],
+      correcta: 1,
+      explicacion: "La cuadrícula de 5x5 LEDs es tu pantalla para iconos, números y texto deslizante."
+    },
+    {
+      pregunta: "¿Cómo se conectan componentes externos (como sensores extra) al micro:bit?",
+      opciones: ["Por USB", "Usando los pines de cobre de la parte inferior", "Por Wi-Fi"],
+      correcta: 1,
+      explicacion: "Los pines 0, 1, 2, 3V y GND permiten usar pinzas de cocodrilo para conectar casi cualquier cosa."
+    },
+    {
+      pregunta: "¿Qué hace el bloque 'Radio' en MakeCode?",
+      opciones: ["Pone música", "Permite enviar y recibir mensajes entre varios micro:bits cercanos", "Apaga la placa"],
+      correcta: 1,
+      explicacion: "¡Es como un walkie-talkie para micro:bits! Ideal para juegos multijugador."
+    }
+  ],
+  'makecode-arcade': [
+    {
+      pregunta: "¿Qué es un 'Sprite' en MakeCode Arcade?",
+      opciones: ["Una bebida gaseosa", "Un personaje u objeto que puede moverse e interactuar", "Un tipo de fuente de texto"],
+      correcta: 1,
+      explicacion: "Los sprites son el corazón de tus juegos: jugadores, enemigos, proyectiles o comida."
+    },
+    {
+      pregunta: "¿Cuál es el bloque más rápido para hacer que tu personaje se mueva con el simulador?",
+      opciones: ["Mover con botones", "Cambiar X por 10", "Seguir al ratón"],
+      correcta: 0,
+      explicacion: "El bloque 'mover sprite con botones' configura automáticamente el control básico por ti."
+    },
+    {
+      pregunta: "¿Qué sucede si no usas el bloque 'Establecer color de fondo'?",
+      opciones: ["El juego no funciona", "El fondo será negro por defecto", "La pantalla parpadeará"],
+      correcta: 1,
+      explicacion: "Por defecto la pantalla está vacía (negra). ¡Dale color o pon una imagen para que tu mundo cobre vida!"
+    },
+    {
+      pregunta: "¿Qué es un 'Tilemap' en Arcade?",
+      opciones: ["Un mapa de tesoros", "Un editor para crear los niveles y suelos de tu juego", "Una lista de jugadores"],
+      correcta: 1,
+      explicacion: "Con el tilemap dibujas paredes, suelos y decorados por donde camina tu sprite."
+    },
+    {
+      pregunta: "¿Para qué sirve el bloque 'Al chocar con otro sprite'?",
+      opciones: ["Para explotar siempre", "Para programar qué pasa cuando dos objetos se tocan (ej: ganar puntos)", "Para borrar el juego"],
+      correcta: 1,
+      explicacion: "¡Es vital! Así sabes cuando el jugador toca una moneda, un enemigo o la meta."
+    },
+    {
+      pregunta: "¿Qué significa 'Destruir sprite con efecto'?",
+      opciones: ["Que el ordenador se rompe", "Eliminar el personaje con una animación (humo, burbujas...)", "Cambiarle el color"],
+      correcta: 1,
+      explicacion: "Ayuda a que el juego se vea profesional. ¡Nada mejor que una explosión de confeti al ganar!"
+    }
+  ],
+  html: [
+    {
+      pregunta: "¿Qué atributo usamos en <img> para poner la ruta de la imagen?",
+      opciones: ["href", "src", "link"],
+      correcta: 1,
+      explicacion: "src significa 'source' (fuente). ¡Sin eso, el navegador no sabe qué imagen mostrar!"
+    },
+    {
+      pregunta: "En CSS, ¿cómo se llama el espacio entre el texto y el borde de su caja?",
+      opciones: ["Border", "Margin", "Padding"],
+      correcta: 2,
+      explicacion: "El padding es el relleno interior. ¡Es lo que evita que el texto choque con el borde!"
+    },
+    {
+      pregunta: "¿Qué hace el atributo 'defer' en una etiqueta <script>?",
+      opciones: ["Carga el código más tarde para no frenar la página", "Borra el código", "Cambia el color de la página"],
+      correcta: 0,
+      explicacion: "¡Correcto! Ayuda a que la página cargue más rápido mientras el código se prepara en segundo plano."
+    },
+    {
+      pregunta: "¿Qué significa HTML?",
+      opciones: ["How To Make Links", "HyperText Markup Language", "High Technical Modern Logic"],
+      correcta: 1,
+      explicacion: "Es el lenguaje de marcas que estructura todas las páginas web del mundo."
+    },
+    {
+      pregunta: "¿Cuál es la etiqueta correcta para crear un enlace?",
+      opciones: ["<link>", "<a>", "<url>"],
+      correcta: 1,
+      explicacion: "La 'a' viene de 'anchor' (ancla). ¡Es lo que une una página con otra!"
+    },
+    {
+      pregunta: "En CSS, ¿para qué sirve 'flexbox'?",
+      opciones: ["Para que las imágenes pesen menos", "Para organizar y alinear elementos de forma fácil y flexible", "Para hackear"],
+      correcta: 1,
+      explicacion: "Flexbox es una herramienta poderosa para crear diseños que se adaptan a cualquier pantalla."
+    }
+  ],
+  appinventor: [
+    {
+      pregunta: "¿Qué componente de App Inventor se usa para 'hablar' o convertir texto a voz?",
+      opciones: ["Etiqueta", "Reproductor", "Texto a voz"],
+      correcta: 2,
+      explicacion: "¡Fácil! El componente 'Texto a voz' hace que tu móvil hable."
+    },
+    {
+      pregunta: "En App Inventor, ¿dónde se programa el comportamiento de los botones?",
+      opciones: ["En la Vista Diseñador", "En el Editor de Bloques", "En la Tienda de Apps"],
+      correcta: 1,
+      explicacion: "La lógica siempre se hace en el Editor de Bloques. El Diseñador es solo para lo visual."
+    },
+    {
+      pregunta: "¿Cuál es la forma más rápida de probar tu app en un móvil real?",
+      opciones: ["Subiéndola a la Play Store", "Usando el AI Companion y escaneando el código QR", "Enviándola por correo"],
+      correcta: 1,
+      explicacion: "¡Exacto! El AI Companion te permite ver los cambios en tiempo real mientras programas."
+    },
+    {
+      pregunta: "¿Qué es una 'Variable' en App Inventor?",
+      opciones: ["Un botón que cambia de color", "Un contenedor para guardar datos (nombres, puntos, etc.)", "El nombre de la app"],
+      correcta: 1,
+      explicacion: "Es como una caja con nombre donde guardas información que puede cambiar durante el juego."
+    },
+    {
+      pregunta: "¿Para qué sirve el componente 'TinyDB'?",
+      opciones: ["Para que la app ocupe poco espacio", "Para guardar datos de forma permanente en el móvil", "Para enviar mensajes"],
+      correcta: 1,
+      explicacion: "Sin TinyDB, al cerrar la app perderías tus puntos. ¡Es la memoria a largo plazo de tu móvil!"
+    },
+    {
+      pregunta: "¿Qué hace el componente 'Lienzo' (Canvas)?",
+      opciones: ["Sirve para escribir textos largos", "Permite dibujar, animar sprites y crear juegos táctiles", "Muestra un mapa"],
+      correcta: 1,
+      explicacion: "¡Es donde ocurre la magia de los juegos! Permite detectar toques y mover personajes por la pantalla."
     }
   ]
 };

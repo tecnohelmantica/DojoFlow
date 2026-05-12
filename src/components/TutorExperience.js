@@ -18,11 +18,18 @@ const TutorExperience = ({ technology, onComplete }) => {
   const planet = getPlanetById(technology);
   const planetName = planet?.name || technology?.toUpperCase() || 'SECTOR';
   
-  let techKey = technology?.toLowerCase() || 'code';
-  if (typeof diagnosticQuizzes[techKey] === 'string') {
-    techKey = diagnosticQuizzes[techKey];
+  let techKeyInitial = technology?.toLowerCase() || 'code';
+  if (typeof diagnosticQuizzes[techKeyInitial] === 'string') {
+    techKeyInitial = diagnosticQuizzes[techKeyInitial];
   }
-  const questions = diagnosticQuizzes[techKey] || diagnosticQuizzes.code;
+
+  const [questions, setQuestions] = useState([]);
+  
+  useEffect(() => {
+    const allQuestions = [...(diagnosticQuizzes[techKeyInitial] || diagnosticQuizzes.code)];
+    const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+    setQuestions(shuffled.slice(0, 3));
+  }, [techKeyInitial]);
 
   const handleStart = () => {
     setStep('quiz');
@@ -239,7 +246,7 @@ const TutorExperience = ({ technology, onComplete }) => {
         </div>
       )}
 
-      {step === 'quiz' && (
+      {step === 'quiz' && questions.length > 0 && (
         <div className="quiz-step">
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#666' }}>
