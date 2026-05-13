@@ -13,6 +13,7 @@ import { useAuth } from '../../components/AuthProvider';
 import TopHeader from '../../components/TopHeader';
 import NinjaChallenges from '../../components/NinjaChallenges';
 import SenseiMissions from '../../components/SenseiMissions';
+import SocraticTutor from '../../components/SocraticTutor';
 import { getPlanetById } from '../../lib/planets';
 import ResourceUploader from '../../components/ResourceUploader';
 import CodeBadges from '../../components/CodeBadges';
@@ -1872,15 +1873,35 @@ function ProfileContent() {
                 />
               </div>
 
-              {/* MISIONES DEL SENSEI (Excepto en Code.org) */}
-              {activePlanet !== 'code' && (
-                <div style={{ marginTop: '40px' }}>
+              {/* MISIONES DEL SENSEI O TUTOR SOCRÁTICO */}
+              <div style={{ marginTop: '40px' }}>
+                {activePlanet !== 'code' ? (
                   <SenseiMissions 
                     planetId={activePlanet} 
                     userId={isGuest ? 'guest_user' : session?.user?.id}
+                    studentLevel={studentLevel}
+                    accentColor={planet?.barColor}
                   />
-                </div>
-              )}
+                ) : (
+                  <GlassCard className="p-8" accentColor={planet?.barColor || '#00d2ff'}>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="p-3 rounded-2xl bg-cyan-500/10 text-cyan-400">
+                        <Brain size={28} />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-black text-white leading-tight">SENSEI SOCRÁTICO</h2>
+                        <p className="text-white/50 text-sm">Consultas inteligentes para el Planeta Code</p>
+                      </div>
+                    </div>
+                    <SocraticTutor 
+                      planetId={activePlanet} 
+                      userId={isGuest ? 'guest_user' : session?.user?.id}
+                      studentLevel={studentLevel}
+                      accentColor={planet?.barColor}
+                    />
+                  </GlassCard>
+                )}
+              </div>
             </>
           )}
 

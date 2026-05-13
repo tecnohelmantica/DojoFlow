@@ -10,13 +10,12 @@ import {
   Settings, RefreshCw, Layers, 
   Gamepad2, Cpu, Box, Code2, Palette
 } from 'lucide-react';
+import SocraticTutor from './SocraticTutor';
 
 export default function SenseiMissions({ planetId, userId, studentLevel, accentColor = '#0097e6', onValidateMission, refreshTrigger }) {
   const [mission, setMission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
-  const [hints, setHints] = useState([]);
-  const [loadingHint, setLoadingHint] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [stats, setStats] = useState({
     completed: 0,
@@ -51,7 +50,6 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
     // Reset state for the new planet
     setMission(null);
     setStats({ completed: 0, xp: 0, streak: 0, medals: [] });
-    setHints([]);
 
     try {
       if (userId === 'guest_user') {
@@ -212,7 +210,6 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           savedMission = sM;
         }
         setMission(savedMission);
-        setHints([]);
         setShowConfig(false);
       } else {
         throw new Error(data.error || "Error al conectar con el Sensei");
@@ -224,37 +221,6 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
     }
   };
 
-  const requestHint = async () => {
-    if (loadingHint) return;
-    setLoadingHint(true);
-    try {
-      const message = hints.length === 0 
-        ? `Sensei, he empezado la misión "${mission.title}". ¿Podrías darme una pista socrática para abordar el objetivo: ${mission.objective}? No me des la solución.`
-        : `Sensei, sigo con la misión. ¿Podrías darme otra pista socrática? Recuérdame los conceptos clave pero no me des el código.`;
-
-      const response = await fetch('/api/tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          mode: 'tutor',
-          planet: planetId,
-          level: config.level,
-          message,
-          history: hints.map(h => ({ role: 'tutor', text: h }))
-        })
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setHints([...hints, data.text]);
-      }
-    } catch (err) {
-      console.error("Error fetching hint:", err);
-    } finally {
-      setLoadingHint(false);
-    }
-  };
 
   const getPlanetIcon = () => {
     switch(planetId) {
@@ -438,43 +404,26 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                 </div>
               )}
 
-              <div className="hints-container">
-                {mission.sensei_tips && (
-                  <div className="hint-bubble sensei">
-                    <div className="hint-header">
-                      <Sparkles size={14} /> 
-                      <span>SABIDURÍA INICIAL</span>
-                    </div>
-                    <p>{mission.sensei_tips}</p>
-                  </div>
-                )}
-                
-                {hints.map((hint, i) => (
-                  <div key={i} className="hint-bubble socratic animate-slide-up">
-                    <div className="hint-header">
-                      <HelpCircle size={14} /> 
-                      <span>GUÍA DEL SENSEI #{i+1}</span>
-                    </div>
-                    <p>{hint}</p>
-                  </div>
-                ))}
+              <div className="hints-section mt-8">
+                <div className="section-title mb-4">
+                  <HelpCircle size={18} />
+                  <span>AYUDA DEL SENSEI</span>
+                </div>
+                <SocraticTutor 
+                  planetId={planetId}
+                  userId={userId}
+                  studentLevel={studentLevel}
+                  accentColor={accentColor}
+                />
               </div>
 
-              <div className="action-footer">
-                <GlowButton 
-                  onClick={requestHint}
-                  disabled={loadingHint}
-                  variant="secondary"
-                  className="flex-1"
-                >
-                  {loadingHint ? <Loader2 size={18} className="animate-spin" /> : <><HelpCircle size={18} className="mr-2" /> PEDIR PISTA</>}
-                </GlowButton>
+              <div className="action-footer mt-8">
                 <GlowButton 
                   onClick={() => onValidateMission?.(mission)}
                   variant="primary"
-                  className="flex-1"
+                  className="w-full py-4"
                 >
-                  <Send size={18} className="mr-2" /> ENVIAR SOLUCIÓN
+                  <Send size={18} className="mr-2" /> ENVIAR SOLUCIÓN PARA VALIDAR
                 </GlowButton>
               </div>
             </div>
