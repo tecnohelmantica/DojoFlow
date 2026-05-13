@@ -954,9 +954,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       ];
     } else if (itinerary === 'codedex') {
       activeMilestones = [
-        { reached: pythonCodedexBeginnerCompleted >= 6, label: 'PRINCIPIANTE', total: 6, type: 'big' },
-        { reached: pythonCodedexIntermediateCompleted >= 5, label: 'INTERMEDIO', total: 5, type: 'big' },
-        { reached: pythonCodedexAdvancedCompleted >= 2, label: 'AVANZADO', total: 2, type: 'big' }
+        { reached: pythonCodedexBeginnerCompleted >= 1, label: 'PRINCIPIANTE', total: 1, type: 'big' },
+        { reached: pythonCodedexIntermediateCompleted >= 2, label: 'INTERMEDIO', total: 2, type: 'big' }
       ];
     } else if (itinerary === 'raspberry') {
       activeMilestones = [
