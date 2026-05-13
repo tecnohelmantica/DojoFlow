@@ -2574,13 +2574,28 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                               </div>
                             </>
 
+                          ) : pid === 'python' && activeTab !== 'python_picuino' ? (
+                            <>
+                              <div style={{ display: 'flex', gap: '15px' }}>
+                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
+                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                  Accede a la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>plataforma oficial del curso</a> y completa la actividad o el nivel correspondiente.
+                                </p>
+                              </div>
+                              <div style={{ display: 'flex', gap: '15px' }}>
+                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>2</div>
+                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                  Cuando termines, sube una <strong>captura de pantalla</strong> de tu progreso o del certificado final aquí abajo para que el Sensei pueda validarlo.
+                                </p>
+                              </div>
+                            </>
                           ) : (
                             <>
                               <div style={{ display: 'flex', gap: '15px' }}>
                                 <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
                                 <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
                                   Entra en la <a href={getChallengeUrl(currentItem, activeTab)} 
-                                                   target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>página del reto {currentItem.numero}</a> para ver las instrucciones del reto. {(pid === 'scratch' && !activeTab.startsWith('raspberry_') && activeTab !== 'expert') ? 'Una vez dentro, clica el botón verde de "Reinventar" (Remix) y resuélvelo. Si no lo ves, asegúrate de haber iniciado sesión en tu cuenta de Scratch.' : 'Resuélvelo en el editor oficial.'}
+                                                   target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>página del reto {currentItem.numero || ''}</a> para ver las instrucciones. {(pid === 'scratch' && !activeTab.startsWith('raspberry_') && activeTab !== 'expert') ? 'Una vez dentro, clica el botón verde de "Reinventar" (Remix) y resuélvelo. Si no lo ves, asegúrate de haber iniciado sesión en tu cuenta de Scratch.' : 'Resuélvelo en el editor oficial.'}
                                 </p>
                               </div>
                               {(pid?.startsWith('tinkercad') || pid === 'arduino') && (
