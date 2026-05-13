@@ -31,7 +31,8 @@ import {
 } from '../lib/machinelearning';
 import { 
   PYTHON_ACADEMIA, 
-  PYTHON_RASPBERRY, 
+  PYTHON_RASPBERRY_INTRO,
+  PYTHON_RASPBERRY_MORE,
   PYTHON_CODING_KIDS, 
   PYTHON_CODEDEX_BEGINNER, 
   PYTHON_CODEDEX_INTERMEDIATE, 
@@ -83,7 +84,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [codeModern, setCodeModern] = useState([]);
   const [codeHourOfCode, setCodeHourOfCode] = useState([]);
   const [codeHourOfAI, setCodeHourOfAI] = useState([]);
-  const [pythonAcademiaRaspberry, setPythonAcademiaRaspberry] = useState([]);
+  const [pythonSilent, setPythonSilent] = useState([]);
+  const [pythonAcademia, setPythonAcademia] = useState([]);
+  const [pythonRetos, setPythonRetos] = useState([]);
+  const [pythonRaspberryIntro, setPythonRaspberryIntro] = useState([]);
+  const [pythonRaspberryMore, setPythonRaspberryMore] = useState([]);
   const [pythonCodingKids, setPythonCodingKids] = useState([]);
   const [pythonCodedexBeginner, setPythonCodedexBeginner] = useState([]);
   const [pythonCodedexIntermediate, setPythonCodedexIntermediate] = useState([]);
@@ -132,6 +137,29 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setActiveTab('challenges');
     }
   }, [pid, userId, difficultyLevel, itinerary, refreshTrigger, searchParams]);
+
+  // Sync activeTab when itinerary or planet changes
+  useEffect(() => {
+    if (pid === 'python') {
+      if (itinerary === 'raspberry') {
+        if (!activeTab.startsWith('python_raspberry')) setActiveTab('python_raspberry_intro');
+      }
+      else if (itinerary === 'kids') setActiveTab('python_kids');
+      else if (itinerary === 'codedex') {
+        if (!activeTab.startsWith('codedex_')) setActiveTab('codedex_beginner');
+      }
+      else if (itinerary === 'picuino') setActiveTab('python_picuino');
+      else if (itinerary === 'freecodecamp') setActiveTab('python_fcc');
+      else if (itinerary === 'academy') setActiveTab('python_silent');
+    } else if (pid === 'tinkercad' || pid === '3d') {
+      if (itinerary === 'codeblocks') setActiveTab('tinkercad-codeblocks');
+      else if (itinerary === 'blockscad') setActiveTab('blockscad');
+      else if (itinerary === '3d-design') setActiveTab('3d-design');
+    } else if (pid === 'ia') {
+      if (itinerary === 'mlforkids') setActiveTab('mlfk_challenges');
+      else setActiveTab('learningml-challenges');
+    }
+  }, [pid, itinerary]);
 
   // DEEP LINKING: Abrir reto desde notificación
   useEffect(() => {
@@ -185,11 +213,20 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       }
     } 
     else if (pid === 'python') {
-      if (itinerary === 'codedex') {
+      if (itinerary === 'raspberry') {
+        setActiveTab('python_raspberry_intro');
+      } else if (itinerary === 'codedex') {
         setActiveTab('codedex_beginner');
+      } else if (itinerary === 'kids') {
+        setActiveTab('python_kids');
+      } else if (itinerary === 'picuino') {
+        setActiveTab('python_picuino');
+      } else if (itinerary === 'freecodecamp') {
+        setActiveTab('python_fcc');
+      } else if (itinerary === 'academy' || !itinerary) {
+        setActiveTab('python_silent');
       } else {
-        if (tutorials && tutorials.length > 0) setActiveTab('tutorials');
-        else setActiveTab('challenges');
+        setActiveTab('python_silent');
       }
     }
     else if (pid === 'ia') {
@@ -252,10 +289,17 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setBlockscad([]);
       setBlockscadTutorials([]);
       setArduinoTutorials([]);
-      setPythonAcademiaRaspberry([]);
+      setPythonSilent([]);
+      setPythonAcademia([]);
+      setPythonRetos([]);
+      setPythonRaspberryIntro([]);
+      setPythonRaspberryMore([]);
+      setPythonCodingKids([]);
       setPythonCodedexBeginner([]);
       setPythonCodedexIntermediate([]);
       setPythonCodedexAdvanced([]);
+      setPythonFreeCodeCamp([]);
+      setPythonPicuino([]);
       setAppInventorAcademia([]);
       setAppInventorSocial([]);
       setMlForKids([]);
@@ -285,7 +329,17 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setChallenges(TINKERCAD_3D_CHALLENGES);
         }
       } else if (pid === 'python') {
-        setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
+        setPythonSilent(PYTHON_ACADEMIA);
+        setPythonRaspberryIntro(PYTHON_RASPBERRY_INTRO);
+        setPythonRaspberryMore(PYTHON_RASPBERRY_MORE);
+        setPythonCodingKids(PYTHON_CODING_KIDS);
+        setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER);
+        setPythonCodedexIntermediate(PYTHON_CODEDEX_INTERMEDIATE);
+        setPythonCodedexAdvanced(PYTHON_CODEDEX_ADVANCED);
+        setPythonFreeCodeCamp(PYTHON_FREECODECAMP);
+        setPythonPicuino(PYTHON_PICUINO);
+        setChallenges(PYTHON_ACADEMIA);
+        setActiveTab('python_silent');
       } else if (pid === 'appinventor') {
         setAppInventorAcademia(APP_INVENTOR_ACADEMIA); 
         setAppInventorSocial(APP_INVENTOR_SOCIAL); 
@@ -488,7 +542,15 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           else setDifficultyChallenges(null);
           
         } else if (pid === 'python') {
-          setChallenges(PYTHON_ACADEMIA); setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER); setPythonCodingKids(PYTHON_CODING_KIDS);
+          setChallenges(PYTHON_ACADEMIA);
+          setPythonRaspberryIntro(PYTHON_RASPBERRY_INTRO);
+          setPythonRaspberryMore(PYTHON_RASPBERRY_MORE);
+          setPythonCodingKids(PYTHON_CODING_KIDS);
+          setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER);
+          setPythonCodedexIntermediate(PYTHON_CODEDEX_INTERMEDIATE);
+          setPythonCodedexAdvanced(PYTHON_CODEDEX_ADVANCED);
+          setPythonFreeCodeCamp(PYTHON_FREECODECAMP);
+          setPythonPicuino(PYTHON_PICUINO);
         } else if (pid === 'appinventor') {
           setAppInventorBasic(APP_INVENTOR_BASIC); setAppInventorIntermediate(APP_INVENTOR_INTERMEDIATE); setAppInventorSocial(APP_INVENTOR_SOCIAL); 
           setChallenges(itinerary === 'social' ? APP_INVENTOR_SOCIAL : (itinerary === 'intermediate' ? APP_INVENTOR_INTERMEDIATE : APP_INVENTOR_BASIC));
@@ -543,14 +605,18 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setDifficultyChallenges(null);
           setTutorials([]);
         } else if (pid === 'python') {
-          populateState(setChallenges, dbChallenges, 'academia', PYTHON_ACADEMIA);
-          populateState(setPythonAcademiaRaspberry, dbChallenges, 'raspberry', PYTHON_RASPBERRY);
+          populateState(setPythonSilent, dbChallenges, 'silent-teacher', PYTHON_ACADEMIA);
+          populateState(setPythonAcademia, dbChallenges, 'academia', []);
+          populateState(setPythonRetos, dbChallenges, 'retos', []);
+          populateState(setPythonRaspberryIntro, dbChallenges, 'raspberry-intro', PYTHON_RASPBERRY_INTRO);
+          populateState(setPythonRaspberryMore, dbChallenges, 'raspberry-more', PYTHON_RASPBERRY_MORE);
           populateState(setPythonCodingKids, dbChallenges, 'coding-for-kids', PYTHON_CODING_KIDS);
           populateState(setPythonCodedexBeginner, dbChallenges, 'codedex', PYTHON_CODEDEX_BEGINNER, 'beginner');
           populateState(setPythonCodedexIntermediate, dbChallenges, 'codedex', PYTHON_CODEDEX_INTERMEDIATE, 'intermediate');
           populateState(setPythonCodedexAdvanced, dbChallenges, 'codedex', PYTHON_CODEDEX_ADVANCED, 'advanced');
           populateState(setPythonFreeCodeCamp, dbChallenges, 'freecodecamp', PYTHON_FREECODECAMP);
           populateState(setPythonPicuino, dbChallenges, 'picuino', PYTHON_PICUINO);
+          setChallenges(PYTHON_ACADEMIA); // Fallback generic list
         } else if (pid === 'appinventor') {
           const academia = populateState(setAppInventorAcademia, dbChallenges, 'academia', APP_INVENTOR_ACADEMIA);
           const social = populateState(setAppInventorSocial, dbChallenges, 'social', APP_INVENTOR_SOCIAL);
@@ -813,12 +879,16 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const codeHourOfCodeCompleted = codeHourOfCode.filter(c => userProgress[`${pid}-reto-hoc-${c.id}`]?.status === 'Validado').length;
   const codeHourOfAICompleted = codeHourOfAI.filter(c => userProgress[`${pid}-reto-ai-${c.id}`]?.status === 'Validado').length;
 
-  const pythonAcademiaRaspberryCompleted = pythonAcademiaRaspberry.filter(c => userProgress[`${pid}-reto-acad-rasp-${c.id}`]?.status === 'Validado').length;
-  const pythonCodingKidsCompleted = pythonCodingKids.filter(c => userProgress[`${pid}-reto-kids-${c.id}`]?.status === 'Validado').length;
-  const pythonCodedexBeginnerCompleted = pythonCodedexBeginner.filter(c => userProgress[`${pid}-reto-codedex-beg-${c.id}`]?.status === 'Validado').length;
-  const pythonCodedexIntermediateCompleted = pythonCodedexIntermediate.filter(c => userProgress[`${pid}-reto-codedex-int-${c.id}`]?.status === 'Validado').length;
-  const pythonCodedexAdvancedCompleted = pythonCodedexAdvanced.filter(c => userProgress[`${pid}-reto-codedex-adv-${c.id}`]?.status === 'Validado').length;
-  const pythonFreeCodeCampCompleted = pythonFreeCodeCamp.filter(c => userProgress[`${pid}-reto-fcc-${c.id}`]?.status === 'Validado').length;
+  const pythonSilentCompleted = pythonSilent.filter(c => userProgress[`${pid}-academy-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonAcademiaCompleted = pythonAcademia.filter(c => userProgress[`${pid}-academy-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonRetosCompleted = pythonRetos.filter(c => userProgress[`${pid}-academy-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonRaspberryIntroCompleted = pythonRaspberryIntro.filter(c => userProgress[`${pid}-raspberry-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonRaspberryMoreCompleted = pythonRaspberryMore.filter(c => userProgress[`${pid}-raspberry-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonCodingKidsCompleted = pythonCodingKids.filter(c => userProgress[`${pid}-others-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-kids-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonCodedexBeginnerCompleted = pythonCodedexBeginner.filter(c => userProgress[`${pid}-codedex-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonCodedexIntermediateCompleted = pythonCodedexIntermediate.filter(c => userProgress[`${pid}-codedex-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonCodedexAdvancedCompleted = pythonCodedexAdvanced.filter(c => userProgress[`${pid}-codedex-reto-${c.id}`]?.status === 'Validado').length;
+  const pythonFreeCodeCampCompleted = pythonFreeCodeCamp.filter(c => userProgress[`${pid}-others-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-freecodecamp-reto-${c.id}`]?.status === 'Validado').length;
   const pythonPicuinoCompleted = pythonPicuino.filter(c => userProgress[`${pid}-picuino-reto-${c.id}`]?.status === 'Validado').length;
   const appInventorAcademiaCompleted = appInventorAcademia.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-academia-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-basic-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-intermediate-reto-${c.id}`]?.status === 'Validado').length;
   const appInventorSocialCompleted = appInventorSocial.filter(c => userProgress[`${pid}-social-reto-${c.id}`]?.status === 'Validado').length;
@@ -884,7 +954,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       { reached: codeHourOfAICompleted >= 1, label: 'IA EXPLORER', total: 1, type: 'big' }
     ];
   } else if (planetId === 'python') {
-    if (itinerary === 'codedex') {
+    if (itinerary === 'academy' || !itinerary) {
+      activeMilestones = [
+        { reached: pythonSilentCompleted >= pythonSilent.length && pythonSilent.length > 0, label: 'SILENT TEACHER', total: pythonSilent.length, type: 'big' }
+      ];
+    } else if (itinerary === 'codedex') {
       activeMilestones = [
         { reached: pythonCodedexBeginnerCompleted >= 6, label: 'PRINCIPIANTE', total: 6, type: 'big' },
         { reached: pythonCodedexIntermediateCompleted >= 5, label: 'INTERMEDIO', total: 5, type: 'big' },
@@ -892,8 +966,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       ];
     } else if (itinerary === 'raspberry') {
       activeMilestones = [
-        { reached: tutorialsCompleted >= 1, label: 'ACADEMIA', total: 1, type: 'big' },
-        { reached: challengesCompleted >= 5, label: 'RASPBERRY PI', total: 5, type: 'big' }
+        { reached: pythonRaspberryIntroCompleted >= 6, label: 'PI PRINCIPIANTE', total: 6, type: 'big' },
+        { reached: pythonRaspberryMoreCompleted >= 6, label: 'PI INTERMEDIO', total: 6, type: 'big' }
       ];
     } else if (itinerary === 'kids') {
       activeMilestones = [
@@ -904,7 +978,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         { reached: pythonFreeCodeCampCompleted >= 1, label: 'COMPLETO', total: 1, type: 'big' }
       ];
     } else if (itinerary === 'picuino') {
-      const pythonPicuinoCompleted = pythonPicuino.filter(c => userProgress[`${planetId}-${itinerary}-reto-${c.id}`]?.status === 'Validado').length;
       activeMilestones = [
         { reached: pythonPicuinoCompleted >= 35, label: 'PICUINO PRO', total: 35, type: 'big' }
       ];
@@ -1181,11 +1254,14 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       'codedex_beginner': pythonCodedexBeginner,
       'codedex_intermediate': pythonCodedexIntermediate,
       'codedex_advanced': pythonCodedexAdvanced,
-      'python_raspberry': pythonAcademiaRaspberry,
+      'python_raspberry_intro': pythonRaspberryIntro,
+      'python_raspberry_more': pythonRaspberryMore,
       'python_kids': pythonCodingKids,
       'python_fcc': pythonFreeCodeCamp,
       'python_picuino': pythonPicuino,
-      'python_academia': challenges,
+      'python_silent': pythonSilent,
+      'python_academia': pythonAcademia,
+      'python_retos': pythonRetos,
       
       // IA Planet
       'mlfk_challenges': mlForKids,
@@ -1768,17 +1844,19 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     { id: 'raspberry', label: '🍓 PROYECTOS PI', color: '#E30B5D' },
                     { id: 'codedex', label: '⚔️ CODÉDEX', color: '#000000' },
                     { id: 'picuino', label: '🐧 CURSO PICUINO', color: '#0097e6' },
-                    { id: 'others', label: '🚀 OTROS', color: '#4cd137' }
+                    { id: 'kids', label: '🧩 CODING KIDS', color: '#4cd137' },
+                    { id: 'freecodecamp', label: '🔥 FREECODECAMP', color: '#0a0a23' }
                   ].map(it => (
                     <button 
                       key={it.id}
                       onClick={() => { 
                         setItinerary(it.id); 
-                        if (it.id === 'academy') setActiveTab('python_academia');
-                        else if (it.id === 'raspberry') setActiveTab('python_raspberry');
+                        if (it.id === 'academy') setActiveTab('python_silent');
+                        else if (it.id === 'raspberry') setActiveTab('python_raspberry_intro');
                         else if (it.id === 'codedex') setActiveTab('codedex_beginner');
                         else if (it.id === 'picuino') setActiveTab('python_picuino');
-                        else if (it.id === 'others') setActiveTab('python_kids');
+                        else if (it.id === 'kids') setActiveTab('python_kids');
+                        else if (it.id === 'freecodecamp') setActiveTab('python_fcc');
                       }}
                       style={{
                         flex: '1 1 auto', padding: '10px 15px', borderRadius: '10px', border: 'none', cursor: 'pointer',
@@ -1798,30 +1876,44 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                 <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '5px', whiteSpace: 'nowrap', scrollbarWidth: 'none' }}>
                   {(itinerary === 'academy' || !itinerary) ? (
                     <button 
-                      onClick={() => setActiveTab('python_academia')}
+                      onClick={() => setActiveTab('python_silent')}
                       style={{ 
                         flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                         fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                        background: activeTab === 'python_academia' ? 'rgba(0,0,0,0.05)' : 'transparent',
-                        color: activeTab === 'python_academia' ? accentColor : '#666',
+                        background: activeTab === 'python_silent' ? 'rgba(0,0,0,0.05)' : 'transparent',
+                        color: activeTab === 'python_silent' ? accentColor : '#666',
                         transition: 'all 0.2s', minWidth: 'fit-content'
                       }}
                     >
-                      SILENT TEACHER ({challengesCompleted}/{challenges.length})
+                      SILENT TEACHER ({pythonSilent.filter(c => userProgress[`python-academy-reto-${c.id}`]?.status === 'Validado').length}/{pythonSilent.length})
                     </button>
                   ) : itinerary === 'raspberry' ? (
-                    <button 
-                      onClick={() => setActiveTab('python_raspberry')}
-                      style={{ 
-                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                        background: activeTab === 'python_raspberry' ? 'rgba(227,11,93,0.1)' : 'transparent',
-                        color: activeTab === 'python_raspberry' ? '#E30B5D' : '#666',
-                        transition: 'all 0.2s', minWidth: 'fit-content'
-                      }}
-                    >
-                      RASPBERRY PI PROJECTS ({pythonAcademiaRaspberryCompleted}/{pythonAcademiaRaspberry.length})
-                    </button>
+                    <>
+                      <button 
+                        onClick={() => setActiveTab('python_raspberry_intro')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'python_raspberry_intro' ? 'rgba(227,11,93,0.1)' : 'transparent',
+                          color: activeTab === 'python_raspberry_intro' ? '#E30B5D' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        PRINCIPIANTE ({pythonRaspberryIntroCompleted}/{pythonRaspberryIntro.length})
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('python_raspberry_more')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'python_raspberry_more' ? 'rgba(227,11,93,0.1)' : 'transparent',
+                          color: activeTab === 'python_raspberry_more' ? '#E30B5D' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        INTERMEDIO ({pythonRaspberryMoreCompleted}/{pythonRaspberryMore.length})
+                      </button>
+                    </>
                   ) : itinerary === 'codedex' ? (
                     <>
                       <button 
@@ -1874,33 +1966,32 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     >
                       CURSO COMPLETO ({pythonPicuinoCompleted}/{pythonPicuino.length})
                     </button>
-                  ) : itinerary === 'others' ? (
-                    <>
-                      <button 
-                        onClick={() => setActiveTab('python_kids')}
-                        style={{ 
-                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                          background: activeTab === 'python_kids' ? 'rgba(76,209,55,0.1)' : 'transparent',
-                          color: activeTab === 'python_kids' ? '#4cd137' : '#666',
-                          transition: 'all 0.2s', minWidth: 'fit-content'
-                        }}
-                      >
-                        CODING FOR KIDS ({pythonCodingKidsCompleted}/{pythonCodingKids.length})
-                      </button>
-                      <button 
-                        onClick={() => setActiveTab('python_fcc')}
-                        style={{ 
-                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                          background: activeTab === 'python_fcc' ? 'rgba(76,209,55,0.1)' : 'transparent',
-                          color: activeTab === 'python_fcc' ? '#4cd137' : '#666',
-                          transition: 'all 0.2s', minWidth: 'fit-content'
-                        }}
-                      >
-                        FREECODECAMP ({pythonFreeCodeCampCompleted}/{pythonFreeCodeCamp.length})
-                      </button>
-                    </>
+                  ) : itinerary === 'kids' ? (
+                    <button 
+                      onClick={() => setActiveTab('python_kids')}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'python_kids' ? 'rgba(76,209,55,0.1)' : 'transparent',
+                        color: activeTab === 'python_kids' ? '#4cd137' : '#666',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      CODING FOR KIDS ({pythonCodingKidsCompleted}/{pythonCodingKids.length})
+                    </button>
+                  ) : itinerary === 'freecodecamp' ? (
+                    <button 
+                      onClick={() => setActiveTab('python_fcc')}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'python_fcc' ? 'rgba(10,10,35,0.1)' : 'transparent',
+                        color: activeTab === 'python_fcc' ? '#0a0a23' : '#666',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      FREECODECAMP ({pythonFreeCodeCampCompleted}/{pythonFreeCodeCamp.length})
+                    </button>
                   ) : null}
                 </div>
               </div>
@@ -2376,32 +2467,31 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                                     Para completar este reto, entra en la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>página oficial del tutorial</a> y sigue las instrucciones.
                                   </p>
                                   
-                                  {itinerary !== 'picuino' && (
-                                    <div style={{ marginTop: '15px', marginBottom: '20px' }}>
-                                      <GlowButton 
-                                        color="blue" 
-                                        onClick={() => window.open(getChallengeUrl(currentItem, activeTab), '_blank')}
-                                        style={{ 
-                                          padding: '12px 25px', 
-                                          fontSize: '0.95rem', 
-                                          fontWeight: '800',
-                                          width: '100%',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          gap: '10px'
-                                        }}
-                                      >
-                                        <ExternalLink size={18} /> ACCEDER AL RETO EN {
-                                          itinerary === 'raspberry' ? 'RASPBERRY PI' : 
-                                          itinerary === 'codedex' ? 'CODÉDEX' : 
-                                          itinerary === 'kids' ? 'CODING KIDS' : 
-                                          itinerary === 'freecodecamp' ? 'FREECODECAMP' : 
-                                          'LA PLATAFORMA'
-                                        }
-                                      </GlowButton>
-                                    </div>
-                                  )}
+                                  <div style={{ marginTop: '15px', marginBottom: '20px' }}>
+                                    <GlowButton 
+                                      color="blue" 
+                                      onClick={() => window.open(getChallengeUrl(currentItem, activeTab), '_blank')}
+                                      style={{ 
+                                        padding: '12px 25px', 
+                                        fontSize: '0.95rem', 
+                                        fontWeight: '800',
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '10px'
+                                      }}
+                                    >
+                                      <ExternalLink size={18} /> ACCEDER AL RETO EN {
+                                        itinerary === 'raspberry' ? 'RASPBERRY PI' : 
+                                        itinerary === 'codedex' ? 'CODÉDEX' : 
+                                        itinerary === 'kids' ? 'CODING KIDS' : 
+                                        itinerary === 'freecodecamp' ? 'FREECODECAMP' : 
+                                        itinerary === 'picuino' ? 'PICUINO' : 
+                                        'LA PLATAFORMA'
+                                      }
+                                    </GlowButton>
+                                  </div>
                                 </div>
                               </div>
                               <div style={{ display: 'flex', gap: '15px' }}>
