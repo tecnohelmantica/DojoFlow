@@ -1247,7 +1247,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       // Python Planet
       'codedex_beginner': pythonCodedexBeginner,
       'codedex_intermediate': pythonCodedexIntermediate,
-      'codedex_advanced': pythonCodedexAdvanced,
       'python_raspberry_intro': pythonRaspberryIntro,
       'python_raspberry_more': pythonRaspberryMore,
       'python_kids': pythonCodingKids,
