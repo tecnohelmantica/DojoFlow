@@ -545,9 +545,12 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         } else if (pid === 'python') {
           populateState(setChallenges, dbChallenges, 'academia', PYTHON_ACADEMIA);
           populateState(setPythonAcademiaRaspberry, dbChallenges, 'raspberry', PYTHON_RASPBERRY);
+          populateState(setPythonCodingKids, dbChallenges, 'coding-for-kids', PYTHON_CODING_KIDS);
           populateState(setPythonCodedexBeginner, dbChallenges, 'codedex', PYTHON_CODEDEX_BEGINNER, 'beginner');
           populateState(setPythonCodedexIntermediate, dbChallenges, 'codedex', PYTHON_CODEDEX_INTERMEDIATE, 'intermediate');
           populateState(setPythonCodedexAdvanced, dbChallenges, 'codedex', PYTHON_CODEDEX_ADVANCED, 'advanced');
+          populateState(setPythonFreeCodeCamp, dbChallenges, 'freecodecamp', PYTHON_FREECODECAMP);
+          populateState(setPythonPicuino, dbChallenges, 'picuino', PYTHON_PICUINO);
         } else if (pid === 'appinventor') {
           const academia = populateState(setAppInventorAcademia, dbChallenges, 'academia', APP_INVENTOR_ACADEMIA);
           const social = populateState(setAppInventorSocial, dbChallenges, 'social', APP_INVENTOR_SOCIAL);
@@ -1178,6 +1181,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       'codedex_beginner': pythonCodedexBeginner,
       'codedex_intermediate': pythonCodedexIntermediate,
       'codedex_advanced': pythonCodedexAdvanced,
+      'python_raspberry': pythonAcademiaRaspberry,
+      'python_kids': pythonCodingKids,
+      'python_fcc': pythonFreeCodeCamp,
+      'python_picuino': pythonPicuino,
+      'python_academia': challenges,
       
       // IA Planet
       'mlfk_challenges': mlForKids,
@@ -1339,7 +1347,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' }}>
           
           {/* Ocultar pestaña CURSO en Arduino si está vacía */}
-          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'python' || pid === 'arduino') && (
+          {(pid !== 'arduino' || (arduinoTutorials && arduinoTutorials.length > 0)) && (pid === 'arduino') && (
             <button 
               onClick={() => { setActiveTab(pid === 'scratch' ? 'scratch_academia' : 'tutorials'); setSelectedTutorial(null); }}
               style={{ 
@@ -1752,35 +1760,150 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
               </div>
 
             ) : pid === 'python' ? (
-              <>
-                <button 
-                  onClick={() => { setActiveTab('tutorials'); setSelectedTutorial(null); }}
-                  style={{ 
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'tutorials' ? 'white' : 'transparent',
-                    color: activeTab === 'tutorials' ? accentColor : '#666',
-                    boxShadow: activeTab === 'tutorials' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  ACADEMIA ({tutorialsCompleted}/{tutorialsList.length})
-                </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                {/* Selector de Itinerario para Python */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '5px', background: 'rgba(0,0,0,0.03)', padding: '5px', borderRadius: '12px', flexWrap: 'wrap' }}>
+                  {[
+                    { id: 'academy', label: '🎓 ACADEMIA', color: accentColor },
+                    { id: 'raspberry', label: '🍓 PROYECTOS PI', color: '#E30B5D' },
+                    { id: 'codedex', label: '⚔️ CODÉDEX', color: '#000000' },
+                    { id: 'picuino', label: '🐧 CURSO PICUINO', color: '#0097e6' },
+                    { id: 'others', label: '🚀 OTROS', color: '#4cd137' }
+                  ].map(it => (
+                    <button 
+                      key={it.id}
+                      onClick={() => { 
+                        setItinerary(it.id); 
+                        if (it.id === 'academy') setActiveTab('python_academia');
+                        else if (it.id === 'raspberry') setActiveTab('python_raspberry');
+                        else if (it.id === 'codedex') setActiveTab('codedex_beginner');
+                        else if (it.id === 'picuino') setActiveTab('python_picuino');
+                        else if (it.id === 'others') setActiveTab('python_kids');
+                      }}
+                      style={{
+                        flex: '1 1 auto', padding: '10px 15px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '800', fontFamily: 'Outfit',
+                        background: (itinerary === it.id || (!itinerary && it.id === 'academy')) ? 'white' : 'transparent',
+                        color: (itinerary === it.id || (!itinerary && it.id === 'academy')) ? it.color : '#666',
+                        boxShadow: (itinerary === it.id || (!itinerary && it.id === 'academy')) ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      {it.label}
+                    </button>
+                  ))}
+                </div>
 
-                <button 
-                  onClick={() => setActiveTab('challenges')}
-                  style={{ 
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'challenges' ? 'white' : 'transparent',
-                    color: activeTab === 'challenges' ? accentColor : '#666',
-                    boxShadow: activeTab === 'challenges' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s', minWidth: 'fit-content'
-                  }}
-                >
-                  {`RETOS NINJA (${challengesCompleted}/${challenges.length})`}
-                </button>
-              </>
+                {/* Sub-tabs según el Itinerario */}
+                <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '5px', whiteSpace: 'nowrap', scrollbarWidth: 'none' }}>
+                  {(itinerary === 'academy' || !itinerary) ? (
+                    <button 
+                      onClick={() => setActiveTab('python_academia')}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'python_academia' ? 'rgba(0,0,0,0.05)' : 'transparent',
+                        color: activeTab === 'python_academia' ? accentColor : '#666',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      SILENT TEACHER ({challengesCompleted}/{challenges.length})
+                    </button>
+                  ) : itinerary === 'raspberry' ? (
+                    <button 
+                      onClick={() => setActiveTab('python_raspberry')}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'python_raspberry' ? 'rgba(227,11,93,0.1)' : 'transparent',
+                        color: activeTab === 'python_raspberry' ? '#E30B5D' : '#666',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      RASPBERRY PI PROJECTS ({pythonAcademiaRaspberryCompleted}/{pythonAcademiaRaspberry.length})
+                    </button>
+                  ) : itinerary === 'codedex' ? (
+                    <>
+                      <button 
+                        onClick={() => setActiveTab('codedex_beginner')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'codedex_beginner' ? 'rgba(0,0,0,0.05)' : 'transparent',
+                          color: activeTab === 'codedex_beginner' ? '#000' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        PRINCIPIANTE ({pythonCodedexBeginnerCompleted}/{pythonCodedexBeginner.length})
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('codedex_intermediate')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'codedex_intermediate' ? 'rgba(0,0,0,0.05)' : 'transparent',
+                          color: activeTab === 'codedex_intermediate' ? '#000' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        INTERMEDIO ({pythonCodedexIntermediateCompleted}/{pythonCodedexIntermediate.length})
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('codedex_advanced')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'codedex_advanced' ? 'rgba(0,0,0,0.05)' : 'transparent',
+                          color: activeTab === 'codedex_advanced' ? '#000' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        AVANZADO ({pythonCodedexAdvancedCompleted}/{pythonCodedexAdvanced.length})
+                      </button>
+                    </>
+                  ) : itinerary === 'picuino' ? (
+                    <button 
+                      onClick={() => setActiveTab('python_picuino')}
+                      style={{ 
+                        flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                        background: activeTab === 'python_picuino' ? 'rgba(0,151,230,0.1)' : 'transparent',
+                        color: activeTab === 'python_picuino' ? '#0097e6' : '#666',
+                        transition: 'all 0.2s', minWidth: 'fit-content'
+                      }}
+                    >
+                      CURSO COMPLETO ({pythonPicuinoCompleted}/{pythonPicuino.length})
+                    </button>
+                  ) : itinerary === 'others' ? (
+                    <>
+                      <button 
+                        onClick={() => setActiveTab('python_kids')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'python_kids' ? 'rgba(76,209,55,0.1)' : 'transparent',
+                          color: activeTab === 'python_kids' ? '#4cd137' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        CODING FOR KIDS ({pythonCodingKidsCompleted}/{pythonCodingKids.length})
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('python_fcc')}
+                        style={{ 
+                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                          background: activeTab === 'python_fcc' ? 'rgba(76,209,55,0.1)' : 'transparent',
+                          color: activeTab === 'python_fcc' ? '#4cd137' : '#666',
+                          transition: 'all 0.2s', minWidth: 'fit-content'
+                        }}
+                      >
+                        FREECODECAMP ({pythonFreeCodeCampCompleted}/{pythonFreeCodeCamp.length})
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+              </div>
             ) : pid === 'ia' && itinerary === 'mlforkids' ? (
               <>
                 <button
