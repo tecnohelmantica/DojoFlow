@@ -116,25 +116,12 @@ export const PYTHON_CODING_KIDS = [
 ];
 
 export const PYTHON_CODEDEX_BEGINNER = [
-  { id: 'cb1', numero: 1, titulo: 'Build a Word Guessing Game', url: 'https://www.codedex.io/projects/build-a-word-guessing-game-with-python', externalUrl: 'https://www.codedex.io/projects/build-a-word-guessing-game-with-python', description: 'Crea un juego de adivinar palabras con Python.' },
-  { id: 'cb2', numero: 2, titulo: 'Convert Roman Numerals', url: 'https://www.codedex.io/projects/convert-roman-numerals-with-python', externalUrl: 'https://www.codedex.io/projects/convert-roman-numerals-with-python', description: 'Aprende a convertir números romanos usando lógica básica.' },
-  { id: 'cb3', numero: 3, titulo: 'Set Up Local Dev Env', url: 'https://www.codedex.io/projects/set-up-your-local-environment-in-python', externalUrl: 'https://www.codedex.io/projects/set-up-your-local-environment-in-python', description: 'Configura tu entorno de desarrollo local para Python.' },
-  { id: 'cb4', numero: 4, titulo: 'Generate a QR Code', url: 'https://www.codedex.io/projects/generate-a-qr-code-with-python', externalUrl: 'https://www.codedex.io/projects/generate-a-qr-code-with-python', description: 'Usa librerías externas para generar códigos QR.' },
-  { id: 'cb5', numero: 5, titulo: 'Create a GIF', url: 'https://www.codedex.io/projects/create-a-gif-with-python', externalUrl: 'https://www.codedex.io/projects/create-a-gif-with-python', description: 'Crea animaciones GIF programando con Python.' },
-  { id: 'cb6', numero: 6, titulo: '50 Terminal Project Ideas', url: 'https://www.codedex.io/projects/50-terminal-project-ideas-using-python', externalUrl: 'https://www.codedex.io/projects/50-terminal-project-ideas-using-python', description: 'Explora 50 ideas de proyectos para la terminal.' }
+  { id: 'cb1', numero: 1, titulo: 'The Python Course', url: 'https://www.codedex.io/python', externalUrl: 'https://www.codedex.io/python', description: 'Curso completo de Python para principiantes en Codédex.' }
 ];
 
 export const PYTHON_CODEDEX_INTERMEDIATE = [
-  { id: 'ci1', numero: 1, titulo: 'Analyze Baseball Stats', url: 'https://www.codedex.io/projects/analyze-baseball-stats-with-pandas-and-matplotlib', externalUrl: 'https://www.codedex.io/projects/analyze-baseball-stats-with-pandas-and-matplotlib', description: 'Usa Pandas y Matplotlib para analizar estadísticas de béisbol.' },
-  { id: 'ci2', numero: 2, titulo: 'Create a Voice Virtual Assistant', url: 'https://www.codedex.io/projects/create-a-voice-virtual-assistant-with-elevenlabs', externalUrl: 'https://www.codedex.io/projects/create-a-voice-virtual-assistant-with-elevenlabs', description: 'Crea tu propio asistente de voz usando ElevenLabs.' },
-  { id: 'ci3', numero: 3, titulo: 'Analyze U.S. Census Data', url: 'https://www.codedex.io/projects/analyze-us-census-data-with-scipy', externalUrl: 'https://www.codedex.io/projects/analyze-us-census-data-with-scipy', description: 'Analiza datos del censo de EE. UU. con SciPy.' },
-  { id: 'ci4', numero: 4, titulo: 'Automate Secret Santa Emails', url: 'https://www.codedex.io/projects/automate-secret-santa-emails-with-smtp', externalUrl: 'https://www.codedex.io/projects/automate-secret-santa-emails-with-smtp', description: 'Automatiza el envío de correos usando el protocolo SMTP.' },
-  { id: 'ci5', numero: 5, titulo: 'Build a Discord Bot', url: 'https://www.codedex.io/projects/build-a-discord-bot-with-python', externalUrl: 'https://www.codedex.io/projects/build-a-discord-bot-with-python', description: 'Crea un bot interactivo para Discord.' }
-];
-
-export const PYTHON_CODEDEX_ADVANCED = [
-  { id: 'ca1', numero: 1, titulo: 'Build a Search Engine with Exa', url: 'https://www.codedex.io/projects/build-a-custom-search-engine-with-exa-ai', externalUrl: 'https://www.codedex.io/projects/build-a-custom-search-engine-with-exa-ai', description: 'Construye un buscador personalizado con IA de Exa.' },
-  { id: 'ca2', numero: 2, titulo: 'Build Pong with PyGame', url: 'https://www.codedex.io/projects/build-pong-with-pygame', externalUrl: 'https://www.codedex.io/projects/build-pong-with-pygame', description: 'Desarrolla el clásico juego Pong usando la librería PyGame.' }
+  { id: 'ci1', numero: 1, titulo: 'Intermediate Python', url: 'https://www.codedex.io/intermediate-python', externalUrl: 'https://www.codedex.io/intermediate-python', description: 'Lleva tus habilidades de Python al siguiente nivel.' },
+  { id: 'ci2', numero: 2, titulo: 'NumPy Course', url: 'https://www.codedex.io/numpy', externalUrl: 'https://www.codedex.io/numpy', description: 'Aprende computación científica y manejo de datos con NumPy.' }
 ];
 
 export const PYTHON_FREECODECAMP = [

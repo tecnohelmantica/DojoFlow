@@ -92,7 +92,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [pythonCodingKids, setPythonCodingKids] = useState([]);
   const [pythonCodedexBeginner, setPythonCodedexBeginner] = useState([]);
   const [pythonCodedexIntermediate, setPythonCodedexIntermediate] = useState([]);
-  const [pythonCodedexAdvanced, setPythonCodedexAdvanced] = useState([]);
   const [pythonFreeCodeCamp, setPythonFreeCodeCamp] = useState([]);
   const [pythonPicuino, setPythonPicuino] = useState([]);
   const [appInventorAcademia, setAppInventorAcademia] = useState([]);
@@ -297,7 +296,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setPythonCodingKids([]);
       setPythonCodedexBeginner([]);
       setPythonCodedexIntermediate([]);
-      setPythonCodedexAdvanced([]);
       setPythonFreeCodeCamp([]);
       setPythonPicuino([]);
       setAppInventorAcademia([]);
@@ -335,7 +333,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         setPythonCodingKids(PYTHON_CODING_KIDS);
         setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER);
         setPythonCodedexIntermediate(PYTHON_CODEDEX_INTERMEDIATE);
-        setPythonCodedexAdvanced(PYTHON_CODEDEX_ADVANCED);
         setPythonFreeCodeCamp(PYTHON_FREECODECAMP);
         setPythonPicuino(PYTHON_PICUINO);
         setChallenges(PYTHON_ACADEMIA);
@@ -548,7 +545,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           setPythonCodingKids(PYTHON_CODING_KIDS);
           setPythonCodedexBeginner(PYTHON_CODEDEX_BEGINNER);
           setPythonCodedexIntermediate(PYTHON_CODEDEX_INTERMEDIATE);
-          setPythonCodedexAdvanced(PYTHON_CODEDEX_ADVANCED);
           setPythonFreeCodeCamp(PYTHON_FREECODECAMP);
           setPythonPicuino(PYTHON_PICUINO);
         } else if (pid === 'appinventor') {
@@ -613,7 +609,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           populateState(setPythonCodingKids, dbChallenges, 'coding-for-kids', PYTHON_CODING_KIDS);
           populateState(setPythonCodedexBeginner, dbChallenges, 'codedex', PYTHON_CODEDEX_BEGINNER, 'beginner');
           populateState(setPythonCodedexIntermediate, dbChallenges, 'codedex', PYTHON_CODEDEX_INTERMEDIATE, 'intermediate');
-          populateState(setPythonCodedexAdvanced, dbChallenges, 'codedex', PYTHON_CODEDEX_ADVANCED, 'advanced');
           populateState(setPythonFreeCodeCamp, dbChallenges, 'freecodecamp', PYTHON_FREECODECAMP);
           populateState(setPythonPicuino, dbChallenges, 'picuino', PYTHON_PICUINO);
           setChallenges(PYTHON_ACADEMIA); // Fallback generic list
@@ -887,7 +882,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const pythonCodingKidsCompleted = pythonCodingKids.filter(c => userProgress[`${pid}-others-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-kids-reto-${c.id}`]?.status === 'Validado').length;
   const pythonCodedexBeginnerCompleted = pythonCodedexBeginner.filter(c => userProgress[`${pid}-codedex-reto-${c.id}`]?.status === 'Validado').length;
   const pythonCodedexIntermediateCompleted = pythonCodedexIntermediate.filter(c => userProgress[`${pid}-codedex-reto-${c.id}`]?.status === 'Validado').length;
-  const pythonCodedexAdvancedCompleted = pythonCodedexAdvanced.filter(c => userProgress[`${pid}-codedex-reto-${c.id}`]?.status === 'Validado').length;
   const pythonFreeCodeCampCompleted = pythonFreeCodeCamp.filter(c => userProgress[`${pid}-others-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-freecodecamp-reto-${c.id}`]?.status === 'Validado').length;
   const pythonPicuinoCompleted = pythonPicuino.filter(c => userProgress[`${pid}-picuino-reto-${c.id}`]?.status === 'Validado').length;
   const appInventorAcademiaCompleted = appInventorAcademia.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-academia-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-basic-reto-${c.id}`]?.status === 'Validado' || userProgress[`${pid}-intermediate-reto-${c.id}`]?.status === 'Validado').length;
@@ -1939,18 +1933,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         }}
                       >
                         INTERMEDIO ({pythonCodedexIntermediateCompleted}/{pythonCodedexIntermediate.length})
-                      </button>
-                      <button 
-                        onClick={() => setActiveTab('codedex_advanced')}
-                        style={{ 
-                          flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                          fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                          background: activeTab === 'codedex_advanced' ? 'rgba(0,0,0,0.05)' : 'transparent',
-                          color: activeTab === 'codedex_advanced' ? '#000' : '#666',
-                          transition: 'all 0.2s', minWidth: 'fit-content'
-                        }}
-                      >
-                        AVANZADO ({pythonCodedexAdvancedCompleted}/{pythonCodedexAdvanced.length})
                       </button>
                     </>
                   ) : itinerary === 'picuino' ? (
