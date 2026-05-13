@@ -369,8 +369,19 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                 <h2>{mission.title}</h2>
               </div>
             </div>
-            <div className="header-right">
+            <div className="header-right flex flex-col items-end gap-3">
               <div className="xp-badge">+{mission.reward_xp || 50} XP</div>
+              <button 
+                className="ask-another-btn" 
+                onClick={() => {
+                  if(confirm("¿Quieres pausar esta misión y generar una nueva? Podrás retomarla luego si sigue activa.")) {
+                    setMission(null);
+                    setShowConfig(true);
+                  }
+                }}
+              >
+                <Sparkles size={14} /> PEDIR OTRA MISIÓN
+              </button>
             </div>
           </div>
 
@@ -668,6 +679,30 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           transition: 0.3s; font-weight: 600;
         }
         .regenerate-btn:hover { color: #ff4757; }
+
+        .ask-another-btn {
+          background: rgba(var(--accent-rgb), 0.1);
+          border: 1px solid rgba(var(--accent-rgb), 0.3);
+          color: var(--accent);
+          padding: 8px 16px;
+          border-radius: 12px;
+          font-size: 0.7rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          transition: all 0.3s;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .ask-another-btn:hover {
+          background: var(--accent);
+          color: white;
+          box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);
+          transform: translateY(-2px);
+        }
 
         /* --- ANIMATIONS --- */
         @keyframes pulse {
