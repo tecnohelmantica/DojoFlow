@@ -2440,52 +2440,58 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                             </>
                           ) : pid === 'python' ? (
                             <>
-                              <div style={{ display: 'flex', gap: '15px' }}>
-                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
-                                <div style={{ flex: 1 }}>
-                                  <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                    Para completar este reto, entra en la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>página oficial del tutorial</a> y sigue las instrucciones.
-                                  </p>
-                                  
-                                  <div style={{ marginTop: '15px', marginBottom: '20px' }}>
-                                    <GlowButton 
-                                      color="blue" 
-                                      onClick={() => window.open(getChallengeUrl(currentItem, activeTab), '_blank')}
-                                      style={{ 
-                                        padding: '12px 25px', 
-                                        fontSize: '0.95rem', 
-                                        fontWeight: '800',
-                                        width: '100%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '10px'
-                                      }}
-                                    >
-                                      <ExternalLink size={18} /> ACCEDER AL RETO EN {
-                                        itinerary === 'raspberry' ? 'RASPBERRY PI' : 
-                                        itinerary === 'codedex' ? 'CODÉDEX' : 
-                                        itinerary === 'kids' ? 'CODING KIDS' : 
-                                        itinerary === 'freecodecamp' ? 'FREECODECAMP' : 
-                                        itinerary === 'picuino' ? 'PICUINO' : 
-                                        'LA PLATAFORMA'
-                                      }
-                                    </GlowButton>
+                              {activeTab === 'python_picuino' ? (
+                                <>
+                                  <div style={{ display: 'flex', gap: '15px' }}>
+                                    <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
+                                    <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                      Mira las instrucciones en la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>página oficial de Picuino</a>.
+                                    </p>
                                   </div>
-                                </div>
-                              </div>
-                              <div style={{ display: 'flex', gap: '15px' }}>
-                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>2</div>
-                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Puedes usar el editor online de <a href="https://trinket.io/python3" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Trinket</a> o <a href="https://replit.com/languages/python3" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>Replit</a> para escribir tu código.
-                                </p>
-                              </div>
-                              <div style={{ display: 'flex', gap: '15px' }}>
-                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>3</div>
-                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                                  Cuando termines el reto, comparte el enlace de tu código con nosotros para validarlo.
-                                </p>
-                              </div>
+                                  <div style={{ display: 'flex', gap: '15px' }}>
+                                    <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>2</div>
+                                    <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                      Cuando termines, comparte una <strong>captura de pantalla</strong> o el enlace de tu código con nosotros para validarlo.
+                                    </p>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div style={{ display: 'flex', gap: '15px' }}>
+                                    <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
+                                    <div style={{ flex: 1 }}>
+                                      <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                        Accede a la <a href={getChallengeUrl(currentItem, activeTab)} target="_blank" rel="noopener noreferrer" style={{ color: accentColor, fontWeight: '800', textDecoration: 'underline' }}>plataforma oficial del curso</a> y completa la actividad propuesta.
+                                      </p>
+                                      
+                                      <div style={{ marginTop: '15px', marginBottom: '20px' }}>
+                                        <GlowButton 
+                                          color="blue" 
+                                          onClick={() => window.open(getChallengeUrl(currentItem, activeTab), '_blank')}
+                                          style={{ 
+                                            padding: '12px 25px', 
+                                            fontSize: '0.95rem', 
+                                            fontWeight: '800',
+                                            width: '100%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '10px'
+                                          }}
+                                        >
+                                          <ExternalLink size={18} /> ACCEDER A LA PLATAFORMA
+                                        </GlowButton>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div style={{ display: 'flex', gap: '15px' }}>
+                                    <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>2</div>
+                                    <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                      Cuando termines, sube una <strong>captura de pantalla</strong> de tu progreso o certificado para que el Sensei lo valide.
+                                    </p>
+                                  </div>
+                                </>
+                              )}
                             </>
                           ) : pid === 'appinventor' ? (
                             <>
