@@ -558,3 +558,76 @@
     gap: 8px;
   }
 }
+
+/* ============================================
+   👤 AJUSTES DE CUENTA - RESPONSIVE
+   ============================================ */
+
+/* Contenedor exterior del dashboard de ajustes */
+.profile-dashboard-wrapper {
+  min-height: 100vh;
+  background: #f8fafb;
+  padding: 40px 20px;
+}
+
+/* Contenedor interior con max-width */
+.profile-dashboard-inner {
+  max-width: 1000px;
+  margin: 40px auto;
+}
+
+/* Grid de 2 columnas (identidad + ajustes) */
+.profile-account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+  gap: 30px;
+}
+
+/* GlassCards de ajustes */
+.profile-account-card {
+  padding: 40px;
+  height: fit-content;
+}
+
+/* Inputs de ajustes: ocupan todo el ancho disponible */
+.profile-account-card input[type="text"],
+.profile-account-card input[type="email"],
+.profile-account-card input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* En móvil: menos padding y margen */
+@media (max-width: 640px) {
+  .profile-dashboard-wrapper {
+    padding: 16px 12px;
+  }
+
+  .profile-dashboard-inner {
+    margin: 20px auto;
+  }
+
+  .profile-account-card {
+    padding: 24px 20px;
+  }
+
+  /* Botones de acción (Guardar / Vincular) ocupan todo el ancho */
+  .profile-account-card .flex-1 {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-dashboard-wrapper {
+    padding: 12px 8px;
+  }
+
+  .profile-account-card {
+    padding: 20px 16px;
+  }
+
+  /* Nombre de usuario más compacto */
+  .profile-account-card h2 {
+    font-size: 1.25rem !important;
+  }
+}

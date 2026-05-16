@@ -1966,11 +1966,7 @@ function ProfileContent() {
 
   // ── VISTA DE DASHBOARD / AJUSTES ──
   return (
-    <div className="layout-container" style={{
-      minHeight: '100vh',
-      background: '#f8fafb',
-      padding: '40px 20px'
-    }}>
+    <div className="layout-container profile-dashboard-wrapper">
       <TopHeader />
       {isGuest && (
         <div style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', textAlign: 'center', padding: '12px', zIndex: 1000, position: 'relative', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -1990,7 +1986,7 @@ function ProfileContent() {
         </div>
       )}
       
-      <div style={{ maxWidth: '1000px', margin: '40px auto' }}>
+      <div className="profile-dashboard-inner">
         {/* Header con estadísticas del alumno */}
         <div style={{
           display: 'grid',
@@ -2015,9 +2011,9 @@ function ProfileContent() {
           </GlassCard>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '30px' }}>
+        <div className="profile-account-grid">
           {/* Columna Izquierda: Identidad */}
-          <GlassCard style={{ padding: '40px', height: 'fit-content' }}>
+          <GlassCard className="profile-account-card">
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <div style={{
@@ -2082,7 +2078,7 @@ function ProfileContent() {
           </GlassCard>
 
           {/* Columna Derecha: Configuración */}
-          <GlassCard style={{ padding: '40px' }}>
+          <GlassCard className="profile-account-card">
             <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Settings size={20} color="#6366f1" /> Ajustes de Cuenta
             </h3>
@@ -2108,7 +2104,7 @@ function ProfileContent() {
                     }}
                   />
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <GlowButton color="purple" className="flex-1" onClick={handleUpdatePassword}>Actualizar</GlowButton>
                   <button onClick={() => setIsUpdatingPassword(false)} style={{
                     padding: '14px 24px',
@@ -2126,8 +2122,9 @@ function ProfileContent() {
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px', fontWeight: '600' }}>Alias en el Dojo</label>
                   <div style={{
-                    display: 'flex',
-                    gap: '10px'
+                  display: 'flex',
+                    gap: '10px',
+                    flexWrap: 'wrap'
                   }}>
                     <input
                       type="text"
@@ -2175,11 +2172,11 @@ function ProfileContent() {
 
                 <div style={{ padding: '20px', borderRadius: '15px', background: '#f8fafb', border: '1px dashed #cbd5e1' }}>
                   <h4 style={{ margin: '0 0 10px', fontSize: '1rem', fontWeight: '700' }}>Estado de Explorador</h4>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#64748b' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.9rem', color: '#64748b' }}>
                     <span>Identidad verificada</span>
                     <span style={{ color: '#10b981', fontWeight: '600' }}>SÍ</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#64748b', marginTop: '5px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.9rem', color: '#64748b', marginTop: '5px' }}>
                     <span>Tipo de cuenta</span>
                     <span style={{ fontWeight: '600' }}>{isAutodidact ? 'Autodidacta' : 'Alumno de Aula'}</span>
                   </div>
