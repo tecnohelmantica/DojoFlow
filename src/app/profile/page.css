@@ -466,3 +466,95 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ============================================
+   🔥 PERFIL - RESPONSIVE MÓVIL COMPLETO
+   ============================================ */
+
+/* Contenedor principal del planeta */
+.profile-planet-main {
+  padding: 40px 5% 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Iframe de recursos: altura grande en desktop */
+.resource-iframe {
+  height: 800px;
+}
+
+/* Tarjeta de identidad: texto nombre grande */
+@media (max-width: 480px) {
+  /* Espaciado del main reducido */
+  .profile-planet-main {
+    padding: 20px 4% 100px;
+  }
+
+  /* Nombre del usuario */
+  .profile-planet-main h2 {
+    font-size: 1.5rem !important;
+  }
+
+  /* Profile wrapper padding */
+  .profile-wrapper {
+    padding: 0 4% 40px;
+  }
+
+  /* Stats row: stack vertical en pantallas muy pequeñas */
+  .stats-row {
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    min-width: 80px;
+  }
+
+  /* Misiones: reducir padding del header */
+  .mission-header-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Chat iframe más compacto en móvil */
+  .resource-iframe {
+    height: 450px;
+  }
+
+  /* Tutor card: reducir height fija en móvil */
+  .tutor-card {
+    padding: 16px;
+  }
+
+  /* Lista de items: reducir gap */
+  .list-item {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Padding del main en tablets pequeñas */
+  .profile-planet-main {
+    padding: 24px 4% 100px;
+  }
+
+  /* Iframe recursos: altura media */
+  .resource-iframe {
+    height: 600px;
+  }
+
+  /* Banners de curso (Arduino) */
+  .profile-planet-main .course-banner {
+    height: 250px !important;
+  }
+
+  /* Hero name */
+  .hero-name {
+    font-size: 1.4rem;
+  }
+
+  /* Encabezado con flex-wrap para notificaciones y controles */
+  .mission-header-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

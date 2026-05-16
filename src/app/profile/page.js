@@ -885,7 +885,7 @@ function ProfileContent() {
           </div>
         )}
         
-        <main style={{ padding: '40px 5% 80px', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
+        <main className="profile-planet-main">
           
           {/* BOTÓN VOLVER */}
           <div style={{ marginBottom: '30px' }}>
@@ -1145,7 +1145,7 @@ function ProfileContent() {
           {/* CONTENIDO GATED: LANZADERAS, RECURSOS E ITINERARIO */}
           {!assessmentCompleted ? (
             <div style={{ marginBottom: '40px' }}>
-              <GlassCard style={{ padding: '60px 40px', textAlign: 'center', background: 'rgba(255,255,255,0.5)', border: '2px dashed rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+              <GlassCard style={{ padding: 'clamp(24px, 5vw, 60px) clamp(16px, 4vw, 40px)', textAlign: 'center', background: 'rgba(255,255,255,0.5)', border: '2px dashed rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
                 <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: `${planet?.barColor || '#6366f1'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Brain size={40} color={planet?.barColor || '#6366f1'} />
                 </div>
@@ -1207,7 +1207,7 @@ function ProfileContent() {
                   <img src={planet?.image} alt="Logo" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
                 </div>
                 <div style={{ padding: '30px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
                     <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '900' }}>{planet?.name}</h4>
                     <span style={{ fontSize: '0.6rem', color: planet?.barColor || '#6366f1', fontWeight: '900', border: `1px solid ${planet?.barColor || '#6366f1'}`, padding: '2px 8px', borderRadius: '10px' }}>ONLINE</span>
                   </div>
@@ -1285,10 +1285,9 @@ function ProfileContent() {
                               padding: '12px 10px', 
                               fontWeight: '900',
                               fontSize: '0.75rem',
-                              flex: planet.buttons.length === 1 ? 'none' : '1',
-                              width: planet.buttons.length === 1 ? '300px' : 'calc(50% - 6px)',
-                              maxWidth: planet.buttons.length === 1 ? '300px' : 'none',
-                              margin: planet.buttons.length === 1 ? '0 auto' : '0'
+                              flex: '1',
+                              width: '100%',
+                              minWidth: 0
                             }}
                           >
                             <BtnIcon size={20} style={{ marginRight: '8px' }} /> {btn.label.toUpperCase()}
@@ -1296,7 +1295,7 @@ function ProfileContent() {
                         );
                       })
                     ) : (
-                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} style={{ width: '300px', maxWidth: '300px', padding: '15px', fontWeight: '900', margin: '0 auto' }}>
+                      <GlowButton color="teal" onClick={() => window.open(planet?.url, '_blank')} style={{ width: '100%', maxWidth: '300px', padding: '15px', fontWeight: '900', margin: '0 auto' }}>
                         <ExternalLink size={20} style={{ marginRight: '10px' }} /> {planet?.name?.toUpperCase()} OFICIAL
                       </GlowButton>
                     )}
@@ -1355,7 +1354,7 @@ function ProfileContent() {
 
           {selectedScroll && (
             <div style={{ marginBottom: '40px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
                 <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
                   <Eye size={16} /> {selectedScroll.nombre_recurso}
                 </h3>
@@ -1380,7 +1379,8 @@ function ProfileContent() {
                   ) : (
                     <iframe 
                       src={selectedScroll.contenido?.url}
-                      style={{ width: '100%', height: '800px', border: 'none' }}
+                      className="resource-iframe"
+                      style={{ width: '100%', border: 'none' }}
                       title={selectedScroll.nombre_recurso}
                     />
                   )}
@@ -1398,7 +1398,7 @@ function ProfileContent() {
           {/* CURSO LUIS LLAMAS (Solo para Arduino) */}
           {activePlanet === 'arduino' && (
             <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
                 <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
                   <Globe size={16} /> ENCICLOPEDIA EXPERTA: LUIS LLAMAS
                 </h3>
@@ -1483,7 +1483,7 @@ function ProfileContent() {
           {/* CURSO LUIS LLAMAS (Solo para Python) */}
           {activePlanet === 'python' && (
             <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
                 <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
                   <Globe size={16} /> ENCICLOPEDIA EXPERTA: LUIS LLAMAS
                 </h3>
@@ -1568,7 +1568,7 @@ function ProfileContent() {
           {/* CURSOS LUIS LLAMAS (Solo para HTML/CSS/JS) */}
           {activePlanet === 'html' && (
             <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
                 <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
                   <Globe size={16} /> ENCICLOPEDIA EXPERTA: LUIS LLAMAS
                 </h3>
@@ -1687,7 +1687,7 @@ function ProfileContent() {
 
               {/* FILA 5: ITINERARIO NINJA */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
                   <h3 style={{ fontSize: '0.85rem', fontWeight: '900', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
                     <Zap size={18} color="#ff9800" fill="#ff9800" /> ITINERARIO NINJA: {planet?.name?.toUpperCase() || 'PLANETA'}
                   </h3>
@@ -1907,8 +1907,7 @@ function ProfileContent() {
             {/* Cabecera del Modal */}
             <div style={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap',
               padding: '15px 30px',
               background: 'white',
               borderRadius: isFullscreenResource ? 0 : '15px 15px 0 0',
