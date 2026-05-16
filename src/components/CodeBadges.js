@@ -78,7 +78,7 @@ const CodeBadges = ({ userId, onValidateBadge, refreshTrigger = 0 }) => {
 
   return (
     <div className="code-badges-container" style={{ marginTop: '20px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '15px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 110px), 1fr))', gap: '15px' }}>
         {CODE_SECTIONS.map((section) => {
           const info = badgeData[section.id];
           const status = info?.status || 'No iniciado';

@@ -20,7 +20,7 @@ export default function StudioPage() {
           <h2 className="section-title">Centro de Gestión por Tecnología</h2>
           <p style={{ color: '#8a8a9e', marginBottom: '32px' }}>Selecciona una tecnología para gestionar tu biblioteca de recursos y las aulas correspondientes.</p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
             {[
               { id: 'scratch', name: 'Scratch', color: '#ff7700', icon: '🧩' },
               { id: 'arduino', name: 'Arduino / C++', color: '#00979d', icon: '🤖' },

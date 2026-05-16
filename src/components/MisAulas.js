@@ -196,7 +196,7 @@ function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
 
       {expanded && (
         <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', padding: '14px 16px', background: 'rgba(248,248,252,0.9)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '7px', marginBottom: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 150px), 1fr))', gap: '7px', marginBottom: '12px' }}>
             {alumno.retos_detalle.map(r => {
               const s = STATUS_CONFIG[r.status] || STATUS_CONFIG['No iniciado'];
               const fKey = `planet_${r.planet_id}`;
@@ -520,7 +520,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                   <p style={{ color: '#8a8a9e' }}>Aún no has compartido ningún recurso con esta clase.</p>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
                   {claseRecursos.map(cr => (
                     <div key={cr.id} style={{ background: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #eee', position: 'relative' }}>
                       <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#1a1a2e', marginBottom: '4px' }}>{cr.recursos_docentes.nombre_recurso || cr.recursos_docentes.contenido?.meta?.filename}</h4>
@@ -566,7 +566,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                 </div>
               </GlassCard>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
                 {platforms.map(p => (
                   <GlassCard key={p.id} style={{ padding: '20px', opacity: activeLaunchers[p.id] ? 1 : 0.6 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -860,7 +860,7 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
             <p style={{ color: '#8a8a9e' }}>{clases.length} clases</p>
             <button onClick={() => setShowCrear(true)} style={BTN_PRIMARY}>+ Nueva Clase</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
             {clases.map(c => <ClaseCard key={c.id} clase={c} onSelect={abrirDashboard} onDelete={eliminarClase} />)}
           </div>
         </>
@@ -883,7 +883,7 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
               <p style={{ color: '#aaa', fontSize: '0.85rem' }}>Los materiales que subas con NotebookLM aparecerán aquí.</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
               {misRecursos.map(r => {
                 const isConfirming = confirmingDelete === r.id;
                 return (

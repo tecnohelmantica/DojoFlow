@@ -328,7 +328,7 @@ export default function HomePage() {
         {role === 'profesor' ? 'Cuadernos Activos de la Clase' : 'Tus Planetas Tecnológicos'}
       </h2>
 
-      <div className="planets-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+      <div className="planets-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '40px' }}>
         {planets.map((planet) => {
           const isAulaConectada = !!studentLaunchers[planet.id];
           const launcherUrl = studentLaunchers[planet.id];

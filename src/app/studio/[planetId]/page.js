@@ -593,7 +593,7 @@ Audiencia objetivo: ${audiencia || 'Exploradores de DojoFlow.'}
                   <p style={{ fontSize:'0.85rem' }}>No tienes recursos privados en este planeta.</p>
                 </GlassCard>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
                   {[...new Map(misRecursos
                     .filter(r => matchTech(r.tecnologia, planetId) && r.profesor_id === currentUser?.id && !r.contenido?.meta?.isGlobal && !r.contenido?.isMaster)
                     .map(item => [item.id, item])).values()]
@@ -745,7 +745,7 @@ Audiencia objetivo: ${audiencia || 'Exploradores de DojoFlow.'}
                   <p style={{ fontSize:'0.85rem' }}>No hay recursos maestros disponibles en este momento.</p>
                 </GlassCard>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
                     {[...new Map(misRecursos
                       .filter(r => matchTech(r.tecnologia, planetId) && (r.contenido?.meta?.isGlobal || r.contenido?.isMaster))
                       .map(item => [item.id, item])).values()]

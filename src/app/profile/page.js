@@ -659,7 +659,7 @@ function ProfileContent() {
               </div>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '20px', marginBottom: '40px' }}>
               <GlassCard style={{ padding: '20px', textAlign: 'center', borderBottom: '4px solid #ff9d00' }}>
                 <p style={{ fontSize: '0.7rem', fontWeight: '800', color: '#8a8a9e', letterSpacing: '1px', marginBottom: '10px' }}>AULAS BAJO MANDO</p>
                 <h2 style={{ fontSize: '2rem', color: '#1a1a2e', fontFamily: 'Outfit' }}>{teacherStats.clases}</h2>
@@ -674,7 +674,7 @@ function ProfileContent() {
               </GlassCard>
             </div>
 
-            <div className="teacher-account-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            <div className="teacher-account-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
               <GlassCard className="account-details-card">
                 <h3 style={{ fontFamily: 'Outfit', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <IdCard size={20} className="text-purple" /> Identidad Digital
@@ -1323,7 +1323,7 @@ function ProfileContent() {
             <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', marginBottom: '15px' }}>
               <BookOpen size={16} /> RECURSOS DE APOYO
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
               {teacherResources
                 .filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
                 .sort(sortRecursos)
@@ -1575,7 +1575,7 @@ function ProfileContent() {
                 <span style={{ fontSize: '0.6rem', color: '#e44d26', fontWeight: '900', background: 'rgba(228, 77, 38, 0.1)', padding: '4px 12px', borderRadius: '15px' }}>TRILOGÍA WEB</span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '20px' }}>
                 {/* HTML */}
                 <GlassCard style={{ padding: 0, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px' }}>
                   <div style={{ position: 'relative', height: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '30px', background: 'linear-gradient(135deg, #e44d26 0%, #f16529 100%)' }}>
@@ -1995,7 +1995,7 @@ function ProfileContent() {
         {/* Header con estadísticas del alumno */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
           gap: '20px',
           marginBottom: '40px'
         }}>
@@ -2016,7 +2016,7 @@ function ProfileContent() {
           </GlassCard>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '30px' }}>
           {/* Columna Izquierda: Identidad */}
           <GlassCard style={{ padding: '40px', height: 'fit-content' }}>
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>

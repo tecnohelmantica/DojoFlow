@@ -2899,7 +2899,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                   {category} <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.05)' }} />
                 </h4>
                 <div style={{ 
-                  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px',
+                  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 160px), 1fr))', gap: '12px',
                   background: 'rgba(0,0,0,0.03)', padding: '20px', borderRadius: '24px'
                 }}>
                   {items.map((item, index) => (
@@ -2913,7 +2913,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           </div>
         ) : (
           <div style={{ 
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px',
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 160px), 1fr))', gap: '12px',
             background: 'rgba(0,0,0,0.03)', padding: '20px', borderRadius: '24px'
           }}>
             {activeList.map((item, index) => (
