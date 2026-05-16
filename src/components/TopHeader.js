@@ -22,7 +22,9 @@ const TopHeader = () => {
       borderBottom: '1px solid rgba(0,0,0,0.05)',
       marginBottom: '20px',
       position: 'relative',
-      zIndex: '1000'
+      zIndex: '1000',
+      flexWrap: 'wrap',
+      gap: '12px'
     }}>
       <div className="profile-badge" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <div className="avatar-small" style={{ 

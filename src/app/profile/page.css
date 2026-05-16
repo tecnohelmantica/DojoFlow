@@ -436,3 +436,33 @@
   z-index: 3;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
+
+.identity-tutor-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 40px;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .identity-tutor-grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    align-items: start;
+  }
+}
+
+.launchers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 1024px) {
+  .launchers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

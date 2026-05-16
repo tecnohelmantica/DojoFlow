@@ -895,7 +895,7 @@ function ProfileContent() {
           </div>
 
           {/* FILA 1: IDENTIDAD + TUTOR SOCRÁTICO */}
-          <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '30px', marginBottom: '40px', alignItems: 'start' }}>
+          <div className="identity-tutor-grid">
             
             {/* TARJETA DE IDENTIDAD */}
             <GlassCard style={{ padding: '40px 30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
@@ -1165,7 +1165,7 @@ function ProfileContent() {
           ) : (
             <>
               {/* FILA 2: LANZADERAS Y PÁGINA OFICIAL */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' }}>
+          <div className="launchers-grid">
             
             {/* LANZADERAS */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -1323,7 +1323,7 @@ function ProfileContent() {
             <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', marginBottom: '15px' }}>
               <BookOpen size={16} /> RECURSOS DE APOYO
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {teacherResources
                 .filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
                 .sort(sortRecursos)
