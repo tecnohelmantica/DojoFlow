@@ -14,6 +14,7 @@ import TopHeader from '../../components/TopHeader';
 import NinjaChallenges from '../../components/NinjaChallenges';
 import SenseiMissions from '../../components/SenseiMissions';
 import SocraticTutor from '../../components/SocraticTutor';
+import ValidationChat from '../../components/ValidationChat';
 import { getPlanetById } from '../../lib/planets';
 import ResourceUploader from '../../components/ResourceUploader';
 import CodeBadges from '../../components/CodeBadges';
@@ -68,6 +69,10 @@ function ProfileContent() {
   const [isTyping, setIsTyping] = useState(false);
   const [isNinjaValidator, setIsNinjaValidator] = useState(false);
   const [evidenceStatus, setEvidenceStatus] = useState('No Iniciado');
+
+  // ── Validation Chat (panel separado del Tutor Socrático) ──
+  const [isValidationChatOpen, setIsValidationChatOpen] = useState(false);
+  const [validationContext, setValidationContext] = useState(null);
   const [studentClassrooms, setStudentClassrooms] = useState([]);
 
   // ── Recursos del Maestro ──
@@ -526,46 +531,23 @@ function ProfileContent() {
   };
 
   const handleValidateChallenge = (challenge, evidenceUrl, challengeId) => {
-    setIsNinjaValidator(true);
-    
-    const planetName = getPlanetById(activePlanet)?.name || activePlanet;
-    const challengeName = challenge.nombre || challenge.title || "este reto";
-
-    // Limpiar mensajes previos o añadir uno nuevo de sistema
-    setSocraticMessages(prev => [
-      ...prev,
-      { 
-        role: 'tutor', 
-        text: `--- MODO VALIDACIÓN ACTIVADO ---\n¡Hola! He recibido tu entrega para **${challengeName}**. \n\nPara validarlo, cuéntame: ¿Qué ha sido lo más difícil de este proyecto o cómo funciona la lógica principal que has aplicado?` 
-      }
-    ]);
-
-    // Hacer scroll suave hacia el tutor
-    const tutorSection = document.getElementById('socratic-tutor-section');
-    if (tutorSection) {
-      tutorSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    const challengeName = challenge.nombre || challenge.title || 'este reto';
+    setValidationContext({
+      type: 'challenge',
+      title: challengeName,
+      objective: challenge.descripcion || challenge.description || '',
+      challengeId
+    });
+    setIsValidationChatOpen(true);
   };
 
   const handleValidateSenseiMission = (mission) => {
-    setIsNinjaValidator(true);
-
-    const missionTitle = mission?.title || 'esta misión';
-    const missionObjective = mission?.objective || '';
-
-    setSocraticMessages(prev => [
-      ...prev,
-      {
-        role: 'tutor',
-        text: `--- VALIDACIÓN DE MISIÓN SENSEI ---\n¡Excelente! Has completado la misión **"${missionTitle}"**.\n\n${missionObjective ? `Objetivo: _${missionObjective}_\n\n` : ''}Para validar tu aprendizaje, cuéntame: ¿Cómo resolviste el reto principal? ¿Qué concepto nuevo has aplicado y cómo lo explicarías con tus propias palabras?`
-      }
-    ]);
-
-    // Scroll suave hacia el tutor socrático
-    const tutorSection = document.getElementById('socratic-tutor-section');
-    if (tutorSection) {
-      tutorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    setValidationContext({
+      type: 'mission',
+      title: mission?.title || 'esta misión',
+      objective: mission?.objective || ''
+    });
+    setIsValidationChatOpen(true);
   };
 
   if (authLoading || loading) return <div className="flex-center" style={{ minHeight: '60vh', color: '#8a8a9e' }}>Sincronizando parámetros...</div>;
@@ -1911,6 +1893,20 @@ function ProfileContent() {
           )}
 
         </main>
+
+        {/* VALIDATION CHAT — Panel lateral de validación de retos y misiones */}
+        <ValidationChat
+          isOpen={isValidationChatOpen}
+          onClose={() => setIsValidationChatOpen(false)}
+          context={validationContext}
+          userId={isGuest ? 'guest_user' : session?.user?.id}
+          planetId={activePlanet}
+          studentLevel={studentLevel}
+          accentColor={planet?.barColor || '#6366f1'}
+          onValidated={() => {
+            setSenseiRefreshTrigger(t => t + 1);
+          }}
+        />
 
         {/* MODAL DE VISUALIZACIÓN DE RECURSOS */}
         {activeResource && (
