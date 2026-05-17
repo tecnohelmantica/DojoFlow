@@ -725,10 +725,45 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         }
 
         @media (max-width: 900px) {
-          .mission-grid { grid-template-columns: 1fr; }
+          .mission-grid { grid-template-columns: 1fr; gap: 24px; }
           .mission-sidebar { order: -1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
           .resources-widget { grid-column: span 2; }
           .regenerate-btn { grid-column: span 2; }
+          .mission-active-card { padding: 24px 18px; }
+          .mission-header { flex-direction: column; gap: 16px; margin-bottom: 28px; }
+          .header-right { flex-direction: row !important; align-items: center !important; width: 100%; justify-content: space-between; }
+          .header-left { gap: 16px; }
+          .planet-badge { width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0; }
+          .title-group h2 { font-size: 1.4rem; }
+          .narrative-box { padding: 18px; }
+          .objective-card { font-size: 1rem; padding: 18px; }
+          .learning-list { grid-template-columns: 1fr; }
+          .action-footer { flex-direction: column; gap: 12px; margin-top: 28px; }
+          .sidebar-widget { padding: 16px; }
+        }
+
+        @media (max-width: 600px) {
+          .sensei-mission-container { margin-bottom: 40px; }
+          .dashboard-stats { flex-wrap: wrap; gap: 12px; padding: 14px 16px; border-radius: 20px; }
+          .stat-item { padding-right: 12px; gap: 8px; }
+          .stat-value { font-size: 1rem; }
+          .stat-label { font-size: 0.6rem; }
+          .welcome-section { padding: 20px 0; }
+          .hero-card { padding: 40px 20px; }
+          .hero-title { font-size: 2rem; }
+          .hero-subtitle { font-size: 1rem; margin-bottom: 28px; }
+          .hero-icon-container { width: 100px; height: 100px; margin-bottom: 24px; }
+          .config-card { padding: 22px 16px; margin: 0 4px; }
+          .config-header h3 { font-size: 1.1rem; }
+          .toggle-group { flex-wrap: wrap; }
+          .toggle-group button { font-size: 0.8rem; padding: 10px 8px; }
+          .mission-active-card { padding: 16px 12px; border-radius: 20px; }
+          .mission-sidebar { grid-template-columns: 1fr 1fr; }
+          .badge { font-size: 0.65rem; }
+          .xp-badge { padding: 8px 14px; font-size: 0.85rem; }
+          .ask-another-btn { font-size: 0.65rem; padding: 6px 10px; }
+          .section-title span { font-size: 0.7rem; }
+          .hints-section { margin-top: 20px; }
         }
       `}</style>
     </div>
