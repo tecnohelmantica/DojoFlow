@@ -8,7 +8,8 @@ import {
   Send, HelpCircle, Trophy, Zap, 
   Brain, Timer, Star, Award, 
   Settings, RefreshCw, Layers, 
-  Gamepad2, Cpu, Box, Code2, Palette
+  Gamepad2, Cpu, Box, Code2, Palette,
+  Upload, Paperclip, Link2, X as XIcon
 } from 'lucide-react';
 import SocraticTutor from './SocraticTutor';
 
@@ -17,6 +18,10 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
+  const [showEvidenceForm, setShowEvidenceForm] = useState(false);
+  const [evidenceUrl, setEvidenceUrl] = useState('');
+  const [evidenceFile, setEvidenceFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [stats, setStats] = useState({
     completed: 0,
     xp: 0,
@@ -221,6 +226,65 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
     }
   };
 
+
+  const handleSubmitEvidence = async () => {
+    if (!evidenceUrl && !evidenceFile) {
+      alert('Por favor, pega el enlace de tu proyecto o adjunta un archivo antes de validar.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      let uploadedFileUrl = null;
+
+      if (userId === 'guest_user') {
+        // Invitado: guardar en localStorage
+        if (evidenceFile) uploadedFileUrl = URL.createObjectURL(evidenceFile);
+        const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
+        const idx = guestMissions.findIndex(m => m.id === mission.id);
+        if (idx >= 0) {
+          guestMissions[idx].evidence_url = evidenceUrl;
+          guestMissions[idx].evidence_file_url = uploadedFileUrl;
+          guestMissions[idx].status = 'En revisión';
+        }
+        localStorage.setItem('guest_sensei_missions', JSON.stringify(guestMissions));
+      } else {
+        // Usuario registrado: subir archivo si hay
+        if (evidenceFile) {
+          const fileExt = evidenceFile.name.split('.').pop();
+          const filePath = `evidences/${userId}/sensei_${mission.id}_${Date.now()}.${fileExt}`;
+          const { error: storageError } = await supabase.storage
+            .from('dojoflow-assets')
+            .upload(filePath, evidenceFile);
+          if (storageError) throw storageError;
+          const { data: { publicUrl } } = supabase.storage
+            .from('dojoflow-assets')
+            .getPublicUrl(filePath);
+          uploadedFileUrl = publicUrl;
+        }
+        // Guardar evidencia en sensei_missions
+        await supabase
+          .from('sensei_missions')
+          .update({
+            evidence_url: evidenceUrl || null,
+            evidence_file_url: uploadedFileUrl || null,
+            status: 'En revisión',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', mission.id);
+      }
+
+      // Limpiar form y lanzar validación socrática
+      setShowEvidenceForm(false);
+      setEvidenceUrl('');
+      setEvidenceFile(null);
+      if (onValidateMission) onValidateMission(mission);
+    } catch (err) {
+      console.error('Error enviando evidencia:', err);
+      alert('Error al enviar la evidencia. Inténtalo de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const getPlanetIcon = () => {
     switch(planetId) {
@@ -429,13 +493,73 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
               </div>
 
               <div className="action-footer mt-8">
-                <GlowButton 
-                  onClick={() => onValidateMission?.(mission)}
-                  variant="primary"
-                  className="w-full py-4"
-                >
-                  <Send size={18} className="mr-2" /> ENVIAR SOLUCIÓN PARA VALIDAR
-                </GlowButton>
+                {!showEvidenceForm ? (
+                  <GlowButton 
+                    onClick={() => setShowEvidenceForm(true)}
+                    variant="primary"
+                    className="w-full py-4"
+                  >
+                    <Send size={18} className="mr-2" /> ENVIAR SOLUCIÓN PARA VALIDAR
+                  </GlowButton>
+                ) : (
+                  <div className="evidence-form">
+                    <div className="evidence-form-header">
+                      <div className="evidence-form-title">
+                        <Upload size={18} />
+                        <span>Adjunta tu evidencia</span>
+                      </div>
+                      <button className="evidence-close-btn" onClick={() => setShowEvidenceForm(false)}>
+                        <XIcon size={16} />
+                      </button>
+                    </div>
+
+                    <div className="evidence-field">
+                      <label><Link2 size={14} /> URL del proyecto (Scratch, Tinkercad, etc.)</label>
+                      <input
+                        type="url"
+                        placeholder="https://scratch.mit.edu/projects/..."
+                        value={evidenceUrl}
+                        onChange={e => setEvidenceUrl(e.target.value)}
+                        className="evidence-input"
+                      />
+                    </div>
+
+                    <div className="evidence-divider"><span>o</span></div>
+
+                    <div className="evidence-field">
+                      <label><Paperclip size={14} /> Archivo (captura, vídeo, PDF...)</label>
+                      <label className="evidence-file-label">
+                        {evidenceFile ? (
+                          <span className="evidence-file-name">
+                            <Paperclip size={14} /> {evidenceFile.name}
+                            <button onClick={e => { e.preventDefault(); setEvidenceFile(null); }}><XIcon size={12} /></button>
+                          </span>
+                        ) : (
+                          <span><Upload size={14} /> Seleccionar archivo</span>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*,video/*,.pdf,.zip"
+                          style={{ display: 'none' }}
+                          onChange={e => setEvidenceFile(e.target.files?.[0] || null)}
+                        />
+                      </label>
+                    </div>
+
+                    <GlowButton
+                      onClick={handleSubmitEvidence}
+                      disabled={isSubmitting || (!evidenceUrl && !evidenceFile)}
+                      variant="primary"
+                      className="w-full mt-4"
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 size={18} className="animate-spin mr-2" /> Enviando...</>
+                      ) : (
+                        <><Send size={18} className="mr-2" /> CONFIRMAR Y VALIDAR CON EL SENSEI</>
+                      )}
+                    </GlowButton>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -740,6 +864,127 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           .learning-list { grid-template-columns: 1fr; }
           .action-footer { flex-direction: column; gap: 12px; margin-top: 28px; }
           .sidebar-widget { padding: 16px; }
+        }
+
+        /* --- EVIDENCE FORM --- */
+        .evidence-form {
+          background: rgba(var(--accent-rgb), 0.06);
+          border: 1px solid rgba(var(--accent-rgb), 0.25);
+          border-radius: 24px;
+          padding: 24px;
+          animation: fadeIn 0.3s ease-out;
+          width: 100%;
+        }
+        .evidence-form-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+        .evidence-form-title {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          color: var(--accent);
+          font-size: 0.85rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .evidence-close-btn {
+          background: rgba(255,255,255,0.06);
+          border: none;
+          color: rgba(255,255,255,0.5);
+          cursor: pointer;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .evidence-close-btn:hover { background: rgba(255,60,60,0.15); color: #ff4757; }
+        .evidence-field { margin-bottom: 14px; }
+        .evidence-field label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.7rem;
+          color: rgba(255,255,255,0.5);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 8px;
+        }
+        .evidence-input {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 14px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(0,0,0,0.3);
+          color: white;
+          font-size: 0.9rem;
+          outline: none;
+          transition: border-color 0.3s;
+          box-sizing: border-box;
+        }
+        .evidence-input:focus { border-color: var(--accent); }
+        .evidence-file-label {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          padding: 12px;
+          border-radius: 14px;
+          border: 1px dashed rgba(var(--accent-rgb), 0.4);
+          background: rgba(var(--accent-rgb), 0.04);
+          color: rgba(255,255,255,0.6);
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-sizing: border-box;
+        }
+        .evidence-file-label:hover { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb), 0.08); }
+        .evidence-file-name {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--accent);
+          font-size: 0.8rem;
+          font-weight: 700;
+        }
+        .evidence-file-name button {
+          background: none;
+          border: none;
+          color: rgba(255,255,255,0.4);
+          cursor: pointer;
+          padding: 2px;
+          display: flex;
+          align-items: center;
+        }
+        .evidence-divider {
+          text-align: center;
+          margin: 12px 0;
+          position: relative;
+        }
+        .evidence-divider::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: rgba(255,255,255,0.08);
+        }
+        .evidence-divider span {
+          position: relative;
+          background: rgba(13,17,30,0.9);
+          padding: 0 12px;
+          font-size: 0.7rem;
+          color: rgba(255,255,255,0.3);
+          text-transform: uppercase;
         }
 
         @media (max-width: 600px) {
