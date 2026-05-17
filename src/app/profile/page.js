@@ -547,6 +547,27 @@ function ProfileContent() {
     }
   };
 
+  const handleValidateSenseiMission = (mission) => {
+    setIsNinjaValidator(true);
+
+    const missionTitle = mission?.title || 'esta misión';
+    const missionObjective = mission?.objective || '';
+
+    setSocraticMessages(prev => [
+      ...prev,
+      {
+        role: 'tutor',
+        text: `--- VALIDACIÓN DE MISIÓN SENSEI ---\n¡Excelente! Has completado la misión **"${missionTitle}"**.\n\n${missionObjective ? `Objetivo: _${missionObjective}_\n\n` : ''}Para validar tu aprendizaje, cuéntame: ¿Cómo resolviste el reto principal? ¿Qué concepto nuevo has aplicado y cómo lo explicarías con tus propias palabras?`
+      }
+    ]);
+
+    // Scroll suave hacia el tutor socrático
+    const tutorSection = document.getElementById('socratic-tutor-section');
+    if (tutorSection) {
+      tutorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   if (authLoading || loading) return <div className="flex-center" style={{ minHeight: '60vh', color: '#8a8a9e' }}>Sincronizando parámetros...</div>;
   
   if (!session && !isGuest) return null;
@@ -1881,6 +1902,8 @@ function ProfileContent() {
                     userId={isGuest ? 'guest_user' : session?.user?.id}
                     studentLevel={studentLevel}
                     accentColor={planet?.barColor}
+                    onValidateMission={handleValidateSenseiMission}
+                    refreshTrigger={senseiRefreshTrigger}
                   />
                 </div>
               )}

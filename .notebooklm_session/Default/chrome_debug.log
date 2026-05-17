@@ -1,28 +1,7 @@
-[0512/215421.658:INFO:CONSOLE:546] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D1_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlE2mu87tS8UufFNcZSuZZoxRmSmjg/dti=1/m=_b,_tp (546)
-[0512/215421.658:INFO:CONSOLE:546] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
+[0513/172432.947:INFO:CONSOLE:546] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D1_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlE2mu87tS8UufFNcZSuZZoxRmSmjg/dti=1/m=_b,_tp (546)
+[0513/172432.948:INFO:CONSOLE:546] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
 Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D1_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlE2mu87tS8UufFNcZSuZZoxRmSmjg/dti=1/m=_b,_tp (546)
-[0512/215422.465:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215422.465:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215422.599:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215422.599:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215458.190:ERROR:net\disk_cache\cache_util_win.cc:25] Unable to move the cache: Acceso denegado. (0x5)
-[0512/215458.191:ERROR:net\disk_cache\cache_util_win.cc:25] Unable to move the cache: Acceso denegado. (0x5)
-[0512/215458.191:ERROR:net\disk_cache\cache_util_win.cc:25] Unable to move the cache: Acceso denegado. (0x5)
-[0512/215458.194:ERROR:net\disk_cache\disk_cache.cc:284] Unable to create cache
-[0512/215458.194:ERROR:gpu\ipc\host\gpu_disk_cache.cc:737] Gpu Cache Creation failed: -2
-[0512/215458.194:ERROR:net\disk_cache\disk_cache.cc:284] Unable to create cache
-[0512/215458.194:ERROR:gpu\ipc\host\gpu_disk_cache.cc:737] Gpu Cache Creation failed: -2
-[0512/215458.194:ERROR:net\disk_cache\disk_cache.cc:284] Unable to create cache
-[0512/215458.194:ERROR:gpu\ipc\host\gpu_disk_cache.cc:737] Gpu Cache Creation failed: -2
-[0512/215458.198:WARNING:content\browser\btm\btm_database.cc:128] Failed to initialize the DIPS SQLite database.
-[0512/215500.202:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
-[0512/215500.936:INFO:CONSOLE:546] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACEQhQhA4Dx_38DAAggiA74ngVoAoQMAAAAAAAAAABYAAAAjQ/d=1/excm=_b,_tp,identifierview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlGeAZRJ55zJsyAdBhxYn_4TIutGoQ/dti=1/m=_b,_tp (546)
-[0512/215500.937:INFO:CONSOLE:546] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
-Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACEQhQhA4Dx_38DAAggiA74ngVoAoQMAAAAAAAAAABYAAAAjQ/d=1/excm=_b,_tp,identifierview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlGeAZRJ55zJsyAdBhxYn_4TIutGoQ/dti=1/m=_b,_tp (546)
-[0512/215501.455:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215501.455:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215501.582:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215501.582:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0512/215502.243:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
-[0512/215504.279:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
-[0512/215506.311:WARNING:components\leveldb_proto\internal\leveldb_database.cc:124] Unable to open C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata: IO error: C:\Users\monsa\Desktop\Antigravity\DojoFlow\dojoflow-app\.notebooklm_session\Default\shared_proto_db\metadata/LOCK: Access denied. (ChromeMethodBFE: 15::LockFile::5)
+[0513/172434.172:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0513/172434.172:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0513/172434.385:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0513/172434.386:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
