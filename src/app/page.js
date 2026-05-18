@@ -393,6 +393,47 @@ export default function HomePage() {
         
         {!isProfesor && (
           <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            {isGuest && (
+              <GlassCard style={{
+                maxWidth: '600px',
+                padding: '20px 24px',
+                background: 'rgba(13, 207, 207, 0.05)',
+                border: '1.5px dashed rgba(13, 207, 207, 0.3)',
+                borderRadius: '16px',
+                textAlign: 'center',
+                marginBottom: '15px'
+              }}>
+                <p style={{ margin: 0, color: 'var(--accent-teal)', fontSize: '0.85rem', fontWeight: '700', lineHeight: '1.5' }}>
+                  🕵️‍♂️ Estás explorando DojoFlow en Modo Invitado. ¿Quieres aprender a navegar por la galaxia de planetas y retos?
+                </p>
+                <button
+                  onClick={() => window.dispatchEvent(new Event('dojoflow_show_onboarding'))}
+                  style={{
+                    marginTop: '12px',
+                    background: 'linear-gradient(135deg, var(--accent-teal), var(--accent-cyan))',
+                    border: 'none',
+                    color: 'white',
+                    fontWeight: '800',
+                    fontSize: '0.75rem',
+                    padding: '8px 18px',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 10px rgba(13, 207, 207, 0.2)',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 14px rgba(13, 207, 207, 0.35)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(13, 207, 207, 0.2)';
+                  }}
+                >
+                  💡 ABRIR GUÍA RÁPIDA DE INVITADO
+                </button>
+              </GlassCard>
+            )}
             {studentAulas.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>

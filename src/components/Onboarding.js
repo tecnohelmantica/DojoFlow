@@ -27,6 +27,16 @@ export default function Onboarding() {
     }
   }, [profile, pathname]);
 
+  // Escuchar evento global para forzar la apertura del onboarding
+  useEffect(() => {
+    const handleOpenOnboarding = () => {
+      setStep(0);
+      setShow(true);
+    };
+    window.addEventListener('dojoflow_show_onboarding', handleOpenOnboarding);
+    return () => window.removeEventListener('dojoflow_show_onboarding', handleOpenOnboarding);
+  }, []);
+
   // Asegurar que si por algún motivo show cambia a true, el step sea 0
   useEffect(() => {
     if (show) setStep(0);
@@ -66,6 +76,12 @@ export default function Onboarding() {
       content: "Estás ingresando en modo demo. Aquí podrás interactuar con todos los planetas tecnológicos y experimentar la IA tutor socrática de DojoFlow de forma directa.",
       icon: <Rocket size={48} color="var(--accent-teal)" />,
       color: "var(--accent-teal)"
+    },
+    {
+      title: "¿Cómo empezar tu viaje?",
+      content: "1. Selecciona cualquiera de los planetas tecnológicos (Scratch, Python, HTML...) en la pantalla principal. \n\n2. Responde a la evaluación inicial del Sensei en la sección superior para determinar tu rango. \n\n3. Explora tu itinerario de retos, sigue las pistas socráticas del Tutor IA y diviértete programando.",
+      icon: <BrainCircuit size={48} color="var(--accent-cyan)" />,
+      color: "var(--accent-cyan)"
     },
     {
       title: "IA Tutor Socrático",

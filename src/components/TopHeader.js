@@ -4,7 +4,7 @@ import { LogOut, Bell, User, CheckCircle, Clock, Trophy } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 
 const TopHeader = () => {
-  const { signOut, profile, role, notifications, markNotificationsAsRead } = useAuth();
+  const { signOut, profile, role, notifications, markNotificationsAsRead, isGuest } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const isProfesor = role === 'profesor';
 
@@ -68,6 +68,37 @@ const TopHeader = () => {
       </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isGuest && (
+            <button 
+              onClick={() => window.dispatchEvent(new Event('dojoflow_show_onboarding'))}
+              style={{
+                cursor: 'pointer', 
+                color: 'white', 
+                padding: '6px 12px',
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-cyan) 100%)',
+                border: 'none',
+                fontWeight: '800',
+                fontSize: '0.7rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 12px rgba(13, 207, 207, 0.2)',
+                transition: 'all 0.2s',
+                marginRight: '6px'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(13, 207, 207, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(13, 207, 207, 0.2)';
+              }}
+            >
+              💡 GUÍA DE INICIO
+            </button>
+          )}
           <div style={{ position: 'relative' }}>
             <div 
               onClick={() => setShowNotifications(!showNotifications)}

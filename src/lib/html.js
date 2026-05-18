@@ -43,41 +43,41 @@ export const HTML_CODE_ORG = [
 // ─── RASPBERRY PI Nivel 1 — BÁSICO (11 proyectos verificados de la imagen) ───
 // Source: projects.raspberrypi.org/en/technology/web_development → Level 1
 export const RASPBERRY_WEB_LEVEL_1 = [
-  { id: 301, numero: 1,  titulo: 'About Me',           description: 'Haz un sitio web sobre ti mismo usando HTML y CSS.',                      url: 'https://projects.raspberrypi.org/en/projects/about-me'           },
-  { id: 302, numero: 2,  titulo: 'Anime Expressions',  description: 'Crea y anima un personaje de anime con CSS.',                            url: 'https://projects.raspberrypi.org/en/projects/anime-expressions'  },
-  { id: 303, numero: 3,  titulo: 'Bird Watch Website 1.0', description: 'Crea tu primera web de observación de aves.',                        url: 'https://projects.raspberrypi.org/en/projects/bird-watch-website' },
-  { id: 304, numero: 4,  titulo: 'Build a Robot',      description: 'Diseña un robot con formas y colores CSS.',                              url: 'https://projects.raspberrypi.org/en/projects/build-a-robot'      },
-  { id: 305, numero: 5,  titulo: 'Happy Birthday',     description: 'Una tarjeta de felicitación interactiva con CSS.',                       url: 'https://projects.raspberrypi.org/en/projects/happy-birthday'     },
-  { id: 306, numero: 6,  titulo: 'Magazine',           description: 'Crea una página web con diseño de revista usando CSS Grid.',             url: 'https://projects.raspberrypi.org/en/projects/magazine'           },
-  { id: 307, numero: 7,  titulo: 'Pixel Art',          description: 'Crea un editor de pixel art con CSS Grid.',                             url: 'https://projects.raspberrypi.org/en/projects/pixel-art'          },
-  { id: 308, numero: 8,  titulo: 'Recipe',             description: 'Diseña tu receta favorita con HTML y CSS.',                             url: 'https://projects.raspberrypi.org/en/projects/recipe'             },
-  { id: 309, numero: 9,  titulo: 'Sunrise',            description: 'Animación CSS de un amanecer con @keyframes.',                          url: 'https://projects.raspberrypi.org/en/projects/sunrise'            },
-  { id: 310, numero: 10, titulo: 'Tell a Story',       description: 'Escribe una historia interactiva con múltiples páginas.',               url: 'https://projects.raspberrypi.org/en/projects/tell-a-story'       },
-  { id: 311, numero: 11, titulo: 'Wanted!',            description: 'Crea un póster "Se busca" para un personaje con HTML y CSS.',           url: 'https://projects.raspberrypi.org/en/projects/wanted'             },
+  { id: 'about-me', numero: 1,  titulo: 'About Me',           description: 'Haz un sitio web sobre ti mismo usando HTML y CSS.',                      url: 'https://projects.raspberrypi.org/en/projects/about-me'           },
+  { id: 'anime-expressions', numero: 2,  titulo: 'Anime Expressions',  description: 'Crea y anima un personaje de anime con CSS.',                            url: 'https://projects.raspberrypi.org/en/projects/anime-expressions'  },
+  { id: 'bird-watch-website', numero: 3,  titulo: 'Bird Watch Website 1.0', description: 'Crea tu primera web de observación de aves.',                        url: 'https://projects.raspberrypi.org/en/projects/bird-watch-website' },
+  { id: 'build-a-robot', numero: 4,  titulo: 'Build a Robot',      description: 'Diseña un robot con formas y colores CSS.',                              url: 'https://projects.raspberrypi.org/en/projects/build-a-robot'      },
+  { id: 'happy-birthday', numero: 5,  titulo: 'Happy Birthday',     description: 'Una tarjeta de felicitación interactiva con CSS.',                       url: 'https://projects.raspberrypi.org/en/projects/happy-birthday'     },
+  { id: 'magazine', numero: 6,  titulo: 'Magazine',           description: 'Crea una página web con diseño de revista usando CSS Grid.',             url: 'https://projects.raspberrypi.org/en/projects/magazine'           },
+  { id: 'pixel-art', numero: 7,  titulo: 'Pixel Art',          description: 'Crea un editor de pixel art con CSS Grid.',                             url: 'https://projects.raspberrypi.org/en/projects/pixel-art'          },
+  { id: 'recipe', numero: 8,  titulo: 'Recipe',             description: 'Diseña tu receta favorita con HTML y CSS.',                             url: 'https://projects.raspberrypi.org/en/projects/recipe'             },
+  { id: 'sunrise', numero: 9,  titulo: 'Sunrise',            description: 'Animación CSS de un amanecer con @keyframes.',                          url: 'https://projects.raspberrypi.org/en/projects/sunrise'            },
+  { id: 'tell-a-story', numero: 10, titulo: 'Tell a Story',       description: 'Escribe una historia interactiva con múltiples páginas.',               url: 'https://projects.raspberrypi.org/en/projects/tell-a-story'       },
+  { id: 'wanted', numero: 11, titulo: 'Wanted!',            description: 'Crea un póster "Se busca" para un personaje con HTML y CSS.',           url: 'https://projects.raspberrypi.org/en/projects/wanted'             },
 ];
 
 // ─── RASPBERRY PI Nivel 2 — INTERMEDIO (10 proyectos verificados de la imagen) ─
 // Source: projects.raspberrypi.org/en/technology/web_development → Level 2
 export const RASPBERRY_WEB_LEVEL_2 = [
-  { id: 312, numero: 1,  titulo: 'Animated Story',     description: 'Usa JavaScript para añadir efectos a una historia animada.',            url: 'https://projects.raspberrypi.org/en/projects/animated-story'    },
-  { id: 313, numero: 2,  titulo: 'Boat Race',          description: 'Un juego simple de carreras de barcos con CSS y JavaScript.',          url: 'https://projects.raspberrypi.org/en/projects/boat-race'          },
-  { id: 314, numero: 3,  titulo: 'Chatbot',            description: 'Simula un chatbot simple con JavaScript.',                             url: 'https://projects.raspberrypi.org/en/projects/chatbot'            },
-  { id: 315, numero: 4,  titulo: 'Comic Character',    description: 'Diseña un personaje de cómic con CSS avanzado.',                       url: 'https://projects.raspberrypi.org/en/projects/comic-character'    },
-  { id: 316, numero: 5,  titulo: 'Mystery Letter',     description: 'Crea una carta misteriosa con estilo de recorte de periódico.',        url: 'https://projects.raspberrypi.org/en/projects/mystery-letter'     },
-  { id: 317, numero: 6,  titulo: 'Pick Your Favourite',description: 'Crea una web de votación de tus cosas favoritas.',                    url: 'https://projects.raspberrypi.org/en/projects/pick-your-favourite'},
-  { id: 318, numero: 7,  titulo: 'Quiz Time!',         description: 'Crea un cuestionario interactivo con JavaScript.',                     url: 'https://projects.raspberrypi.org/en/projects/quiz-time'          },
-  { id: 319, numero: 8,  titulo: 'Share Your World',   description: 'Construye un sitio web interactivo para compartir tu mundo.',          url: 'https://projects.raspberrypi.org/en/projects/share-your-world'   },
-  { id: 320, numero: 9,  titulo: 'Stickers!',          description: 'Diseña stickers divertidos con CSS avanzado.',                        url: 'https://projects.raspberrypi.org/en/projects/stickers'           },
-  { id: 321, numero: 10, titulo: 'Talk Like a Pirate', description: 'Crea una web que traduzca texto al habla pirata con JavaScript.',      url: 'https://projects.raspberrypi.org/en/projects/talk-like-a-pirate' },
+  { id: 'animated-story', numero: 1,  titulo: 'Animated Story',     description: 'Usa JavaScript para añadir efectos a una historia animada.',            url: 'https://projects.raspberrypi.org/en/projects/animated-story'    },
+  { id: 'boat-race', numero: 2,  titulo: 'Boat Race',          description: 'Un juego simple de carreras de barcos con CSS y JavaScript.',          url: 'https://projects.raspberrypi.org/en/projects/boat-race'          },
+  { id: 'chatbot', numero: 3,  titulo: 'Chatbot',            description: 'Simula un chatbot simple con JavaScript.',                             url: 'https://projects.raspberrypi.org/en/projects/chatbot'            },
+  { id: 'comic-character', numero: 4,  titulo: 'Comic Character',    description: 'Diseña un personaje de cómic con CSS avanzado.',                       url: 'https://projects.raspberrypi.org/en/projects/comic-character'    },
+  { id: 'mystery-letter', numero: 5,  titulo: 'Mystery Letter',     description: 'Crea una carta misteriosa con estilo de recorte de periódico.',        url: 'https://projects.raspberrypi.org/en/projects/mystery-letter'     },
+  { id: 'pick-your-favourite', numero: 6,  titulo: 'Pick Your Favourite',description: 'Crea una web de votación de tus cosas favoritas.',                    url: 'https://projects.raspberrypi.org/en/projects/pick-your-favourite'},
+  { id: 'quiz-time', numero: 7,  titulo: 'Quiz Time!',         description: 'Crea un cuestionario interactivo con JavaScript.',                     url: 'https://projects.raspberrypi.org/en/projects/quiz-time'          },
+  { id: 'share-your-world', numero: 8,  titulo: 'Share Your World',   description: 'Construye un sitio web interactivo para compartir tu mundo.',          url: 'https://projects.raspberrypi.org/en/projects/share-your-world'   },
+  { id: 'stickers', numero: 9,  titulo: 'Stickers!',          description: 'Diseña stickers divertidos con CSS avanzado.',                        url: 'https://projects.raspberrypi.org/en/projects/stickers'           },
+  { id: 'talk-like-a-pirate', numero: 10, titulo: 'Talk Like a Pirate', description: 'Crea una web que traduzca texto al habla pirata con JavaScript.',      url: 'https://projects.raspberrypi.org/en/projects/talk-like-a-pirate' },
 ];
 
 // ─── RASPBERRY PI Nivel 3 — AVANZADO (6 proyectos verificados de la imagen) ──
 // Source: projects.raspberrypi.org/en/technology/web_development → Level 3
 export const RASPBERRY_WEB_LEVEL_3 = [
-  { id: 322, numero: 1, titulo: 'Build a Webpage',     description: 'Lleva tu diseño web a un nivel superior.',                             url: 'https://projects.raspberrypi.org/en/projects/build-a-webpage'    },
-  { id: 323, numero: 2, titulo: 'Mood Board',          description: 'Crea un tablero de moodboard interactivo con HTML y CSS.',             url: 'https://projects.raspberrypi.org/en/projects/mood-board'         },
-  { id: 324, numero: 3, titulo: 'Sell Me Something',   description: 'Diseña una página web de producto o servicio.',                        url: 'https://projects.raspberrypi.org/en/projects/sell-me-something'  },
-  { id: 325, numero: 4, titulo: 'Welcome to Aotearoa', description: 'Usa CSS para hacer un sitio web creativo sobre Nueva Zelanda.',        url: 'https://projects.raspberrypi.org/en/projects/welcome-to-aotearoa'},
-  { id: 326, numero: 5, titulo: 'Flip Treat Selector', description: 'Aplica animaciones avanzadas y manipulación del DOM con JavaScript.',  url: 'https://projects.raspberrypi.org/en/projects/flip-treat-selector'},
-  { id: 327, numero: 6, titulo: 'Persuasive Page',     description: 'Crea una página web persuasiva con diseño profesional.',              url: 'https://projects.raspberrypi.org/en/projects/persuasive-page'    },
+  { id: 'build-a-webpage', numero: 1, titulo: 'Build a Webpage',     description: 'Lleva tu diseño web a un nivel superior.',                             url: 'https://projects.raspberrypi.org/en/projects/build-a-webpage'    },
+  { id: 'mood-board', numero: 2, titulo: 'Mood Board',          description: 'Crea un tablero de moodboard interactivo con HTML y CSS.',             url: 'https://projects.raspberrypi.org/en/projects/mood-board'         },
+  { id: 'sell-me-something', numero: 3, titulo: 'Sell Me Something',   description: 'Diseña una página web de producto o servicio.',                        url: 'https://projects.raspberrypi.org/en/projects/sell-me-something'  },
+  { id: 'welcome-to-aotearoa', numero: 4, titulo: 'Welcome to Aotearoa', description: 'Usa CSS para hacer un sitio web creativo sobre Nueva Zelanda.',        url: 'https://projects.raspberrypi.org/en/projects/welcome-to-aotearoa'},
+  { id: 'flip-treat-webcards', numero: 5, titulo: 'Flip Treat Selector', description: 'Aplica animaciones avanzadas y manipulación del DOM con JavaScript.',  url: 'https://projects.raspberrypi.org/en/projects/flip-treat-webcards'},
+  { id: 'persuasive-page', numero: 6, titulo: 'Persuasive Page',     description: 'Crea una página web persuasiva con diseño profesional.',              url: 'https://projects.raspberrypi.org/en/projects/persuasive-page'    },
 ];

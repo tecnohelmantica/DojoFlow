@@ -337,6 +337,8 @@ export default function AuthProvider({ children }) {
         }
       }
       keysToRemove.forEach(key => localStorage.removeItem(key));
+      // También limpiar onboarding visto para el invitado
+      localStorage.removeItem('onboarding_seen_guest_user');
     }
 
     localStorage.setItem('dojoflow_guest', 'true');
