@@ -264,7 +264,7 @@ export default function AuthProvider({ children }) {
           alias: 'Invitado',
           real_name: 'Explorador Anónimo',
           avatar_url: 'alumno.png',
-          has_seen_onboarding: true,
+          has_seen_onboarding: false,
           isGuest: true
         });
         setSession({ user: { id: 'guest_user' } });
@@ -347,7 +347,7 @@ export default function AuthProvider({ children }) {
       alias: 'Invitado',
       real_name: 'Explorador Anónimo',
       avatar_url: 'alumno.png',
-      has_seen_onboarding: true,
+      has_seen_onboarding: false,
       isGuest: true
     });
     setSession({ user: { id: 'guest_user' } });

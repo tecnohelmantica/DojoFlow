@@ -4,7 +4,7 @@ import GlassCard from '../components/GlassCard';
 import GlowButton from '../components/GlowButton';
 import MisAulas from '../components/MisAulas';
 import { useAuth } from '../components/AuthProvider';
-import { Bell, User, Code, Puzzle, Cpu as OriginalCpu, MonitorPlay, Zap, Gamepad2, Box, Smartphone, Brain, Globe, Eye, EyeOff, LogOut, UserPlus, ExternalLink, Castle } from 'lucide-react';
+import { Bell, User, Code, Puzzle, Cpu as OriginalCpu, MonitorPlay, Zap, Gamepad2, Box, Smartphone, Brain, Globe, Eye, EyeOff, LogOut, UserPlus, ExternalLink, Castle, Star, Clock, XCircle } from 'lucide-react';
 const Cpu = OriginalCpu;
 const ArduinoIcon = OriginalCpu;
 
@@ -19,7 +19,7 @@ import { PLANETS } from '../lib/planets';
 
 export default function HomePage() {
   const router = useRouter();
-  const { session, profile, role, loading, signOut } = useAuth();
+  const { session, profile, role, loading, signOut, isGuest } = useAuth();
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -67,56 +67,180 @@ export default function HomePage() {
     }
   };
 
-  // Enriquecer planetas con iconos y estados
-  const planets = PLANETS.map(p => ({
-    ...p,
-    icon: getIcon(p.icon),
-    level: 1,
-    complete: 0
-  }));
+  // Estado para guardar el progreso del alumno por planeta
+  const [studentProgress, setStudentProgress] = useState({});
 
   // Estado para aulas del alumno y sus enlaces
   const [studentLaunchers, setStudentLaunchers] = useState({});
   const [studentAulas, setStudentAulas] = useState([]);
 
   const fetchStudentData = async () => {
-    if (!session?.user?.id || role !== 'alumno' || session?.user?.id === 'guest_user') return;
+    const activeUserId = isGuest ? 'guest_user' : session?.user?.id;
+    if (!activeUserId) return;
 
-    // 1. Obtener IDs y Nombres de las clases en las que está el alumno
-    const { data: vincs } = await supabase
-      .from('clase_alumnos')
-      .select('clase_id, clases(id, nombre)')
-      .eq('alumno_id', session.user.id);
+    // 1. Obtener IDs y Nombres de las clases en las que está el alumno (solo si no es guest)
+    if (!isGuest && role === 'alumno') {
+      try {
+        const { data: vincs } = await supabase
+          .from('clase_alumnos')
+          .select('clase_id, clases(id, nombre)')
+          .eq('alumno_id', activeUserId);
+        
+        const aulas = (vincs || []).map(v => v.clases).filter(Boolean);
+        setStudentAulas(aulas);
+
+        if (aulas.length > 0) {
+          const claseIds = aulas.map(a => a.id);
+          const { data: recs } = await supabase
+            .from('clase_recursos')
+            .select('*, recursos_docentes(*)')
+            .in('clase_id', claseIds);
+          
+          const launchers = {};
+          (recs || []).forEach(r => {
+            const res = r.recursos_docentes;
+            if (res && res.tipo_recurso === 'enlace') {
+              if (!launchers[res.tecnologia]) {
+                launchers[res.tecnologia] = res.contenido.markdown;
+              }
+            }
+          });
+          setStudentLaunchers(launchers);
+        }
+      } catch (e) {
+        console.error("Error al obtener aulas:", e);
+      }
+    }
+
+    // 2. Obtener progreso de retos (user_challenges) y explore_progress
+    let userChalls = [];
+    let exploreProg = [];
+
+    if (isGuest) {
+      if (typeof window !== 'undefined') {
+        userChalls = JSON.parse(localStorage.getItem('guest_user_challenges') || '[]');
+        exploreProg = JSON.parse(localStorage.getItem('guest_explore_progress') || '[]');
+      }
+    } else {
+      try {
+        const { data: dbChalls } = await supabase
+          .from('user_challenges')
+          .eq('student_id', activeUserId);
+        userChalls = dbChalls || [];
+
+        const { data: dbExplore } = await supabase
+          .from('explore_progress')
+          .eq('student_id', activeUserId);
+        exploreProg = dbExplore || [];
+      } catch (e) {
+        console.error("Error al obtener retos:", e);
+      }
+    }
+
+    const progressMap = {};
     
-    const aulas = (vincs || []).map(v => v.clases).filter(Boolean);
-    setStudentAulas(aulas);
+    // Inicializar mapas para cada tecnología en PLANETS
+    PLANETS.forEach(p => {
+      progressMap[p.id] = {
+        complete: 0,
+        level: 1,
+        validatedCount: 0,
+        inReviewCount: 0,
+        corregirCount: 0,
+        planetStatus: 'No iniciado'
+      };
+    });
 
-    if (aulas.length === 0) return;
-
-    const claseIds = aulas.map(a => a.id);
-
-    // 2. Obtener recursos vinculados a esas clases que sean enlaces
-    const { data: recs } = await supabase
-      .from('clase_recursos')
-      .select('*, recursos_docentes(*)')
-      .in('clase_id', claseIds);
-    
-    const launchers = {};
-    (recs || []).forEach(r => {
-      const res = r.recursos_docentes;
-      if (res && res.tipo_recurso === 'enlace') {
-        if (!launchers[res.tecnologia]) {
-          launchers[res.tecnologia] = res.contenido.markdown;
+    // Mapear explore_progress (progreso general del planeta)
+    (exploreProg || []).forEach(ep => {
+      const planetId = ep.planet_id;
+      if (progressMap[planetId]) {
+        progressMap[planetId].planetStatus = ep.status || 'No iniciado';
+        if (ep.status === 'Validado') {
+          progressMap[planetId].complete = 100;
         }
       }
     });
-    setStudentLaunchers(launchers);
+
+    // Mapear user_challenges (retos individuales)
+    (userChalls || []).forEach(uc => {
+      const planetId = uc.planet_id;
+      if (progressMap[planetId]) {
+        if (uc.status === 'Validado') {
+          progressMap[planetId].validatedCount += 1;
+        } else if (uc.status === 'En revisión') {
+          progressMap[planetId].inReviewCount += 1;
+        } else if (uc.status === 'Corregir') {
+          progressMap[planetId].corregirCount += 1;
+        }
+      }
+    });
+
+    // Mapear levels de localStorage por planeta
+    if (typeof window !== 'undefined') {
+      PLANETS.forEach(p => {
+        const savedLevel = localStorage.getItem(`dojoflow_level_${p.id}`);
+        if (savedLevel && progressMap[p.id]) {
+          progressMap[p.id].level = parseInt(savedLevel) || 1;
+        }
+      });
+    }
+
+    // Calcular el porcentaje de completado para cada planeta
+    const PLANET_TOTAL_CHALLENGES = {
+      'code': 30,
+      'scratch': 66,
+      'makecode-microbit': 30,
+      'makecode-arcade': 30,
+      'tinkercad': 36,
+      'arduino': 24,
+      'appinventor': 26,
+      'ia': 27,
+      'python': 73,
+      'html': 63
+    };
+
+    PLANETS.forEach(p => {
+      const mapItem = progressMap[p.id];
+      if (mapItem && mapItem.planetStatus !== 'Validado') {
+        const total = PLANET_TOTAL_CHALLENGES[p.id] || 30;
+        const valCount = mapItem.validatedCount;
+        if (valCount > 0) {
+          const calcPerc = Math.min(100, Math.round((valCount / total) * 100));
+          mapItem.complete = Math.max(1, calcPerc);
+        }
+      }
+    });
+
+    setStudentProgress(progressMap);
   };
 
-  // Cargar lanzadores del alumno
+  // Cargar lanzadores y progresos del alumno
   React.useEffect(() => {
     fetchStudentData();
-  }, [session?.user?.id, role]);
+  }, [session?.user?.id, role, isGuest]);
+
+  // Construir planetas enriquecidos con progresos reales
+  const dynamicPlanets = PLANETS.map(p => {
+    const prog = studentProgress[p.id] || {
+      complete: 0,
+      level: 1,
+      validatedCount: 0,
+      inReviewCount: 0,
+      corregirCount: 0,
+      planetStatus: 'No iniciado'
+    };
+    return {
+      ...p,
+      icon: getIcon(p.icon),
+      level: prog.level || 1,
+      complete: prog.complete || 0,
+      validatedCount: prog.validatedCount || 0,
+      inReviewCount: prog.inReviewCount || 0,
+      corregirCount: prog.corregirCount || 0,
+      planetStatus: prog.planetStatus || 'No iniciado'
+    };
+  });
 
   // Estado de carga - Esperar a que el perfil se cargue si hay sesión
   if (loading || (session && !role)) {
@@ -329,10 +453,27 @@ export default function HomePage() {
       </h2>
 
       <div className="planets-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '40px' }}>
-        {planets.map((planet) => {
+        {dynamicPlanets.map((planet) => {
           const isAulaConectada = !!studentLaunchers[planet.id];
           const launcherUrl = studentLaunchers[planet.id];
           const isProfesor = role === 'profesor';
+
+          // Determinar bordes e iluminaciones premium basados en retos validados/espesa/ajustar
+          let cardBorder = '1px solid rgba(255,255,255,0.1)';
+          let cardShadow = 'none';
+          
+          if (!isProfesor) {
+            if (planet.planetStatus === 'Validado' || (planet.validatedCount > 0 && planet.inReviewCount === 0 && planet.corregirCount === 0)) {
+              cardBorder = '1.5px solid rgba(34, 197, 94, 0.4)';
+              cardShadow = '0 0 15px rgba(34, 197, 94, 0.08)';
+            } else if (planet.corregirCount > 0) {
+              cardBorder = '1.5px solid rgba(239, 68, 68, 0.4)';
+              cardShadow = '0 0 15px rgba(239, 68, 68, 0.08)';
+            } else if (planet.inReviewCount > 0) {
+              cardBorder = '1.5px solid rgba(245, 158, 11, 0.4)';
+              cardShadow = '0 0 15px rgba(245, 158, 11, 0.08)';
+            }
+          }
 
           return (
             <div key={planet.id} className="planet-card-wrapper" style={{ animation: 'fadeInUp 0.6s ease-out backwards' }}>
@@ -345,7 +486,8 @@ export default function HomePage() {
                   overflow: 'hidden',
                   cursor: 'pointer',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '1px solid rgba(255,255,255,0.1)'
+                  border: cardBorder,
+                  boxShadow: cardShadow
                 }}
                 onClick={() => {
                   if (isProfesor) {
@@ -356,13 +498,29 @@ export default function HomePage() {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 20px rgba(13, 207, 207, 0.1)';
-                  e.currentTarget.style.borderColor = planet.barColor + '44';
+                  if (!isProfesor) {
+                    if (planet.planetStatus === 'Validado') {
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 25px rgba(34, 197, 94, 0.2)';
+                      e.currentTarget.style.borderColor = 'rgba(34, 197, 94, 0.6)';
+                    } else if (planet.corregirCount > 0) {
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 25px rgba(239, 68, 68, 0.2)';
+                      e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+                    } else if (planet.inReviewCount > 0) {
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 25px rgba(245, 158, 11, 0.2)';
+                      e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.6)';
+                    } else {
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 20px rgba(13, 207, 207, 0.15)';
+                      e.currentTarget.style.borderColor = planet.barColor + '44';
+                    }
+                  } else {
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15), 0 0 20px rgba(13, 207, 207, 0.15)';
+                    e.currentTarget.style.borderColor = planet.barColor + '44';
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.boxShadow = cardShadow;
+                  e.currentTarget.style.borderColor = cardBorder;
                 }}
               >
                 <div className="planet-header" style={{ position: 'relative', height: '160px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
@@ -383,7 +541,29 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  {planet.complete === 100 && (
+                  {!isProfesor && planet.planetStatus === 'Validado' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '12px',
+                      right: '12px',
+                      background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)',
+                      color: 'white',
+                      fontSize: '0.65rem',
+                      fontWeight: '900',
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                      zIndex: 2,
+                      border: '1px solid rgba(255,255,255,0.2)'
+                    }}>
+                      <Star size={10} fill="white" color="white" /> COMPLETADO
+                    </div>
+                  )}
+
+                  {!isProfesor && planet.planetStatus !== 'Validado' && planet.complete === 100 && (
                     <div className="tag-advanced" style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.9)', color: '#128989', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>MASTERY</div>
                   )}
                 </div>
@@ -397,6 +577,61 @@ export default function HomePage() {
                   
                   {!isProfesor && (
                     <div className="progress-section" style={{ marginTop: '16px' }}>
+                      {/* Micro stats indicators */}
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                        {planet.validatedCount > 0 && (
+                          <span style={{ 
+                            fontSize: '0.58rem', 
+                            fontWeight: '900', 
+                            padding: '3px 8px', 
+                            borderRadius: '20px', 
+                            background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', 
+                            color: '#16a34a', 
+                            border: '1px solid #bbf7d0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            boxShadow: '0 2px 4px rgba(34, 197, 94, 0.05)'
+                          }}>
+                            <Star size={9} fill="#16a34a" color="#16a34a" /> {planet.validatedCount} HECHO
+                          </span>
+                        )}
+                        {planet.inReviewCount > 0 && (
+                          <span style={{ 
+                            fontSize: '0.58rem', 
+                            fontWeight: '900', 
+                            padding: '3px 8px', 
+                            borderRadius: '20px', 
+                            background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', 
+                            color: '#d97706', 
+                            border: '1px solid #fde68a',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            boxShadow: '0 2px 4px rgba(245, 158, 11, 0.05)'
+                          }}>
+                            <Clock size={9} color="#d97706" /> {planet.inReviewCount} ESPERA
+                          </span>
+                        )}
+                        {planet.corregirCount > 0 && (
+                          <span style={{ 
+                            fontSize: '0.58rem', 
+                            fontWeight: '900', 
+                            padding: '3px 8px', 
+                            borderRadius: '20px', 
+                            background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)', 
+                            color: '#ef4444', 
+                            border: '1px solid #fecaca',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            boxShadow: '0 2px 4px rgba(239, 68, 68, 0.05)'
+                          }}>
+                            <XCircle size={9} color="#ef4444" /> {planet.corregirCount} AJUSTAR
+                          </span>
+                        )}
+                      </div>
+
                       <div className="progress-labels" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <span style={{ color: planet.barColor, fontSize: '0.65rem', fontWeight: '800' }}>{planet.complete}% COMPLETO</span>
                       </div>

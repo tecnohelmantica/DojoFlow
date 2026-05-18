@@ -18,7 +18,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
-  const [showEvidenceForm, setShowEvidenceForm] = useState(false);
+  const [showEvidenceForm, setShowEvidenceForm] = useState(true);
   const [evidenceUrl, setEvidenceUrl] = useState('');
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -493,24 +493,12 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
               </div>
 
               <div className="action-footer mt-8">
-                {!showEvidenceForm ? (
-                  <GlowButton 
-                    onClick={() => setShowEvidenceForm(true)}
-                    variant="primary"
-                    className="w-full py-4"
-                  >
-                    <Send size={18} className="mr-2" /> ENVIAR SOLUCIÓN PARA VALIDAR
-                  </GlowButton>
-                ) : (
                   <div className="evidence-form">
                     <div className="evidence-form-header">
                       <div className="evidence-form-title">
                         <Upload size={18} />
                         <span>Adjunta tu evidencia</span>
                       </div>
-                      <button className="evidence-close-btn" onClick={() => setShowEvidenceForm(false)}>
-                        <XIcon size={16} />
-                      </button>
                     </div>
 
                     <div className="evidence-field">
@@ -559,7 +547,6 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                       )}
                     </GlowButton>
                   </div>
-                )}
               </div>
             </div>
 
@@ -864,6 +851,11 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           .learning-list { grid-template-columns: 1fr; }
           .action-footer { flex-direction: column; gap: 12px; margin-top: 28px; }
           .sidebar-widget { padding: 16px; }
+          .dashboard-stats { flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+          .stat-item { padding-right: 12px; }
+          .hero-card { padding: 40px 20px; }
+          .hero-title { font-size: 2.2rem; }
+          .toggle-group { flex-direction: column; }
         }
 
         /* --- EVIDENCE FORM --- */
@@ -988,24 +980,33 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         }
 
         @media (max-width: 600px) {
-          .sensei-mission-container { margin-bottom: 40px; }
-          .dashboard-stats { flex-wrap: wrap; gap: 12px; padding: 14px 16px; border-radius: 20px; }
-          .stat-item { padding-right: 12px; gap: 8px; }
-          .stat-value { font-size: 1rem; }
-          .stat-label { font-size: 0.6rem; }
-          .welcome-section { padding: 20px 0; }
-          .hero-card { padding: 40px 20px; }
-          .hero-title { font-size: 2rem; }
-          .hero-subtitle { font-size: 1rem; margin-bottom: 28px; }
-          .hero-icon-container { width: 100px; height: 100px; margin-bottom: 24px; }
-          .config-card { padding: 22px 16px; margin: 0 4px; }
+          .sensei-mission-container { margin-bottom: 40px; padding: 0 10px; }
+          .dashboard-stats { flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 20px; }
+          .stat-item { padding-right: 0; border-right: none; gap: 8px; width: 45%; }
+          .stat-value { font-size: 1.1rem; }
+          .stat-label { font-size: 0.65rem; }
+          .medals-display { width: 100%; justify-content: center; margin-top: 8px; }
+          .welcome-section { padding: 10px 0; }
+          .hero-card { padding: 30px 16px; }
+          .hero-title { font-size: 1.8rem; }
+          .hero-subtitle { font-size: 0.95rem; margin-bottom: 24px; }
+          .hero-icon-container { width: 90px; height: 90px; margin-bottom: 20px; }
+          .config-card { padding: 20px 14px; margin: 0; border-radius: 20px; }
           .config-header h3 { font-size: 1.1rem; }
           .toggle-group { flex-wrap: wrap; }
           .toggle-group button { font-size: 0.8rem; padding: 10px 8px; }
-          .mission-active-card { padding: 16px 12px; border-radius: 20px; }
-          .mission-sidebar { grid-template-columns: 1fr 1fr; }
+          .mission-active-card { padding: 16px; border-radius: 20px; margin: 0; }
+          .mission-sidebar { grid-template-columns: 1fr; gap: 12px; }
           .badge { font-size: 0.65rem; }
-          .xp-badge { padding: 8px 14px; font-size: 0.85rem; }
+          .xp-badge { padding: 8px 12px; font-size: 0.8rem; }
+          .evidence-form { padding: 16px; border-radius: 16px; }
+          .evidence-form-title { font-size: 0.8rem; }
+          .evidence-file-label { padding: 10px; font-size: 0.8rem; }
+          .evidence-file-name { flex-wrap: wrap; word-break: break-word; font-size: 0.75rem; }
+          .learning-list li { font-size: 0.85rem; align-items: flex-start; }
+          .objective-card { font-size: 0.95rem; padding: 16px; }
+          .title-group h2 { font-size: 1.25rem; }
+          .planet-badge { width: 48px; height: 48px; border-radius: 14px; }
           .ask-another-btn { font-size: 0.65rem; padding: 6px 10px; }
           .section-title span { font-size: 0.7rem; }
           .hints-section { margin-top: 20px; }

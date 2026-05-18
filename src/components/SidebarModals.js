@@ -134,10 +134,10 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
       case 'Retos':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {data.map((item) => {
+            {data.map((item, index) => {
               const planet = getPlanetById(item.planet_id);
               return (
-                <div key={item.id} className="history-item" style={{ 
+                <div key={item.id || item.challenge_id || index} className="history-item" style={{ 
                   background: 'white', 
                   padding: '16px', 
                   borderRadius: '12px', 

@@ -8,7 +8,7 @@ import GlowButton from './GlowButton';
 import {
   Plus, Copy, Check, Users, ChevronRight, ChevronLeft,
   Trash2, UserPlus, RefreshCw, AlertCircle, Clock,
-  CheckCircle, XCircle, Search, FileText, Zap, BookOpen, Link, Tv, FileBarChart, Sparkles, Clipboard, User, HardDrive, Pencil, Download, DownloadCloud, ExternalLink, Paperclip
+  CheckCircle, XCircle, Search, FileText, Zap, BookOpen, Link, Tv, FileBarChart, Sparkles, Clipboard, User, HardDrive, Pencil, Download, DownloadCloud, ExternalLink, Paperclip, Star
 } from 'lucide-react';
 import ResourceUploader from './ResourceUploader';
 
@@ -139,7 +139,7 @@ function ClaseCard({ clase, onSelect, onDelete }) {
 }
 
 // ── Fila Alumno ──
-function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
+function AlumnoRow({ alumno, onValidar, onValidarNinja, onValidarSensei, onEliminar }) {
   const [expanded, setExpanded] = useState(false);
   const [feedbackMap, setFeedbackMap] = useState({});
 
@@ -315,6 +315,74 @@ function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
               </div>
             </div>
           )}
+
+          {alumno.sensei_missions && alumno.sensei_missions.filter(sm => sm.evidence_url || sm.evidence_file_url).length > 0 && (
+            <div style={{ marginTop: '15px' }}>
+              <p style={{ fontSize: '0.72rem', fontWeight: '700', color: '#8a8a9e', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Star size={14} /> Evidencias de Misiones del Sensei
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {alumno.sensei_missions.filter(sm => sm.evidence_url || sm.evidence_file_url).map((sm, idx) => (
+                  <div key={`sm_${idx}`} style={{ background: '#fff', padding: '12px', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: '700', color: '#1a1a2e' }}>
+                          Misión: <span style={{ color: '#666', fontWeight: '500' }}>{sm.title || 'Desconocida'}</span>
+                        </p>
+                        <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                          {sm.evidence_url && (
+                            <a href={sm.evidence_url} target="_blank" rel="noreferrer" style={{ fontSize: '0.65rem', color: '#0dcfcf', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: '600' }}>
+                              <ExternalLink size={10} /> Ver Proyecto
+                            </a>
+                          )}
+                          {sm.evidence_file_url && (
+                            <a href={sm.evidence_file_url} target="_blank" rel="noreferrer" style={{ fontSize: '0.65rem', color: '#9c27b0', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: '600' }}>
+                              <Paperclip size={10} /> Descargar Archivo
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ fontSize: '0.62rem', fontWeight: '800', padding: '2px 6px', borderRadius: '4px', background: STATUS_CONFIG[sm.status]?.bg || '#f5f5f5', color: STATUS_CONFIG[sm.status]?.color || '#aaa' }}>
+                          {sm.status.toUpperCase()}
+                        </span>
+                        {sm.status === 'En revisión' && (
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button 
+                              onClick={() => onValidarSensei(alumno.id, sm.id, 'Validado', feedbackMap[sm.id])} 
+                              style={{ background: 'linear-gradient(135deg, #128989, #0dcfcf)', border: 'none', color: '#fff', borderRadius: '8px', padding: '6px 12px', fontSize: '0.65rem', cursor: 'pointer', fontWeight: '800', boxShadow: '0 4px 10px rgba(13,207,207,0.2)' }}
+                            >
+                              Aprobar
+                            </button>
+                            <button 
+                              onClick={() => onValidarSensei(alumno.id, sm.id, 'Corregir', feedbackMap[sm.id])} 
+                              style={{ background: 'linear-gradient(135deg, #ff4b2b, #ff416c)', border: 'none', color: '#fff', borderRadius: '8px', padding: '6px 12px', fontSize: '0.65rem', cursor: 'pointer', fontWeight: '800', boxShadow: '0 4px 10px rgba(255,75,43,0.2)' }}
+                            >
+                              Corregir
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {sm.status === 'En revisión' && (
+                      <textarea 
+                        placeholder="Escribe aquí tu feedback (positivo o áreas de mejora)..." 
+                        value={feedbackMap[sm.id] || ''}
+                        onChange={(e) => handleFeedbackChange(sm.id, e.target.value)}
+                        style={{ width: '100%', minHeight: '60px', padding: '10px', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.08)', fontSize: '0.75rem', fontFamily: 'Outfit', resize: 'vertical' }}
+                      />
+                    )}
+                    {sm.teacher_feedback && sm.status !== 'En revisión' && (
+                      <div style={{ padding: '10px', background: 'rgba(0,0,0,0.02)', borderRadius: '10px', borderLeft: `3px solid ${STATUS_CONFIG[sm.status]?.color}` }}>
+                        <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: '700', color: '#666', marginBottom: '2px' }}>Feedback del Profesor:</p>
+                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#333', fontStyle: 'italic' }}>"{sm.teacher_feedback}"</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -322,7 +390,7 @@ function AlumnoRow({ alumno, onValidar, onValidarNinja, onEliminar }) {
 }
 
 // ── Detalle de Clase ──
-const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh, currentUser, misRecursos = [], onVincular, onDesvincular, onValidarReto, onValidarRetoNinja, onEliminarAlumno, loadingDash, dashData, claseRecursos, onMsg, setShowUploadModal }) => {
+const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh, currentUser, misRecursos = [], onVincular, onDesvincular, onValidarReto, onValidarRetoNinja, onValidarSenseiMission, onEliminarAlumno, loadingDash, dashData, claseRecursos, onMsg, setShowUploadModal }) => {
 
   const [activeTab, setActiveTab] = useState('alumnos');
   const [showVincular, setShowVincular] = useState(false);
@@ -491,7 +559,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                 </button>
               </div>
               {dashData?.alumnos?.length > 0 ? (
-                dashData?.alumnos.map(a => <AlumnoRow key={a.id} alumno={a} onValidar={onValidarReto} onValidarNinja={onValidarRetoNinja} onEliminar={onEliminarAlumno}/>)
+                dashData?.alumnos.map(a => <AlumnoRow key={a.id} alumno={a} onValidar={onValidarReto} onValidarNinja={onValidarRetoNinja} onValidarSensei={onValidarSenseiMission} onEliminar={onEliminarAlumno}/>)
               ) : (
                 <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.7)', borderRadius: '14px', border: '1.5px dashed #ddd' }}>
                   <Users size={32} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.25 }}/>
@@ -721,11 +789,12 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
           
           let pendingCount = 0;
           if (ids.length > 0) {
-            const [resRegular, resNinja] = await Promise.all([
+            const [resRegular, resNinja, resSensei] = await Promise.all([
               supabase.from('explore_progress').select('id', { count: 'exact', head: true }).in('student_id', ids).eq('status', 'En revisión'),
-              supabase.from('user_challenges').select('id', { count: 'exact', head: true }).in('student_id', ids).eq('status', 'En revisión')
+              supabase.from('user_challenges').select('id', { count: 'exact', head: true }).in('student_id', ids).eq('status', 'En revisión'),
+              supabase.from('sensei_missions').select('id', { count: 'exact', head: true }).in('student_id', ids).eq('status', 'En revisión')
             ]);
-            pendingCount = (resRegular.count || 0) + (resNinja.count || 0);
+            pendingCount = (resRegular.count || 0) + (resNinja.count || 0) + (resSensei.count || 0);
           }
 
           return { ...c, num_alumnos: ids.length, revisiones_pendientes: pendingCount };
@@ -764,37 +833,42 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
       const ids = (vincs || []).map(v => v.alumno_id);
 
       if (ids.length > 0) {
-        const [resP, resPr, resI, resN] = await Promise.all([
+        const [resP, resPr, resI, resN, resSM] = await Promise.all([
           supabase.from('profiles').select('id, alias, real_name, avatar_url').in('id', ids),
           supabase.from('explore_progress').select('student_id, planet_id, status').in('student_id', ids),
           supabase.from('badges').select('student_id, planet_id, badge_name, awarded_at').in('student_id', ids),
-          supabase.from('user_challenges').select('student_id, challenge_id, planet_id, status, evidence_url, evidence_file_url, teacher_feedback').in('student_id', ids)
+          supabase.from('user_challenges').select('student_id, challenge_id, planet_id, status, evidence_url, evidence_file_url, teacher_feedback').in('student_id', ids),
+          supabase.from('sensei_missions').select('id, student_id, title, planet_id, status, evidence_url, evidence_file_url, teacher_feedback').in('student_id', ids)
         ]);
 
         const perfiles = resP.data || [];
         const progreso = resPr.data || [];
         const insignias = resI.data || [];
         const retosNinja = resN.data || [];
+        const senseiMissions = resSM.data || [];
 
           const alumnos = (perfiles || []).map(p => {
             const retos = (progreso || []).filter(r => r.student_id === p.id);
             const badges = (insignias || []).filter(b => b.student_id === p.id);
             const nimbus = (retosNinja || []).filter(rn => rn.student_id === p.id);
+            const sm = (senseiMissions || []).filter(s => s.student_id === p.id);
             const v = (vincs || []).find(v => v.alumno_id === p.id);
             
             const enRevisionRegular = retos.filter(r => r.status === 'En revisión').length;
             const enRevisionNinja = nimbus.filter(rn => rn.status === 'En revisión').length;
+            const enRevisionSensei = sm.filter(s => s.status === 'En revisión').length;
 
             return {
               ...p, fecha_union: v?.fecha_union,
               metricas: { 
                 validados: retos.filter(r => r.status === 'Validado').length, 
-                en_revision: enRevisionRegular + enRevisionNinja, 
+                en_revision: enRevisionRegular + enRevisionNinja + enRevisionSensei, 
                 total_retos: retos.length, 
                 insignias: badges.length 
               },
               retos_detalle: retos, insignias_detalle: badges,
-              retos_ninja: nimbus
+              retos_ninja: nimbus,
+              sensei_missions: sm
             };
           });
 
@@ -997,6 +1071,14 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
               teacher_feedback: feedback || null,
               updated_at: new Date().toISOString()
             }).eq('student_id', id).eq('challenge_id', challengeId); 
+            abrirDashboard(claseActiva); 
+          }}
+          onValidarSenseiMission={async (id, missionId, status, feedback) => { 
+            await supabase.from('sensei_missions').update({ 
+              status: status, 
+              teacher_feedback: feedback || null,
+              updated_at: new Date().toISOString()
+            }).eq('student_id', id).eq('id', missionId); 
             abrirDashboard(claseActiva); 
           }}
           onEliminarAlumno={async (id) => { if(confirm("¿Quitar alumno?")) { await supabase.from('clase_alumnos').delete().eq('clase_id', claseActiva.id).eq('alumno_id', id); abrirDashboard(claseActiva); } }}

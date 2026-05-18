@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Sparkles, HelpCircle, Loader2, Brain } from 'lucide-react';
+import { Sparkles, HelpCircle, Loader2, Brain, AlertCircle } from 'lucide-react';
 import GlowButton from './GlowButton';
 
 export default function SocraticTutor({ planetId, userId, studentLevel, accentColor = '#00d2ff' }) {
   const [hints, setHints] = useState([]);
   const [loadingHint, setLoadingHint] = useState(false);
+  const [error, setError] = useState(null);
 
   // Helper to get RGB from Hex
   const hexToRgb = (hex) => {
@@ -17,6 +18,7 @@ export default function SocraticTutor({ planetId, userId, studentLevel, accentCo
   const requestHint = async () => {
     if (loadingHint) return;
     setLoadingHint(true);
+    setError(null);
     try {
       const message = hints.length === 0 
         ? `Sensei, estoy trabajando en el planeta ${planetId}. ¿Podrías darme una pista socrática para avanzar en mi aprendizaje? No me des la solución ni código directo.`
@@ -38,9 +40,12 @@ export default function SocraticTutor({ planetId, userId, studentLevel, accentCo
       const data = await response.json();
       if (data.success) {
         setHints([...hints, data.text]);
+      } else {
+        setError(data.error || 'El Sensei no ha podido responder en este momento.');
       }
     } catch (err) {
-      console.error("Error fetching hint:", err);
+      console.warn("Error fetching hint:", err.message);
+      setError('Se ha interrumpido la conexión con el Dojo. Por favor, inténtalo de nuevo.');
     } finally {
       setLoadingHint(false);
     }
@@ -65,6 +70,13 @@ export default function SocraticTutor({ planetId, userId, studentLevel, accentCo
             <p>{hint}</p>
           </div>
         ))}
+
+        {error && (
+          <div className="error-message glass animate-slide-up" style={{ borderColor: '#ef4444', background: 'rgba(239, 68, 68, 0.05)', padding: '15px', borderRadius: '16px', display: 'flex', gap: '8px', alignItems: 'center', color: '#fca5a5', fontSize: '0.85rem' }}>
+            <AlertCircle size={16} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
+          </div>
+        )}
       </div>
 
       <div className="action-area">

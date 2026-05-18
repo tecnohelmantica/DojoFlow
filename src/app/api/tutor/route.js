@@ -6,18 +6,52 @@ import { supabase } from '../../../lib/supabaseClient';
 import { PLANETS } from '../../../lib/planets';
 import { fetchResource } from '../notebooklm/fetcher';
 
-// Mapeo de planetas a variables de entorno de NotebookLM
+// Importación estática de conocimientos locales para evitar errores de bundle dinámicos en Serverless/Vercel
+import scratchKnowledge from '../../../data/scratch_knowledge.json';
+import arduinoKnowledge from '../../../data/arduino_knowledge.json';
+import tinkercadKnowledge from '../../../data/tinkercad_knowledge.json';
+import microbitKnowledge from '../../../data/makecode-microbit_knowledge.json';
+import arcadeKnowledge from '../../../data/makecode-arcade_knowledge.json';
+import codeKnowledge from '../../../data/code_knowledge.json';
+import iaKnowledge from '../../../data/ia_knowledge.json';
+import pythonKnowledge from '../../../data/python_knowledge.json';
+import htmlKnowledge from '../../../data/html_knowledge.json';
+import appinventorKnowledge from '../../../data/appinventor_knowledge.json';
+
+const STATIC_KNOWLEDGE = {
+  'scratch': scratchKnowledge,
+  'arduino': arduinoKnowledge,
+  'tinkercad': tinkercadKnowledge,
+  'makecode-microbit': microbitKnowledge,
+  'makecode-arcade': arcadeKnowledge,
+  'code': codeKnowledge,
+  'ia': iaKnowledge,
+  'python': pythonKnowledge,
+  'html': htmlKnowledge,
+  'appinventor': appinventorKnowledge
+};
+
+function extractUuid(val) {
+  if (!val) return null;
+  if (val.includes('notebooklm.google.com/notebook/')) {
+    const parts = val.split('/notebook/');
+    return parts[1].split(/[?#\/]/)[0];
+  }
+  return val.trim();
+}
+
+// Mapeo de planetas unificado con IDs de lib/planets.js y variables de entorno de NotebookLM
 const NOTEBOOK_MAP = {
-  'scratch': process.env.NB_SCRATCH,
-  'arduino': process.env.NB_ARDUINO,
-  'tinkercad': process.env.NB_TINKERCAD,
-  'microbit': process.env.NB_MAKECODE_MICROBIT,
-  'arcade': process.env.NB_MAKECODE_ARCADE,
-  'code': process.env.NB_CODE,
-  'learningml': process.env.NB_LEARNINGML,
-  'python': process.env.NB_PYTHON,
-  'html': process.env.NB_HTML,
-  'appinventor': process.env.NB_APPINVENTOR
+  'code':              extractUuid(process.env.NB_CODE),
+  'scratch':           extractUuid(process.env.NB_SCRATCH),
+  'makecode-microbit': extractUuid(process.env.NB_MAKECODE_MICROBIT),
+  'makecode-arcade':   extractUuid(process.env.NB_MAKECODE_ARCADE),
+  'tinkercad':         extractUuid(process.env.NB_TINKERCAD),
+  'arduino':           extractUuid(process.env.NB_ARDUINO),
+  'appinventor':       extractUuid(process.env.NB_APPINVENTOR),
+  'ia':                extractUuid(process.env.NB_LEARNINGML),
+  'python':            extractUuid(process.env.NB_PYTHON),
+  'html':              extractUuid(process.env.NB_HTML),
 };
 
 export async function POST(req) {
@@ -57,17 +91,13 @@ export async function POST(req) {
     // --- NUEVA PRIORIDAD 2: CONOCIMIENTO LOCAL (Fallback si no hay en Supabase) ---
     if (!masterKnowledge) {
       try {
-        // Intentamos cargar el JSON local dinámicamente
-        const localKnowledge = await import(`@/data/${planetId}_knowledge.json`)
-          .then(m => m.default)
-          .catch(() => null);
-        
+        const localKnowledge = STATIC_KNOWLEDGE[planetId];
         if (localKnowledge) {
           masterKnowledge = localKnowledge.knowledge_base;
           console.log(`[Tutor API] Conocimiento cargado desde JSON LOCAL para ${planetId}`);
         }
       } catch (lError) {
-        console.warn(`[Tutor API] No hay fallback local para ${planetId}`);
+        console.warn(`[Tutor API] No hay fallback local para ${planetId}:`, lError.message);
       }
     }
 
@@ -213,9 +243,15 @@ REGLA DE VALIDACIÓN:
             sanitizedHistory.shift();
         }
 
-        const chat = model.startChat({ history: sanitizedHistory });
-        const result = await chat.sendMessage(cleanMessage);
-        responseText = result.response.text();
+        // Solo inicializamos el chat si quedan mensajes válidos en el historial
+        if (sanitizedHistory.length > 0) {
+            const chat = model.startChat({ history: sanitizedHistory });
+            const result = await chat.sendMessage(cleanMessage);
+            responseText = result.response.text();
+        } else {
+            const result = await model.generateContent(cleanMessage);
+            responseText = result.response.text();
+        }
     } else {
         const result = await model.generateContent(cleanMessage);
         responseText = result.response.text();
@@ -226,9 +262,18 @@ REGLA DE VALIDACIÓN:
 
   } catch (error) {
     console.error('[Tutor API Error]:', error);
+    
+    // Identificar el tipo de error (especialmente cuotas/rate limits) y formular una respuesta detallada
+    let friendlyError = 'El Sensei está en meditación profunda en este momento. Por favor, inténtalo de nuevo en unos instantes.';
+    if (error.message && (error.message.includes('429') || error.message.includes('quota') || error.message.includes('Quota') || error.status === 429)) {
+      friendlyError = '¡Dojo saturado! El Sensei está recibiendo demasiadas preguntas simultáneas (Límite de cuota Gemini API). Por favor, espera 10-15 segundos y vuelve a intentarlo.';
+    } else if (error.message && (error.message.includes('API key') || error.message.includes('key not found') || error.status === 400)) {
+      friendlyError = 'Configuración del Dojo incompleta: La clave API de Gemini no está configurada o no es válida.';
+    }
+
     return NextResponse.json({ 
       success: false, 
-      error: 'Sensei en meditación', 
+      error: friendlyError, 
       details: error.message 
     }, { status: 500 });
   }

@@ -226,7 +226,7 @@ function ProfileContent() {
           alias: 'Invitado',
           real_name: 'Explorador Anónimo',
           avatar_url: 'alumno.png',
-          has_seen_onboarding: true,
+          has_seen_onboarding: false,
           isGuest: true
         });
 
@@ -545,7 +545,8 @@ function ProfileContent() {
     setValidationContext({
       type: 'mission',
       title: mission?.title || 'esta misión',
-      objective: mission?.objective || ''
+      objective: mission?.objective || '',
+      missionId: mission?.id
     });
     setIsValidationChatOpen(true);
   };
@@ -1903,7 +1904,38 @@ function ProfileContent() {
           planetId={activePlanet}
           studentLevel={studentLevel}
           accentColor={planet?.barColor || '#6366f1'}
-          onValidated={() => {
+          onValidated={async (context) => {
+            if (isGuest) {
+              if (context.type === 'challenge') {
+                const guestChallenges = JSON.parse(localStorage.getItem('guest_user_challenges') || '[]');
+                const idx = guestChallenges.findIndex(c => c.challenge_id === context.challengeId);
+                if (idx >= 0) guestChallenges[idx].status = 'Validado';
+                else guestChallenges.push({ challenge_id: context.challengeId, planet_id: activePlanet, status: 'Validado' });
+                localStorage.setItem('guest_user_challenges', JSON.stringify(guestChallenges));
+              } else if (context.type === 'mission') {
+                const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
+                const idx = guestMissions.findIndex(m => m.id === context.missionId);
+                if (idx >= 0) guestMissions[idx].status = 'Validado';
+                localStorage.setItem('guest_sensei_missions', JSON.stringify(guestMissions));
+              }
+            } else if (session?.user?.id) {
+              if (context.type === 'challenge') {
+                const { data: existing } = await supabase.from('user_challenges')
+                  .select('id').eq('student_id', session.user.id).eq('challenge_id', context.challengeId).maybeSingle();
+                if (existing) {
+                  await supabase.from('user_challenges').update({ status: 'Validado' }).eq('id', existing.id);
+                } else {
+                  await supabase.from('user_challenges').insert({
+                    student_id: session.user.id,
+                    planet_id: activePlanet,
+                    challenge_id: context.challengeId,
+                    status: 'Validado'
+                  });
+                }
+              } else if (context.type === 'mission' && context.missionId) {
+                await supabase.from('sensei_missions').update({ status: 'Validado' }).eq('id', context.missionId);
+              }
+            }
             setSenseiRefreshTrigger(t => t + 1);
           }}
         />

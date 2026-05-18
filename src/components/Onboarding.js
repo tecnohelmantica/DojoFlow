@@ -37,25 +37,55 @@ export default function Onboarding() {
       // 1. Guardar en localStorage para feedback inmediato
       localStorage.setItem(`onboarding_seen_${profile.id}`, 'true');
       
-      // 2. Guardar en base de datos para persistencia real
-      try {
-        await supabase
-          .from('profiles')
-          .update({ has_seen_onboarding: true })
-          .eq('id', profile.id);
-        
-        // 3. Actualizar estado local del profile
-        updateProfile({ has_seen_onboarding: true });
-      } catch (err) {
-        console.error("Error saving onboarding status:", err);
+      // 2. Guardar en base de datos para persistencia real si no es invitado
+      if (profile.id !== 'guest_user') {
+        try {
+          await supabase
+            .from('profiles')
+            .update({ has_seen_onboarding: true })
+            .eq('id', profile.id);
+        } catch (err) {
+          console.error("Error saving onboarding status:", err);
+        }
       }
+      
+      // 3. Actualizar estado local del profile
+      updateProfile({ has_seen_onboarding: true });
     }
     setShow(false);
   };
 
   if (!show) return null;
 
+  const isGuest = profile?.isGuest || profile?.id === 'guest_user';
   const isTeacher = role === 'profesor';
+
+  const guestSteps = [
+    {
+      title: "¡Bienvenido, Explorador Invitado!",
+      content: "Estás ingresando en modo demo. Aquí podrás interactuar con todos los planetas tecnológicos y experimentar la IA tutor socrática de DojoFlow de forma directa.",
+      icon: <Rocket size={48} color="var(--accent-teal)" />,
+      color: "var(--accent-teal)"
+    },
+    {
+      title: "IA Tutor Socrático",
+      content: "Entra a cualquier planeta para interactuar con nuestro Sensei IA. No te dará la solución directa al código, sino que te guiará con preguntas y pistas inteligentes.",
+      icon: <Sparkles size={48} color="var(--accent-purple)" />,
+      color: "var(--accent-purple)"
+    },
+    {
+      title: "Progreso Local",
+      content: "Tus niveles y respuestas se guardarán temporalmente en este navegador. Si deseas conservar tu progreso para siempre, ¡puedes registrarte gratis en cualquier momento!",
+      icon: <Trophy size={48} color="#ffd43b" />,
+      color: "#ffd43b"
+    },
+    {
+      title: "Únete a un Aula Real",
+      content: "Si tu colegio o docente utiliza DojoFlow, pídele su código de aula para ingresar como Alumno Oficial y permitir que califique tus Retos Ninja en tiempo real.",
+      icon: <Users size={48} color="var(--accent-cyan)" />,
+      color: "var(--accent-cyan)"
+    }
+  ];
 
   const teacherSteps = [
     {
@@ -111,7 +141,7 @@ export default function Onboarding() {
     }
   ];
 
-  const steps = isTeacher ? teacherSteps : studentSteps;
+  const steps = isGuest ? guestSteps : (isTeacher ? teacherSteps : studentSteps);
   const currentStep = steps[step];
 
   return (

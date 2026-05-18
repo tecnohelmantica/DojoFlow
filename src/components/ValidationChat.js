@@ -115,10 +115,13 @@ export default function ValidationChat({
           }, 3500);
         }
       } else {
-        throw new Error(data.error || 'Error del Sensei');
+        setMessages(prev => [...prev, {
+          role: 'sensei',
+          text: data.error || 'El Sensei no ha podido responder en este momento.'
+        }]);
       }
     } catch (err) {
-      console.error('ValidationChat error:', err);
+      console.warn('ValidationChat connection error:', err.message);
       setMessages(prev => [...prev, {
         role: 'sensei',
         text: 'Lo siento, se ha interrumpido la conexión con el Dojo. Por favor, inténtalo de nuevo.'

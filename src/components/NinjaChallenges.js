@@ -1161,14 +1161,108 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         style={{ 
           aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
           borderRadius: '16px', cursor: 'pointer', 
-          border: isSelected ? `3px solid ${accentColor}` : '1px solid rgba(0,0,0,0.08)',
-          background: status === 'Validado' ? `${accentColor}15` : (status === 'En revisión' ? '#fff4e6' : (status === 'Corregir' ? '#fff0f0' : 'white')),
+          border: isSelected 
+            ? `3px solid ${accentColor}` 
+            : (status === 'Validado' 
+                ? '2px solid #22c55e' 
+                : (status === 'En revisión' 
+                    ? '1.5px solid #f59e0b' 
+                    : (status === 'Corregir' 
+                        ? '1.5px solid #ef4444' 
+                        : '1px solid rgba(0,0,0,0.08)'))),
+          background: status === 'Validado' 
+            ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' 
+            : (status === 'En revisión' 
+                ? 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' 
+                : (status === 'Corregir' 
+                    ? 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' 
+                    : 'white')),
           position: 'relative', transition: 'all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 
           transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-          boxShadow: isSelected ? `0 10px 25px ${accentColor}30` : '0 4px 12px rgba(0,0,0,0.05)',
+          boxShadow: isSelected 
+            ? `0 10px 25px ${accentColor}30` 
+            : (status === 'Validado' 
+                ? '0 4px 15px rgba(34, 197, 94, 0.18)' 
+                : (status === 'En revisión'
+                    ? '0 4px 12px rgba(245, 158, 11, 0.12)'
+                    : (status === 'Corregir'
+                        ? '0 4px 12px rgba(239, 68, 68, 0.12)'
+                        : '0 4px 12px rgba(0,0,0,0.05)'))),
           overflow: 'hidden'
         }}
       >
+        {status === 'Validado' && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)',
+            color: 'white',
+            fontSize: '0.48rem',
+            fontWeight: '900',
+            padding: '3px 8px 3px 6px',
+            borderRadius: '0 0 12px 0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+            boxShadow: '0 2px 6px rgba(16, 185, 129, 0.25)',
+            zIndex: 3,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            <Star size={8} fill="white" color="white" />
+            <span>HECHO</span>
+          </div>
+        )}
+
+        {status === 'En revisión' && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+            color: 'white',
+            fontSize: '0.48rem',
+            fontWeight: '900',
+            padding: '3px 8px 3px 6px',
+            borderRadius: '0 0 12px 0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+            boxShadow: '0 2px 6px rgba(217, 119, 6, 0.25)',
+            zIndex: 3,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            <Clock size={8} color="white" />
+            <span>ESPERA</span>
+          </div>
+        )}
+
+        {status === 'Corregir' && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+            color: 'white',
+            fontSize: '0.48rem',
+            fontWeight: '900',
+            padding: '3px 8px 3px 6px',
+            borderRadius: '0 0 12px 0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+            boxShadow: '0 2px 6px rgba(220, 38, 38, 0.25)',
+            zIndex: 3,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            <XCircle size={8} color="white" />
+            <span>AJUSTAR</span>
+          </div>
+        )}
+
         {pid === 'html' && (
           <div style={{ position: 'absolute', top: '10px', right: '10px', opacity: 0.05, transform: 'rotate(15deg)', pointerEvents: 'none' }}>
             <Code size={40} />
@@ -1177,12 +1271,28 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', padding: '10px', position: 'relative', zIndex: 1 }}>
           <span style={{ 
             fontSize: '1.2rem', fontWeight: '900', 
-            color: isSelected ? (status === 'Validado' ? '#22c55e' : accentColor) : (status === 'Validado' ? '#22c55e' : (status === 'Corregir' ? '#ff4b4b' : accentColor)), 
+            color: isSelected 
+              ? (status === 'Validado' ? '#16a34a' : accentColor) 
+              : (status === 'Validado' 
+                  ? '#16a34a' 
+                  : (status === 'Corregir' 
+                      ? '#ef4444' 
+                      : (status === 'En revisión' 
+                          ? '#d97706' 
+                          : accentColor))), 
             marginBottom: '4px' 
           }}>{num}</span>
           <span style={{ 
             fontSize: '0.6rem', fontWeight: '800', 
-            color: isSelected ? (status === 'Validado' ? '#22c55e' : accentColor) : (status === 'Validado' ? '#22c55e' : (status === 'Corregir' ? '#ff4b4b' : accentColor)),
+            color: isSelected 
+              ? (status === 'Validado' ? '#15803d' : '#1e293b') 
+              : (status === 'Validado' 
+                  ? '#15803d' 
+                  : (status === 'Corregir' 
+                      ? '#b91c1c' 
+                      : (status === 'En revisión' 
+                          ? '#b45309' 
+                          : '#475569'))),
             textAlign: 'center', textTransform: 'uppercase', lineHeight: '1.2',
             maxWidth: '100%'
           }}>{(item.titulo || item.title)?.length > 25 ? (item.titulo || item.title).substring(0, 22) + '...' : (item.titulo || item.title)}</span>
@@ -2734,6 +2844,32 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         </div>
                       </div>
                     </div>
+
+                    {(currentProgress?.status === 'En revisión' || currentProgress?.status === 'Corregir') && (
+                      <div style={{ marginBottom: '25px', padding: '15px', borderRadius: '16px', background: `${accentColor}0a`, border: `1px dashed ${accentColor}40`, textAlign: 'center' }}>
+                        <p style={{ fontSize: '0.85rem', color: '#444', margin: '0 0 12px 0', lineHeight: '1.4' }}>
+                          Tu entrega ya está registrada. ¡Habla con el Sensei en el chat para validar tus conocimientos y completar el reto!
+                        </p>
+                        <GlowButton 
+                          onClick={() => {
+                            if (onValidateChallenge) {
+                              onValidateChallenge(
+                                currentItem, 
+                                currentProgress.evidence_url || evidenceUrl || '', 
+                                progressKey, 
+                                currentProgress.evidence_file_url || null
+                              );
+                            }
+                            setSelectedTutorial(null);
+                          }}
+                          fullWidth
+                          variant="primary"
+                          style={{ padding: '14px', fontSize: '1rem', borderRadius: '12px' }}
+                        >
+                          💬 Hablar con el Sensei para Validar
+                        </GlowButton>
+                      </div>
+                    )}
 
                     <GlowButton 
                       onClick={() => handleAction(currentItem, isTutorial ? 'tutorial' : 'challenge')}
