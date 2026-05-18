@@ -79,7 +79,22 @@ export default function Onboarding() {
     },
     {
       title: "¿Cómo empezar tu viaje?",
-      content: "1. Selecciona cualquiera de los planetas tecnológicos (Scratch, Python, HTML...) en la pantalla principal. \n\n2. Responde a la evaluación inicial del Sensei en la sección superior para determinar tu rango. \n\n3. Explora tu itinerario de retos, sigue las pistas socráticas del Tutor IA y diviértete programando.",
+      content: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left', fontSize: '0.95rem' }}>
+          <p style={{ margin: 0, display: 'flex', gap: '8px', lineHeight: '1.5' }}>
+            <span style={{ fontWeight: '800', color: 'var(--accent-cyan)' }}>1.</span>
+            <span>Selecciona cualquiera de los planetas tecnológicos (Scratch, Python, HTML...) en la <strong>pestaña dojo</strong>.</span>
+          </p>
+          <p style={{ margin: 0, display: 'flex', gap: '8px', lineHeight: '1.5' }}>
+            <span style={{ fontWeight: '800', color: 'var(--accent-cyan)' }}>2.</span>
+            <span>Responde a la evaluación inicial del Sensei en la sección superior para determinar tu rango.</span>
+          </p>
+          <p style={{ margin: 0, display: 'flex', gap: '8px', lineHeight: '1.5' }}>
+            <span style={{ fontWeight: '800', color: 'var(--accent-cyan)' }}>3.</span>
+            <span>Explora tu itinerario de retos, sigue las pistas socráticas del Tutor IA y diviértete programando.</span>
+          </p>
+        </div>
+      ),
       icon: <BrainCircuit size={48} color="var(--accent-cyan)" />,
       color: "var(--accent-cyan)"
     },
@@ -212,14 +227,14 @@ export default function Onboarding() {
           {currentStep.title}
         </h2>
 
-        <p style={{ 
+        <div style={{ 
           color: '#475569', 
           lineHeight: '1.6', 
           marginBottom: '32px',
           fontSize: '1.05rem'
         }}>
           {currentStep.content}
-        </p>
+        </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
