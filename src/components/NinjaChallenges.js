@@ -199,6 +199,12 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   useEffect(() => {
     if (!pid) return;
 
+    // Si el diagnóstico no está hecho, y el planeta tiene diagnóstico, la pestaña por defecto es 'assessment'
+    if (['scratch', 'microbit', 'makecode-microbit', 'arcade', 'makecode-arcade', 'arduino', 'tinkercad-arduino'].includes(pid) && !assessmentCompleted) {
+      setActiveTab('assessment');
+      return;
+    }
+
     // Sincronización de Pestaña Activa según Planeta e Itinerario
     if (pid === 'html') {
       if (itinerary === 'raspberry') {
@@ -264,7 +270,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         setActiveTab('challenges');
       }
     }
-  }, [pid, planetId, itinerary, tutorials]);
+  }, [pid, planetId, itinerary, tutorials, assessmentCompleted]);
 
   const loadData = async () => {
     setLoading(true);
@@ -1601,13 +1607,13 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                   </button>
                 )}
                 <button 
-                  onClick={() => { setActiveTab('tutorials'); setSelectedTutorial(null); }}
+                  onClick={() => { setActiveTab('scratch_academia'); setSelectedTutorial(null); }}
                   style={{ 
                     flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                     fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
-                    background: activeTab === 'tutorials' ? 'white' : 'transparent',
-                    color: activeTab === 'tutorials' ? accentColor : '#666',
-                    boxShadow: activeTab === 'tutorials' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    background: (activeTab === 'scratch_academia' || activeTab === 'tutorials') ? 'white' : 'transparent',
+                    color: (activeTab === 'scratch_academia' || activeTab === 'tutorials') ? accentColor : '#666',
+                    boxShadow: (activeTab === 'scratch_academia' || activeTab === 'tutorials') ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >

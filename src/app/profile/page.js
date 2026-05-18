@@ -102,6 +102,12 @@ function ProfileContent() {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false); 
 
   const [isAutodidact, setIsAutodidact] = useState(true);
+
+  // Helper to determine if an itinerary option button should be highlighted as active.
+  // It handles null, '', and 'academy' as equivalent for the leftmost 'ACADEMIA' tab.
+  const isItineraryActive = (optId) => {
+    return itinerary === optId || (optId === null && (!itinerary || itinerary === 'academy' || itinerary === ''));
+  };
   
   // ── Estadísticas de Docente ──
   const [teacherStats, setTeacherStats] = useState({
@@ -465,7 +471,7 @@ function ProfileContent() {
     // Iniciar conversación socrática con feedback del nivel
     const welcomeMsg = { 
       role: 'tutor', 
-      text: `¡Excelente trabajo completando la evaluación! He detectado que tienes un nivel **${level}** en este sector. He preparado un itinerario personalizado para ti. Ya puedes explorar la lista de **Retos Ninja** que aparece más abajo para avanzar a tu propio ritmo. Si te quedas atascado en algún desafío o necesitas una pista, escríbeme aquí mismo en el tutor socrático. ¿Tienes alguna duda técnica?` 
+      text: `¡Excelente trabajo completando la evaluación! He detectado que tienes un nivel **${level}** en este sector. He preparado un itinerario personalizado para ti. Explora los retos que aparecen más abajo para comenzar. Si tienes alguna duda o te quedas atascado, puedes consultar en el tutor socrático de NotebookLM en este chat. ¿Tienes alguna duda técnica?` 
     };
     setSocraticMessages([welcomeMsg]);
   };
@@ -1716,9 +1722,9 @@ function ProfileContent() {
                             fontWeight: '800',
                             cursor: 'pointer',
                             transition: 'all 0.2s',
-                            background: itinerary === opt.id ? (planet?.barColor || '#0dcfcf') : 'white',
-                            color: itinerary === opt.id ? 'white' : '#64748b',
-                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#0dcfcf') : '#e2e8f0'}`,
+                            background: isItineraryActive(opt.id) ? (planet?.barColor || '#0dcfcf') : 'white',
+                            color: isItineraryActive(opt.id) ? 'white' : '#64748b',
+                            border: `1px solid ${isItineraryActive(opt.id) ? (planet?.barColor || '#0dcfcf') : '#e2e8f0'}`,
                             boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
                           }}
                         >
@@ -1751,9 +1757,9 @@ function ProfileContent() {
                             fontWeight: '800',
                             cursor: 'pointer',
                             transition: 'all 0.2s',
-                            background: itinerary === opt.id ? (planet?.barColor || '#306998') : 'white',
-                            color: itinerary === opt.id ? 'white' : '#64748b',
-                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#306998') : '#e2e8f0'}`,
+                            background: isItineraryActive(opt.id) ? (planet?.barColor || '#306998') : 'white',
+                            color: isItineraryActive(opt.id) ? 'white' : '#64748b',
+                            border: `1px solid ${isItineraryActive(opt.id) ? (planet?.barColor || '#306998') : '#e2e8f0'}`,
                             boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
                           }}
                         >
@@ -1782,9 +1788,9 @@ function ProfileContent() {
                             fontWeight: '800',
                             cursor: 'pointer',
                             transition: 'all 0.2s',
-                            background: itinerary === opt.id ? (planet?.barColor || '#f57c00') : 'white',
-                            color: itinerary === opt.id ? 'white' : '#64748b',
-                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#f57c00') : '#e2e8f0'}`,
+                            background: isItineraryActive(opt.id) ? (planet?.barColor || '#f57c00') : 'white',
+                            color: isItineraryActive(opt.id) ? 'white' : '#64748b',
+                            border: `1px solid ${isItineraryActive(opt.id) ? (planet?.barColor || '#f57c00') : '#e2e8f0'}`,
                             boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
                           }}
                         >
@@ -1816,9 +1822,9 @@ function ProfileContent() {
                             fontWeight: '800',
                             cursor: 'pointer',
                             transition: 'all 0.2s',
-                            background: itinerary === opt.id ? (planet?.barColor || '#9c27b0') : 'white',
-                            color: itinerary === opt.id ? 'white' : '#64748b',
-                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#9c27b0') : '#e2e8f0'}`,
+                            background: isItineraryActive(opt.id) ? (planet?.barColor || '#9c27b0') : 'white',
+                            color: isItineraryActive(opt.id) ? 'white' : '#64748b',
+                            border: `1px solid ${isItineraryActive(opt.id) ? (planet?.barColor || '#9c27b0') : '#e2e8f0'}`,
                             boxShadow: itinerary === opt.id ? '0 4px 10px rgba(0,0,0,0.1)' : 'none'
                           }}
                         >
@@ -1849,9 +1855,9 @@ function ProfileContent() {
                             cursor: 'pointer',
                             transition: 'all 0.2s',
                             whiteSpace: 'nowrap',
-                            background: itinerary === opt.id ? (planet?.barColor || '#6366f1') : 'white',
-                            color: itinerary === opt.id ? 'white' : '#64748b',
-                            border: `1px solid ${itinerary === opt.id ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
+                            background: isItineraryActive(opt.id) ? (planet?.barColor || '#6366f1') : 'white',
+                            color: isItineraryActive(opt.id) ? 'white' : '#64748b',
+                            border: `1px solid ${isItineraryActive(opt.id) ? (planet?.barColor || '#6366f1') : '#e2e8f0'}`,
                             boxShadow: itinerary === opt.id ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
                           }}
                         >
