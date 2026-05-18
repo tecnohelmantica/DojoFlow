@@ -465,7 +465,7 @@ function ProfileContent() {
     // Iniciar conversación socrática con feedback del nivel
     const welcomeMsg = { 
       role: 'tutor', 
-      text: `¡Excelente trabajo completando la evaluación! He detectado que tienes un nivel **${level}** en este sector. He preparado un itinerario personalizado para ti. ¿Quieres que empecemos con el primer reto o tienes alguna duda técnica?` 
+      text: `¡Excelente trabajo completando la evaluación! He detectado que tienes un nivel **${level}** en este sector. He preparado un itinerario personalizado para ti. Ya puedes explorar la lista de **Retos Ninja** que aparece más abajo para avanzar a tu propio ritmo. Si te quedas atascado en algún desafío o necesitas una pista, escríbeme aquí mismo en el tutor socrático. ¿Tienes alguna duda técnica?` 
     };
     setSocraticMessages([welcomeMsg]);
   };
