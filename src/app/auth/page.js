@@ -167,20 +167,68 @@ function AuthContent() {
 
     try {
       if (isLogin) {
-        let finalAuthEmail = cleanAlias.includes('@') ? cleanAlias : internalAuthEmail;
-        let { data: authData, error } = await supabase.auth.signInWithPassword({
-          email: finalAuthEmail,
-          password
-        });
+        let finalAuthEmail = cleanAlias.includes('@') ? cleanAlias : null;
+        let authData = null;
+        let error = null;
 
-        if (error && !cleanAlias.includes('@')) {
-          const { data: pData } = await supabase.from('profiles').select('email_real').eq('alias', cleanAlias).maybeSingle();
-          if (pData?.email_real) {
-            const { data: rData, error: rErr } = await supabase.auth.signInWithPassword({ email: pData.email_real, password });
-            if (!rErr) { handleLoginSuccess(rData); return; }
+        if (finalAuthEmail) {
+          const res = await supabase.auth.signInWithPassword({
+            email: finalAuthEmail,
+            password
+          });
+          authData = res.data;
+          error = res.error;
+        } else {
+          // Buscar el alias en la base de datos de manera insensible a mayúsculas
+          const { data: profileObj } = await supabase
+            .from('profiles')
+            .select('alias, email_real')
+            .ilike('alias', cleanAlias)
+            .maybeSingle();
+
+          const targetAlias = profileObj?.alias || cleanAlias;
+
+          // 1. Intentar con .local (alumnos/profesores creados manualmente)
+          const localEmail = `${targetAlias.toLowerCase()}@dojoflow.local`;
+          const localRes = await supabase.auth.signInWithPassword({
+            email: localEmail,
+            password
+          });
+
+          if (!localRes.error) {
+            authData = localRes.data;
+          } else {
+            // 2. Intentar con .edu (alumnos generados en bulk por docentes)
+            const eduEmail = `${targetAlias.toLowerCase()}@dojoflow.edu`;
+            const eduRes = await supabase.auth.signInWithPassword({
+              email: eduEmail,
+              password
+            });
+
+            if (!eduRes.error) {
+              authData = eduRes.data;
+            } else {
+              // 3. Intentar con el correo de recuperación si existe
+              if (profileObj?.email_real) {
+                const realRes = await supabase.auth.signInWithPassword({
+                  email: profileObj.email_real,
+                  password
+                });
+                if (!realRes.error) {
+                  authData = realRes.data;
+                } else {
+                  error = realRes.error;
+                }
+              } else {
+                error = eduRes.error || localRes.error;
+              }
+            }
           }
         }
-        if (error) throw new Error("Credenciales inválidas.");
+
+        if (error || !authData?.user) {
+          throw new Error("Credenciales inválidas.");
+        }
         handleLoginSuccess(authData);
       } else {
         const { data, error } = await supabase.auth.signUp({
@@ -255,6 +303,21 @@ function AuthContent() {
                isLogin ? 'Accede a tus simuladores de código' : 
                '¡Crea tu personaje y empieza a explorar!'}
             </p>
+            {!isLogin && !isRecovering && !isUpdatingPassword && (
+              <div style={{
+                background: 'rgba(0, 242, 254, 0.08)',
+                border: '1px dashed rgba(0, 242, 254, 0.3)',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                marginTop: '12px',
+                fontSize: '0.75rem',
+                color: '#e2e8f0',
+                lineHeight: '1.4',
+                textAlign: 'left'
+              }}>
+                🔑 <strong>¿Tu profesor ha creado tu cuenta?</strong> No necesitas registrarte aquí. Haz clic abajo en <strong>"Inicia Sesión"</strong> e introduce las claves que te han dado.
+              </div>
+            )}
           </div>
 
           {errorMsg && (
