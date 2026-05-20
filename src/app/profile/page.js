@@ -389,17 +389,24 @@ function ProfileContent() {
         const claseIds = [...new Set((memberships || []).map(m => m.clase_id))];
         setIsAutodidact(claseIds.length === 0);
 
-               // 🤝 3. Cargar recursos separados: Maestro vs. Propios de clase
-        // --- Maestros (globales para todos los alumnos) ---
+               // 🤝 3. Cargar recursos: separar por flag isMaster/isGlobal
+        // La distinción CORRECTA es por el flag en contenido, no por profesor_id
+        // (el profesor maestro puede tener recursos propios con is_master=false)
+
+        // --- Maestros: del MASTER_PROFESOR_ID con isGlobal/isMaster = true ---
         const { data: globalRes } = await supabase
           .from('recursos_docentes')
           .select('*')
-          .eq('profesor_id', MASTER_PROFESOR_ID);
+          .eq('profesor_id', MASTER_PROFESOR_ID)
+          .or('contenido->isGlobal.eq.true,contenido->isMaster.eq.true');
 
-        const masterList = globalRes || [];
+        const masterList = (globalRes || []).filter(r =>
+          r.contenido?.isGlobal === true || r.contenido?.isMaster === true ||
+          r.contenido?.isGlobal === 'true' || r.contenido?.isMaster === 'true'
+        );
         setTeacherResources(masterList);
 
-        // --- Propios de la clase (asignados por el profesor, NO maestros) ---
+        // --- Propios de la clase: en clase_recursos y que NO son maestros ---
         const masterIds = new Set(masterList.map(r => r.id));
         const classOnlyArr = [];
 
@@ -412,10 +419,10 @@ function ProfileContent() {
           (classResources || []).forEach(cr => {
             const r = cr.recursos_docentes;
             if (!r) return;
-            // Solo es MAESTRO si lo subió el profesor maestro (MASTER_PROFESOR_ID)
-            // Los recursos del profe con isGlobal=true siguen siendo "de clase", no maestros
-            const isMaestro = r.profesor_id === MASTER_PROFESOR_ID;
-            if (!isMaestro && !masterIds.has(r.id)) {
+            // Es maestro si tiene los flags activos
+            const isGlobal = r.contenido?.isGlobal === true || r.contenido?.isGlobal === 'true';
+            const isMaster = r.contenido?.isMaster === true || r.contenido?.isMaster === 'true';
+            if (!isGlobal && !isMaster && !masterIds.has(r.id)) {
               classOnlyArr.push(r);
             }
           });
@@ -1349,7 +1356,6 @@ function ProfileContent() {
                 {teacherResources
                   .filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
                   .sort(sortRecursos)
-                  .slice(0, 3)
                   .map(r => {
                     const type = r.tipo_recurso?.toLowerCase() || '';
                     const Icon = type.includes('video') ? Play : (type.includes('info') ? Camera : (type.includes('presen') || type.includes('slide') ? Presentation : FileText));
