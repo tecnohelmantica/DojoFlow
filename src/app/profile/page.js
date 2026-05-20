@@ -378,12 +378,15 @@ function ProfileContent() {
           `)
           .eq('alumno_id', session.user.id);
 
+        const seenClaseIds = new Set();
         const classroomNames = (memberships || [])
+          .filter(m => { if (seenClaseIds.has(m.clase_id)) return false; seenClaseIds.add(m.clase_id); return true; })
           .map(m => m.clases?.nombre)
           .filter(Boolean);
         
         setStudentClassrooms(classroomNames);
-        const claseIds = (memberships || []).map(m => m.clase_id);
+        // Deduplicar por clase_id para evitar membresías duplicadas
+        const claseIds = [...new Set((memberships || []).map(m => m.clase_id))];
         setIsAutodidact(claseIds.length === 0);
 
                // 🤝 3. Cargar recursos separados: Maestro vs. Propios de clase
@@ -391,7 +394,7 @@ function ProfileContent() {
         const { data: globalRes } = await supabase
           .from('recursos_docentes')
           .select('*')
-          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->isGlobal.eq.true,contenido->isMaster.eq.true`);
+          .eq('profesor_id', MASTER_PROFESOR_ID);
 
         const masterList = globalRes || [];
         setTeacherResources(masterList);
@@ -409,10 +412,9 @@ function ProfileContent() {
           (classResources || []).forEach(cr => {
             const r = cr.recursos_docentes;
             if (!r) return;
-            const isMaestro = r.profesor_id === MASTER_PROFESOR_ID
-              || r.contenido?.isGlobal
-              || r.contenido?.isMaster
-              || r.contenido?.meta?.isGlobal;
+            // Solo es MAESTRO si lo subió el profesor maestro (MASTER_PROFESOR_ID)
+            // Los recursos del profe con isGlobal=true siguen siendo "de clase", no maestros
+            const isMaestro = r.profesor_id === MASTER_PROFESOR_ID;
             if (!isMaestro && !masterIds.has(r.id)) {
               classOnlyArr.push(r);
             }
