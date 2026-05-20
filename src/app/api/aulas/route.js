@@ -7,6 +7,26 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+function generateSecurePassword(length = 12) {
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*(),.?:{}|<>';
+    
+    let password = '';
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+    
+    const allChars = lowercase + uppercase + numbers + symbols;
+    for (let i = password.length; i < length; i++) {
+        password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    return password.split('').sort(() => 0.5 - Math.random()).join('');
+}
+
 export async function POST(req) {
     try {
         const body = await req.json();
@@ -30,9 +50,9 @@ export async function POST(req) {
 
         if (action === 'unirse_con_codigo') {
             const { codigo, alumnoId } = body;
-            const { data: clase } = await supabase.from('clases').select('id, nombre, nombre_clase').ilike('codigo_invitacion', codigo.trim()).single();
+            const { data: clase } = await supabase.from('clases').select('id, nombre, nombre_clase, profesor_id').ilike('codigo_invitacion', codigo.trim()).single();
             if (!clase) return NextResponse.json({ error: 'Codigo invalido' }, { status: 404 });
-            const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId });
+            const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId, profesor_id: clase.profesor_id });
             
             if (insertError) {
                 // Si ya está unido (error de clave duplicada), lo tratamos como éxito pero con mensaje
@@ -55,6 +75,9 @@ export async function POST(req) {
                 auth: { autoRefreshToken: false, persistSession: false }
             });
 
+            const { data: claseInfo } = await adminClient.from('clases').select('profesor_id').eq('id', claseId).single();
+            const profId = claseInfo?.profesor_id || null;
+
             console.log(">>> PROCESO GENERACIÓN:", { claseId, cantidad, alias });
             
             const created = [];
@@ -63,7 +86,7 @@ export async function POST(req) {
             if (alias) {
                 usersToCreate.push({
                     email: `${alias.toLowerCase().replace(/\s+/g, '')}@dojoflow.edu`,
-                    password: Math.random().toString(36).slice(-8),
+                    password: generateSecurePassword(12),
                     alias: alias
                 });
             } else if (cantidad) {
@@ -73,7 +96,7 @@ export async function POST(req) {
                     const studentAlias = `${prefix}_${randomStr}_${i + 1}`;
                     usersToCreate.push({
                         email: `${studentAlias}@dojoflow.edu`,
-                        password: Math.random().toString(36).slice(-8),
+                        password: generateSecurePassword(12),
                         alias: studentAlias
                     });
                 }
@@ -94,7 +117,7 @@ export async function POST(req) {
                 
                 const uid = authData.user.id;
                 await adminClient.from('profiles').insert({ id: uid, alias: user.alias, role: 'alumno' });
-                await adminClient.from('clase_alumnos').insert({ clase_id: claseId, alumno_id: uid });
+                await adminClient.from('clase_alumnos').insert({ clase_id: claseId, alumno_id: uid, profesor_id: profId });
                 
                 created.push({ id: uid, alias: user.alias, password: user.password });
             }

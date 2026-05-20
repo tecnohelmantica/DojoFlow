@@ -1136,7 +1136,13 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
                const { data: p } = await supabase.from('profiles').select('id').ilike('alias', cleanAlias).maybeSingle();
                
                if (p) {
-                 const { error: linkErr } = await supabase.from('clase_alumnos').insert({ clase_id: claseActiva.id, alumno_id: p.id });
+                 // Verificar si ya está en la clase
+                 const { data: existingLink } = await supabase.from('clase_alumnos').select('alumno_id').eq('clase_id', claseActiva.id).eq('alumno_id', p.id).maybeSingle();
+                 if (existingLink) {
+                   msg('err', 'Este alumno ya está inscrito en esta clase');
+                   return;
+                 }
+                 const { error: linkErr } = await supabase.from('clase_alumnos').insert({ clase_id: claseActiva.id, alumno_id: p.id, profesor_id: claseActiva.profesor_id });
                  if (linkErr) {
                    msg('err', 'Ya está en la clase o error');
                  } else {
