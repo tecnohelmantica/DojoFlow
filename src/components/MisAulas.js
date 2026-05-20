@@ -575,7 +575,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                 <p style={{ fontSize: '0.75rem', color: '#8a8a9e', fontWeight: '700', margin: 0, textTransform: 'uppercase' }}>Materiales visibles para los alumnos</p>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => setShowVincular(true)} style={{ ...BTN_CYAN, padding: '8px 16px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <BookOpen size={14}/> Biblioteca
+                    <BookOpen size={14}/> Desde Biblioteca
                   </button>
                   <button onClick={() => setShowUploadModal(true)} style={{ ...BTN_PRIMARY, padding: '8px 16px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Plus size={14}/> Subir Nuevo Material
@@ -585,19 +585,49 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
               {claseRecursos.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '60px', background: 'rgba(255,255,255,0.7)', borderRadius: '14px', border: '1.5px dashed #ddd' }}>
                   <Zap size={32} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.2 }}/>
-                  <p style={{ color: '#8a8a9e' }}>Aún no has compartido ningún recurso con esta clase.</p>
+                  <p style={{ color: '#8a8a9e', fontWeight: '600' }}>Aún no has compartido ningún recurso con esta clase.</p>
+                  <p style={{ color: '#aaa', fontSize: '0.82rem', margin: '5px 0 0' }}>Usa "Subir Material" para añadir contenido o "Desde Biblioteca" para vincular materiales existentes.</p>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
-                  {claseRecursos.map(cr => (
-                    <div key={cr.id} style={{ background: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #eee', position: 'relative' }}>
-                      <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#1a1a2e', marginBottom: '4px' }}>{cr.recursos_docentes.nombre_recurso || cr.recursos_docentes.contenido?.meta?.filename}</h4>
-                      <span style={{ fontSize: '0.6rem', color: '#9c27b0' }}>{cr.recursos_docentes.tipo_recurso.toUpperCase()}</span>
-                      <button onClick={() => onDesvincular(cr.id)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer' }}>
-                        <Trash2 size={14}/>
-                      </button>
-                    </div>
-                  ))}
+                  {claseRecursos.map(cr => {
+                    const r = cr.recursos_docentes;
+                    if (!r) return null;
+                    const isGlobalR = r.contenido?.isGlobal || r.contenido?.isMaster || r.contenido?.meta?.isGlobal;
+                    const planetLabel = PLANET_LABELS[r.tecnologia] || r.tecnologia || 'General';
+                    const typeIcon = r.tipo_recurso === 'video'
+                      ? <Tv size={15} color="#9c27b0" />
+                      : (r.tipo_recurso === 'enlace' || r.tipo_recurso === 'lanzadera')
+                        ? <Link size={15} color="#128989" />
+                        : <FileText size={15} color="#5c6ac4" />;
+                    return (
+                      <div key={cr.id} style={{ background: 'white', padding: '18px', borderRadius: '16px', border: '1.5px solid #eee', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {isGlobalR && (
+                          <div style={{ position: 'absolute', top: '14px', right: '42px', background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: 'white', padding: '2px 8px', borderRadius: '8px', fontSize: '0.55rem', fontWeight: '900' }}>MAESTRO</div>
+                        )}
+                        <button onClick={() => onDesvincular(cr.id)} style={{ position: 'absolute', top: '12px', right: '12px', background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', padding: '2px' }} title="Quitar de esta clase">
+                          <Trash2 size={14}/>
+                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ padding: '8px', borderRadius: '10px', background: '#f8f8fc', flexShrink: 0 }}>{typeIcon}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1a1a2e', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {r.nombre_recurso || r.contenido?.meta?.filename || 'Sin titulo'}
+                            </h4>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '0.6rem', fontWeight: '800', color: '#9c27b0', background: '#f3e5f5', padding: '1px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>{r.tipo_recurso}</span>
+                              <span style={{ fontSize: '0.6rem', fontWeight: '700', color: '#128989', background: '#e0f5f5', padding: '1px 6px', borderRadius: '4px' }}>Planeta: {planetLabel}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {r.contenido?.url && (
+                          <a href={r.contenido.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', color: '#5c6ac4', fontWeight: '700', textDecoration: 'none', marginTop: 'auto' }}>
+                            <ExternalLink size={12}/> Ver recurso
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </>
@@ -658,19 +688,49 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
       {showVincular && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
            <div style={{ background: 'white', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '500px' }}>
-             <h3 style={{ fontSize: '1.3rem', fontWeight: '800', fontFamily: 'Outfit', marginBottom: '20px' }}>Vincular de Biblioteca</h3>
-             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-               {misRecursos.map(r => (
-                 <button key={r.id} onClick={() => { onVincular(r.id); setShowVincular(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:'12px', padding:'14px', borderRadius:'12px', border:'1px solid #eee', background:'white', marginBottom:'8px', cursor:'pointer', textAlign:'left' }}>
-                    <FileText size={16}/>
-                    <div>
-                      <p style={{ margin:0, fontWeight:'700', fontSize:'0.9rem' }}>{r.nombre_recurso || r.contenido?.meta?.filename}</p>
-                      <p style={{ margin:0, fontSize:'0.7rem', color:'#9c27b0' }}>{r.tipo_recurso.toUpperCase()}</p>
-                    </div>
-                 </button>
-               ))}
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+               <h3 style={{ fontSize: '1.2rem', fontWeight: '800', fontFamily: 'Outfit', margin: 0 }}>Vincular desde Biblioteca</h3>
+               <button onClick={() => setShowVincular(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa' }}><XCircle size={20}/></button>
              </div>
-             <button onClick={() => setShowVincular(false)} style={{ ...BTN_GHOST, width:'100%', marginTop:'20px' }}>Cerrar</button>
+             <p style={{ fontSize: '0.8rem', color: '#8a8a9e', margin: '0 0 16px' }}>Selecciona un material de tu biblioteca para compartirlo con esta clase.</p>
+             <div style={{ overflowY: 'auto', maxHeight: '400px' }}>
+               {misRecursos.length === 0 ? (
+                 <div style={{ textAlign: 'center', padding: '40px', color: '#aaa' }}>
+                   <HardDrive size={32} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.3 }}/>
+                   <p>Tu biblioteca esta vacia.</p>
+                 </div>
+               ) : (
+                 misRecursos.map(r => {
+                   const alreadyLinked = claseRecursos.some(cr => cr.recurso_id === r.id || cr.recursos_docentes?.id === r.id);
+                   const isGlobalR = r.contenido?.isGlobal || r.contenido?.isMaster || r.contenido?.meta?.isGlobal;
+                   const planetLabel = PLANET_LABELS[r.tecnologia] || r.tecnologia || 'General';
+                   return (
+                     <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', border: alreadyLinked ? '1px solid #e0f5f5' : '1px solid #eee', background: alreadyLinked ? '#f7fffe' : 'white', marginBottom: '8px' }}>
+                       <div style={{ padding: '8px', borderRadius: '8px', background: '#f5f5f5', flexShrink: 0 }}>
+                         {r.tipo_recurso === 'video' ? <Tv size={16} color="#9c27b0" /> : <FileText size={16} color="#5c6ac4" />}
+                       </div>
+                       <div style={{ flex: 1, minWidth: 0 }}>
+                         <p style={{ margin: 0, fontWeight: '700', fontSize: '0.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.nombre_recurso || r.contenido?.meta?.filename}</p>
+                         <div style={{ display: 'flex', gap: '5px', marginTop: '3px', flexWrap: 'wrap' }}>
+                           <span style={{ fontSize: '0.6rem', color: '#9c27b0', fontWeight: '700', background: '#f3e5f5', padding: '1px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>{r.tipo_recurso}</span>
+                           <span style={{ fontSize: '0.6rem', color: '#128989', fontWeight: '700', background: '#e0f5f5', padding: '1px 6px', borderRadius: '4px' }}>Planeta: {planetLabel}</span>
+                           {isGlobalR && <span style={{ fontSize: '0.55rem', color: '#f90', fontWeight: '900', background: '#fff8e1', padding: '1px 6px', borderRadius: '4px' }}>MAESTRO</span>}
+                         </div>
+                       </div>
+                       {alreadyLinked ? (
+                         <span style={{ fontSize: '0.65rem', color: '#128989', fontWeight: '800', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '3px' }}><CheckCircle size={12}/> Vinculado</span>
+                       ) : (
+                         <button
+                           onClick={() => { onVincular(r.id); setShowVincular(false); }}
+                           style={{ background: 'linear-gradient(135deg, #9c27b0, #5c6ac4)', border: 'none', color: 'white', borderRadius: '8px', padding: '6px 12px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                         >Vincular</button>
+                       )}
+                     </div>
+                   );
+                 })
+               )}
+             </div>
+             <button onClick={() => setShowVincular(false)} style={{ ...BTN_GHOST, width:'100%', marginTop:'16px' }}>Cerrar</button>
            </div>
         </div>
       )}
@@ -967,7 +1027,9 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
                         {r.tipo_recurso === 'video' ? <Tv size={18} color="#9c27b0" /> : <FileText size={18} color="#128989" />}
                       </div>
                       <div>
-                        <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#aaa', textTransform: 'uppercase' }}>PLANETA {r.tecnologia.toUpperCase()}</span>
+                        <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#128989', background: '#e0f5f5', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                          {PLANET_LABELS[r.tecnologia] || r.tecnologia || 'General'}
+                        </span>
                         <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: '800', color: '#1a1a2e' }}>{r.nombre_recurso || r.contenido?.meta?.filename || 'Sin título'}</h4>
                       </div>
                     </div>
@@ -1031,8 +1093,8 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
                         )}
                       </div>
                     </div>
-                    {r.contenido?.meta?.isGlobal && (
-                      <div style={{ position: 'absolute', top: '15px', right: '15px', background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '0.55rem', fontWeight: '900', boxShadow: '0 2px 8px rgba(255,165,0,0.3)' }}>GLOBAL</div>
+                    {r.contenido?.meta?.(isGlobal || r.contenido?.isGlobal || r.contenido?.isMaster) && (
+                      <div style={{ position: 'absolute', top: '15px', right: '38px', background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '0.55rem', fontWeight: '900', boxShadow: '0 2px 8px rgba(255,165,0,0.3)' }}>MAESTRO</div>
                     )}
                   </div>
                 );

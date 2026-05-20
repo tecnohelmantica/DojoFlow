@@ -1,7 +1,7 @@
-[0513/172432.947:INFO:CONSOLE:546] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D1_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlE2mu87tS8UufFNcZSuZZoxRmSmjg/dti=1/m=_b,_tp (546)
-[0513/172432.948:INFO:CONSOLE:546] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
-Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D1_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlE2mu87tS8UufFNcZSuZZoxRmSmjg/dti=1/m=_b,_tp (546)
-[0513/172434.172:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0513/172434.172:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0513/172434.385:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
-[0513/172434.386:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0518/054501.149:INFO:CONSOLE:546] "%c%s color: red; background: yellow; font-size: 24px; WARNING!", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D9_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlFtUdoDEvd1zZ1CiraNADSlZMbwMw/dti=1/m=_b,_tp (546)
+[0518/054501.149:INFO:CONSOLE:546] "%c%s font-size: 18px; Using this console may allow attackers to impersonate you and steal your information using an attack called Self-XSS.
+Do not enter or paste code that you do not understand.", source: https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.AccountsSignInUi.en_US.alsf3k9Xrdw.es5.O/am=iW8AAACE4hwhA4D9_38DAAggiA74ngVoAoQMAAAAAAAAAABYAgAAjQ/d=1/excm=_b,_tp,accountchooserview/ed=1/dg=0/wt=2/ujg=1/rs=AOaEmlFtUdoDEvd1zZ1CiraNADSlZMbwMw/dti=1/m=_b,_tp (546)
+[0518/054501.417:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0518/054501.417:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0518/054501.514:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+[0518/054501.514:ERROR:content\public\browser\web_contents_delegate.cc:309] WebContentsDelegate::CheckMediaAccessPermission: Not supported.

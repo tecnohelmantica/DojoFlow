@@ -5,6 +5,13 @@ import { PLANETS } from '../lib/planets';
 
 const MASTER_PROFESOR_ID = '5ec7cea5-1dfa-461f-8a07-ecf1da1854a6';
 
+const PLANET_NAMES = {
+  scratch: 'Scratch', arduino: 'Arduino', tinkercad: 'Tinkercad',
+  'makecode-microbit': 'micro:bit (MakeCode)', 'makecode-arcade': 'MakeCode Arcade',
+  code: 'Code.org', ia: 'Machine Learning (IA)', python: 'Python',
+  html: 'Web (HTML/CSS)', appinventor: 'App Inventor', general: 'General',
+};
+
 const ResourceUploader = ({ classId, currentUser, onUploadSuccess, role = 'profesor', planet: initialPlanet, onClose, editData }) => {
   const [file, setFile] = useState(null);
   const [planet, setPlanet] = useState(initialPlanet || PLANETS[0]?.id || '');
@@ -127,8 +134,20 @@ const ResourceUploader = ({ classId, currentUser, onUploadSuccess, role = 'profe
       if (dbResult.error) throw dbResult.error;
       const insertedData = dbResult.data;
 
-      if (classId && !isGlobal && insertedData && !editData) {
-        await supabase.from('clase_recursos').insert({ clase_id: classId, recurso_id: insertedData.id });
+      // Vincular a la clase si hay classId (tanto recursos normales como globales)
+      // Los globales también deben aparecer en la lista de materiales de la clase
+      if (classId && insertedData && !editData) {
+        // Verificar que no esté ya vinculado (evitar duplicados)
+        const { data: existingLink } = await supabase
+          .from('clase_recursos')
+          .select('id')
+          .eq('clase_id', classId)
+          .eq('recurso_id', insertedData.id)
+          .maybeSingle();
+        
+        if (!existingLink) {
+          await supabase.from('clase_recursos').insert({ clase_id: classId, recurso_id: insertedData.id });
+        }
       }
 
       setStatus('success');
@@ -158,6 +177,13 @@ const ResourceUploader = ({ classId, currentUser, onUploadSuccess, role = 'profe
         )}
       </div>
       
+      {classId && (
+        <div style={{ marginBottom: '14px', padding: '10px 14px', background: 'rgba(13,207,207,0.1)', border: '1px solid rgba(13,207,207,0.3)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <CheckCircle size={14} color="#0dcfcf" />
+          <span style={{ fontSize: '0.78rem', color: '#0dcfcf', fontWeight: '600' }}>El material se vinculará automáticamente a esta clase</span>
+        </div>
+      )}
+
       {role === 'profesor' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
           <div>
@@ -273,17 +299,29 @@ const ResourceUploader = ({ classId, currentUser, onUploadSuccess, role = 'profe
       )}
 
       {role === 'profesor' && (
-        <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input 
-            type="checkbox" 
-            id="is-global" 
-            checked={isGlobal} 
-            onChange={(e) => setIsGlobal(e.target.checked)}
-            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-          />
-          <label htmlFor="is-global" style={{ fontSize: '0.85rem', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            ✨ Contenido Maestro (Visible para todos los alumnos)
-          </label>
+        <div style={{ marginBottom: '15px', padding: '12px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <input 
+              type="checkbox" 
+              id="is-global" 
+              checked={isGlobal} 
+              onChange={(e) => setIsGlobal(e.target.checked)}
+              style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#ff9500' }}
+            />
+            <label htmlFor="is-global" style={{ fontSize: '0.85rem', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600' }}>
+              ✨ Marcar como Contenido Maestro
+            </label>
+          </div>
+          <p style={{ margin: '6px 0 0 28px', fontSize: '0.72rem', color: '#8a8a9e', lineHeight: '1.4' }}>
+            {isGlobal
+              ? classId
+                ? 'El material se vinculará a esta clase Y será visible globalmente para todos los alumnos.'
+                : 'El material será visible para TODOS los alumnos de la plataforma.'
+              : classId
+                ? 'El material solo será visible para los alumnos de esta clase.'
+                : 'El material se guardará en tu biblioteca. Vincúlalo a una clase para que los alumnos lo vean.'
+            }
+          </p>
         </div>
       )}
 
