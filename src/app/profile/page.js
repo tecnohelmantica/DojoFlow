@@ -1382,6 +1382,49 @@ function ProfileContent() {
             </div>
           )}
 
+          {selectedScroll && (
+            <div style={{ marginBottom: '40px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
+                  <Eye size={16} /> {selectedScroll.nombre_recurso}
+                </h3>
+                <button 
+                  onClick={() => setSelectedScroll(null)}
+                  style={{ border: 'none', background: 'none', color: '#8a8a9e', cursor: 'pointer', fontSize: '0.7rem', fontWeight: '800' }}
+                >
+                  CERRAR VISTA
+                </button>
+              </div>
+              
+              <GlassCard style={{ padding: 0, boxShadow: '0 20px 50px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                <div style={{ width: '100%', minHeight: '400px', background: '#fff', position: 'relative' }}>
+                  {selectedScroll.tipo_recurso?.toLowerCase().includes('info') ? (
+                    <div style={{ padding: '10px' }}>
+                      <img 
+                        src={selectedScroll.contenido?.url} 
+                        alt={selectedScroll.nombre_recurso} 
+                        style={{ width: '100%', height: 'auto', borderRadius: '8px', display: 'block' }} 
+                      />
+                    </div>
+                  ) : (
+                    <iframe 
+                      src={selectedScroll.contenido?.url}
+                      className="resource-iframe"
+                      style={{ width: '100%', border: 'none' }}
+                      title={selectedScroll.nombre_recurso}
+                    />
+                  )}
+                </div>
+                
+                <div style={{ padding: '15px', display: 'flex', justifyContent: 'center', borderTop: '1px solid #eee', background: '#fcfcfc' }}>
+                  <GlowButton color="white" onClick={() => window.open(selectedScroll.contenido?.url, '_blank')} style={{ fontSize: '0.7rem', padding: '8px 20px', border: '1px solid #e2e8f0', color: '#64748b' }}>
+                    <ExternalLink size={14} style={{ marginRight: '8px' }} /> ABRIR EN VENTANA COMPLETA
+                  </GlowButton>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
           {/* FILA 3B: RECURSOS DEL PROFESOR (materiales propios de la clase) */}
           {classOnlyResources.filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas').length > 0 && (
             <div style={{ marginBottom: '40px' }}>
@@ -1425,50 +1468,7 @@ function ProfileContent() {
             </div>
           )}
 
-                    {selectedScroll && (
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', margin: 0 }}>
-                  <Eye size={16} /> {selectedScroll.nombre_recurso}
-                </h3>
-                <button 
-                  onClick={() => setSelectedScroll(null)}
-                  style={{ border: 'none', background: 'none', color: '#8a8a9e', cursor: 'pointer', fontSize: '0.7rem', fontWeight: '800' }}
-                >
-                  CERRAR VISTA
-                </button>
-              </div>
-              
-              <GlassCard style={{ padding: 0, boxShadow: '0 20px 50px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-                <div style={{ width: '100%', minHeight: '400px', background: '#fff', position: 'relative' }}>
-                  {selectedScroll.tipo_recurso?.toLowerCase().includes('info') ? (
-                    <div style={{ padding: '10px' }}>
-                      <img 
-                        src={selectedScroll.contenido?.url} 
-                        alt={selectedScroll.nombre_recurso} 
-                        style={{ width: '100%', height: 'auto', borderRadius: '8px', display: 'block' }} 
-                      />
-                    </div>
-                  ) : (
-                    <iframe 
-                      src={selectedScroll.contenido?.url}
-                      className="resource-iframe"
-                      style={{ width: '100%', border: 'none' }}
-                      title={selectedScroll.nombre_recurso}
-                    />
-                  )}
-                </div>
-                
-                <div style={{ padding: '15px', display: 'flex', justifyContent: 'center', borderTop: '1px solid #eee', background: '#fcfcfc' }}>
-                  <GlowButton color="white" onClick={() => window.open(selectedScroll.contenido?.url, '_blank')} style={{ fontSize: '0.7rem', padding: '8px 20px', border: '1px solid #e2e8f0', color: '#64748b' }}>
-                    <ExternalLink size={14} style={{ marginRight: '8px' }} /> ABRIR EN VENTANA COMPLETA
-                  </GlowButton>
-                </div>
-              </GlassCard>
-            </div>
-          )}
-
-          {/* CURSO LUIS LLAMAS (Solo para Arduino) */}
+                    {/* CURSO LUIS LLAMAS (Solo para Arduino) */}
           {activePlanet === 'arduino' && (
             <div style={{ marginBottom: '50px', animation: 'fadeInUp 0.8s ease-out' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '15px' }}>
