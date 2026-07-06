@@ -215,7 +215,7 @@ REGLA DE VALIDACIÓN:
          7. Si es Arduino (Pro), usa C++ textual.`;
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash-latest", 
+      model: "gemini-2.5-flash", 
       systemInstruction: mode === 'mission_generator' ? 
         `Eres el Sensei de DojoFlow. Genera una Misión Especial en JSON para nivel ${studentLevel}, planeta ${planetName}.
          Semilla de aleatoriedad: ${randomSeed}.
