@@ -1959,99 +1959,42 @@ function ProfileContent() {
                       gap: 30px;
                       width: 100%;
                       margin-top: 40px;
+                      align-items: start;
+                    }
+                    .mission-cell-fullwidth {
+                      grid-column: 1 / -1;
                     }
                     @media (max-width: 1024px) {
-                      .missions-grid-layout {
-                        grid-template-columns: 1fr;
-                      }
+                      .missions-grid-layout { grid-template-columns: 1fr; }
+                      .mission-cell-fullwidth { grid-column: 1; }
                     }
                   `}} />
-                  
-                  {/* Grid de Configuración: Solo muestra las tarjetas de bienvenida si NO están activas */}
-                  {(!hasActiveStandardMission || !hasActiveCustomMission) && (
-                    <div className="missions-grid-layout">
-                      {!hasActiveStandardMission && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                          <div style={{
-                            background: 'rgba(255, 255, 255, 0.45)',
-                            border: '1px solid rgba(0, 0, 0, 0.04)',
-                            padding: '18px 24px',
-                            borderRadius: '20px',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
-                            backdropFilter: 'blur(10px)'
-                          }}>
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
-                              🎯 Misiones del Sensei
-                            </h3>
-                            <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
-                              Desafíos listos creados por el Sensei según tu nivel actual para fortalecer tus bases técnicas en este planeta.
-                            </p>
-                          </div>
-                          <SenseiMissions 
-                            planetId={activePlanet} 
-                            userId={isGuest ? 'guest_user' : session?.user?.id}
-                            studentLevel={studentLevel}
-                            accentColor={planet?.barColor}
-                            onValidateMission={handleValidateSenseiMission}
-                            refreshTrigger={senseiRefreshTrigger}
-                            onMissionStateChange={setHasActiveStandardMission}
-                          />
-                        </div>
-                      )}
 
-                      {!hasActiveCustomMission && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                          <div style={{
-                            background: 'rgba(255, 255, 255, 0.45)',
-                            border: '1px solid rgba(0, 0, 0, 0.04)',
-                            padding: '18px 24px',
-                            borderRadius: '20px',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
-                            backdropFilter: 'blur(10px)'
-                          }}>
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
-                              🎨 Diseña tu Propia Misión
-                            </h3>
-                            <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
-                              Define tu propio reto. Explica qué quieres construir y el Sensei te guiará socráticamente para lograr tu objetivo.
-                            </p>
-                          </div>
-                          <SenseiMissions 
-                            planetId={activePlanet} 
-                            userId={isGuest ? 'guest_user' : session?.user?.id}
-                            studentLevel={studentLevel}
-                            accentColor={planet?.barColor}
-                            onValidateMission={handleValidateSenseiMission}
-                            refreshTrigger={senseiRefreshTrigger}
-                            isCustomOnly={true}
-                            onMissionStateChange={setHasActiveCustomMission}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Misiones Activas (Ancho Completo de la Pantalla, debajo de las opciones) */}
-                  {hasActiveStandardMission && (
-                    <div style={{ marginTop: '40px', width: '100%' }}>
+                  <div className="missions-grid-layout">
+                    {/* Columna 1: Misiones del Sensei — se expande si tiene misión activa */}
+                    <div
+                      className={hasActiveStandardMission ? 'mission-cell-fullwidth' : ''}
+                      style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
+                    >
                       <div style={{
                         background: 'rgba(255, 255, 255, 0.45)',
                         border: '1px solid rgba(0, 0, 0, 0.04)',
                         padding: '18px 24px',
                         borderRadius: '20px',
                         boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
-                        backdropFilter: 'blur(10px)',
-                        marginBottom: '20px'
+                        backdropFilter: 'blur(10px)'
                       }}>
                         <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
-                          🎯 Misión del Sensei en Curso
+                          {hasActiveStandardMission ? '🎯 Misión del Sensei en Curso' : '🎯 Misiones del Sensei'}
                         </h3>
                         <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
-                          Supera los hitos prácticos propuestos y adjunta tu creación para la validación socrática.
+                          {hasActiveStandardMission
+                            ? 'Supera los hitos prácticos propuestos y adjunta tu creación para la validación socrática.'
+                            : 'Desafíos listos creados por el Sensei según tu nivel actual para fortalecer tus bases técnicas en este planeta.'}
                         </p>
                       </div>
-                      <SenseiMissions 
-                        planetId={activePlanet} 
+                      <SenseiMissions
+                        planetId={activePlanet}
                         userId={isGuest ? 'guest_user' : session?.user?.id}
                         studentLevel={studentLevel}
                         accentColor={planet?.barColor}
@@ -2060,38 +2003,43 @@ function ProfileContent() {
                         onMissionStateChange={setHasActiveStandardMission}
                       />
                     </div>
-                  )}
 
-                  {hasActiveCustomMission && (
-                    <div style={{ marginTop: '40px', width: '100%' }}>
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.45)',
-                        border: '1px solid rgba(0, 0, 0, 0.04)',
-                        padding: '18px 24px',
-                        borderRadius: '20px',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
-                        backdropFilter: 'blur(10px)',
-                        marginBottom: '20px'
-                      }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
-                          🎨 Tu Misión Personalizada en Curso
-                        </h3>
-                        <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
-                          Trabaja en tu propio proyecto con el apoyo del Sensei socrático interactivo en el chat de ayuda.
-                        </p>
+                    {/* Columna 2: Diseña tu Propia Misión — se oculta sólo si la misión del Sensei está activa */}
+                    {!hasActiveStandardMission && (
+                      <div
+                        className={hasActiveCustomMission ? 'mission-cell-fullwidth' : ''}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
+                      >
+                        <div style={{
+                          background: 'rgba(255, 255, 255, 0.45)',
+                          border: '1px solid rgba(0, 0, 0, 0.04)',
+                          padding: '18px 24px',
+                          borderRadius: '20px',
+                          boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
+                          backdropFilter: 'blur(10px)'
+                        }}>
+                          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
+                            {hasActiveCustomMission ? '🎨 Tu Misión Personalizada en Curso' : '🎨 Diseña tu Propia Misión'}
+                          </h3>
+                          <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
+                            {hasActiveCustomMission
+                              ? 'Trabaja en tu propio proyecto con el apoyo del Sensei socrático interactivo en el chat de ayuda.'
+                              : 'Define tu propio reto. Explica qué quieres construir y el Sensei te guiará socráticamente para lograr tu objetivo.'}
+                          </p>
+                        </div>
+                        <SenseiMissions
+                          planetId={activePlanet}
+                          userId={isGuest ? 'guest_user' : session?.user?.id}
+                          studentLevel={studentLevel}
+                          accentColor={planet?.barColor}
+                          onValidateMission={handleValidateSenseiMission}
+                          refreshTrigger={senseiRefreshTrigger}
+                          isCustomOnly={true}
+                          onMissionStateChange={setHasActiveCustomMission}
+                        />
                       </div>
-                      <SenseiMissions 
-                        planetId={activePlanet} 
-                        userId={isGuest ? 'guest_user' : session?.user?.id}
-                        studentLevel={studentLevel}
-                        accentColor={planet?.barColor}
-                        onValidateMission={handleValidateSenseiMission}
-                        refreshTrigger={senseiRefreshTrigger}
-                        isCustomOnly={true}
-                        onMissionStateChange={setHasActiveCustomMission}
-                      />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </>
               )}
             </>
