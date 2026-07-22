@@ -271,6 +271,7 @@ const ResourceUploader = ({ classId, currentUser, onUploadSuccess, role = 'profe
           <input 
             type="file" 
             id="artifact-file"
+            accept="image/*,video/*,.pdf,.zip,.sb3,.aia,.py,.ino,.hex,.json"
             onChange={handleFileChange}
             style={{ display: 'none' }}
           />
@@ -290,10 +291,10 @@ const ResourceUploader = ({ classId, currentUser, onUploadSuccess, role = 'profe
             }}
           >
             <Upload size={24} color={file ? '#0dcfcf' : '#ccc'} />
-            <span style={{ fontSize: '0.8rem', color: file ? '#fff' : '#ccc' }}>
+            <span style={{ fontSize: '0.85rem', color: file ? '#fff' : '#ccc' }}>
               {file ? file.name : 'Arrastra aquí tu creación de NotebookLM'}
             </span>
-            <span style={{ fontSize: '0.6rem', color: '#888' }}>(.mp4, .pdf, .png, .zip)</span>
+            <span style={{ fontSize: '0.6rem', color: '#888' }}>(.mp4, .pdf, .png, .zip, .sb3, .aia, .py, .ino...)</span>
           </label>
         </div>
       )}

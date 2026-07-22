@@ -57,7 +57,7 @@ const NOTEBOOK_MAP = {
 export async function POST(req) {
   const startTime = Date.now();
   try {
-    const { userId, mode, message, history, planet, level, missionType, missionTheme, randomSeed, excludeList } = await req.json();
+    const { userId, mode, message, history, planet, level, missionType, missionTheme, randomSeed, excludeList, context } = await req.json();
     const studentLevel = level || 'Junior';
     const searchPlanet = (planet || "scratch").toLowerCase();
     
@@ -103,23 +103,31 @@ export async function POST(req) {
 
     // --- NUEVA PRIORIDAD: CONTEXTO DE RETO (Para validación) ---
     let challengeContext = "";
-    if (mode === 'validador' && userId) {
-      try {
-        const { data: cData } = await supabase
-          .from('user_challenges')
-          .select('challenge_id, challenge_name, difficulty, evidence_url')
-          .eq('student_id', userId)
-          .eq('planet_id', planetId)
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+    let isCustomMission = false;
+    
+    if (mode === 'validador') {
+      if (context) {
+        isCustomMission = context.type === 'mission' && context.isCustom;
+        challengeContext = `\nRETO/MISIÓN A VALIDAR:\n- Tipo: ${context.type}\n- Nombre: ${context.title || 'No especificado'}\n- Objetivo: ${context.objective || 'No especificado'}\n- Misión Personalizada: ${isCustomMission ? 'Sí' : 'No'}\n`;
+        console.log(`[Tutor API] Contexto de validación recibido en el body: ${context.title} (Custom: ${isCustomMission})`);
+      } else if (userId) {
+        try {
+          const { data: cData } = await supabase
+            .from('user_challenges')
+            .select('challenge_id, challenge_name, difficulty, evidence_url')
+            .eq('student_id', userId)
+            .eq('planet_id', planetId)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        if (cData) {
-          challengeContext = `\nRETO A VALIDAR:\n- ID: ${cData.challenge_id}\n- Nombre: ${cData.challenge_name || 'No especificado'}\n- Dificultad: ${cData.difficulty || 'No especificada'}\n- Evidencia: ${cData.evidence_url || 'No proporcionada'}\n`;
-          console.log(`[Tutor API] Contexto de reto cargado para ${userId}`);
+          if (cData) {
+            challengeContext = `\nRETO A VALIDAR:\n- ID: ${cData.challenge_id}\n- Nombre: ${cData.challenge_name || 'No especificado'}\n- Dificultad: ${cData.difficulty || 'No especificada'}\n- Evidencia: ${cData.evidence_url || 'No proporcionada'}\n`;
+            console.log(`[Tutor API] Contexto de reto cargado desde DB para ${userId}`);
+          }
+        } catch (cError) {
+          console.warn(`[Tutor API] No se pudo cargar el contexto del reto:`, cError.message);
         }
-      } catch (cError) {
-        console.warn(`[Tutor API] No se pudo cargar el contexto del reto:`, cError.message);
       }
     }
 
@@ -127,7 +135,8 @@ export async function POST(req) {
     const isLocal = process.env.NODE_ENV === 'development' || process.env.HOSTNAME === 'localhost';
     const notebookId = NOTEBOOK_MAP[planetId];
 
-    if (isLocal && notebookId) {
+    // Excluimos generadores complejos estructurados de NotebookLM para asegurar formato JSON estricto
+    if (isLocal && notebookId && mode !== 'mission_generator' && mode !== 'custom_mission_generator') {
       try {
         console.log(`[Tutor API] Intentando conectar con NotebookLM para ${planetId}...`);
         const notebookUrl = `https://notebooklm.google.com/notebook/${notebookId}`;
@@ -137,30 +146,7 @@ export async function POST(req) {
         // Inyectamos el conocimiento maestro si existe para ayudar a NotebookLM o como contexto extra
         const knowledgeContext = masterKnowledge ? `\nCONOCIMIENTO DE REFERENCIA:\n${JSON.stringify(masterKnowledge)}\n` : "";
 
-        if (mode === 'mission_generator') {
-          promptTemplate = `Actúa como el Sensei Socrático de DojoFlow. Genera una Misión Especial para un alumno:
-- Nivel: ${studentLevel}
-- Planeta: ${planetName}
-- Tipo de Reto: ${missionType || 'Aleatorio'}
-- Tema: ${missionTheme || 'Cualquiera'}
-- Semilla Aleatoria (Seed): ${randomSeed || Date.now()}
-- EVITAR REPETIR ESTOS TÍTULOS: ${JSON.stringify(excludeList || [])}
-${knowledgeContext}
-La respuesta DEBE ser exclusivamente un objeto JSON válido con estos campos:
-{
-  "title": "Título épico Y DIFERENTE A LA LISTA DE EXCLUIDOS",
-  "description": "Narrativa espacial/dojo variada y original",
-  "objective": "Reto práctico concreto y diferente a misiones previas",
-  "learning_objectives": ["obj1", "obj2"],
-  "sensei_tips": "Breve consejo socrático (sin solución)",
-  "estimated_time": "Tiempo estimado (ej: 20 min)",
-  "reward_xp": 50,
-  "recommended_resources": ["recurso1", "recurso2"]
-}
-IMPORTANTE: Cambia la estructura narrativa y el objetivo técnico en cada generación. Usa la Semilla ${randomSeed} para variar tu creatividad.
-Usa exclusivamente el conocimiento de este cuaderno y el contexto de referencia proporcionado. No entregues código.`;
-        } else {
-          promptTemplate = `Contexto: El alumno está en el planeta ${planetName}. 
+        promptTemplate = `Contexto: El alumno está en el planeta ${planetName}. 
 Nivel del alumno: ${studentLevel}.
 Modo: ${mode === 'validador' ? 'Validación de reto' : 'Consulta general'}.
 ${challengeContext}
@@ -169,13 +155,12 @@ ${knowledgeContext}
 Pregunta: ${message}
 
 Responde como el Sensei de DojoFlow. Sé socrático y usa analogías.
-REGLA DE VALIDACIÓN:
-- Si el modo es 'Validación de reto', concéntrate en el reto '${challengeContext.match(/Nombre: (.*)/)?.[1] || 'actual'}'.
+REGLAS DE VALIDACIÓN:
+- Si el modo es 'validador', concéntrate en el reto '${challengeContext.match(/Nombre: (.*)/)?.[1] || 'actual'}'.
 - Si el nivel es 'Junior', NO pidas explicaciones técnicas profundas. Haz una única pregunta sencilla sobre qué hace su código o por qué eligió un bloque.
 - NUNCA hagas más de una pregunta a la vez.
 - Si la explicación es razonable para su nivel, incluye el comando [VALIDADO] al final.
 - No des el código directamente.`;
-        }
 
         const responseText = await fetchResource(notebookUrl, promptTemplate);
         
@@ -200,11 +185,19 @@ REGLA DE VALIDACIÓN:
       `USA ESTE CONOCIMIENTO MAESTRO COMO BASE:\n${JSON.stringify(masterKnowledge)}\n\n` : 
       "Usa tu conocimiento general sobre programación educativa.";
 
+    const customMissionInstructions = isCustomMission ?
+      `\nINSTRUCCIONES PARA MISIÓN PERSONALIZADA:
+       - El alumno ha completado un proyecto propio/libre creado a su medida en base a su idea original.
+       - Pregúntale obligatoriamente si el proyecto funciona exactamente como él quería, y si siente que ha conseguido su objetivo.
+       - Pídele que te explique brevemente cómo organizó la lógica de su solución (sin código directo).
+       - Mantén un tono amigable, socrático y de felicitación. Si demuestra comprender su lógica básica, incluye la palabra [VALIDADO] al final.` : "";
+
     const systemPromptBase = `Eres el Sensei de DojoFlow, un tutor experto en programación inspirado en la pedagogía de @tecnohelmantica.
          PLANETA ACTUAL: ${planetName}.
          NIVEL DEL ALUMNO: ${studentLevel}.
          ${challengeContext}
          ${masterContextPrompt}
+         ${customMissionInstructions}
          REGLAS CRÍTICAS: 
          1. Nunca des el código directo. 
          2. Usa pistas graduadas y analogías. 
@@ -214,19 +207,43 @@ REGLA DE VALIDACIÓN:
          6. Si el alumno demuestra entender lo básico de su reto, incluye [VALIDADO] en tu respuesta.
          7. Si es Arduino (Pro), usa C++ textual.`;
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash-latest", 
-      systemInstruction: mode === 'mission_generator' ? 
-        `Eres el Sensei de DojoFlow. Genera una Misión Especial en JSON para nivel ${studentLevel}, planeta ${planetName}.
+    let systemInstruction = systemPromptBase;
+    
+    if (mode === 'mission_generator') {
+      systemInstruction = `Eres el Sensei de DojoFlow. Genera una Misión Especial en JSON para nivel ${studentLevel}, planeta ${planetName}.
          Semilla de aleatoriedad: ${randomSeed}.
          EVITAR REPETIR TEMAS O TÍTULOS DE: ${JSON.stringify(excludeList || [])}.
          ${masterContextPrompt}
          Campos obligatorios: title, description, objective, learning_objectives (array), sensei_tips, estimated_time, reward_xp, recommended_resources (array).
-         No des código. Sé socrático y extremadamente creativo para no repetirte.` :
-        systemPromptBase
+         No des código. Sé socrático y extremadamente creativo para no repetirte.`;
+    } else if (mode === 'custom_mission_generator') {
+      systemInstruction = `Eres el Sensei de DojoFlow, un tutor experto en programación inspirado en la pedagogía de @tecnohelmantica.
+         Genera un Desafío de Misión Personalizado en JSON para un alumno que desea crear el proyecto libre: "${message}".
+         Nivel del alumno: ${studentLevel}.
+         Planeta actual: ${planetName}.
+         ${masterContextPrompt}
+         La respuesta DEBE ser exclusivamente un objeto JSON válido con la estructura exacta descrita a continuación. No incluyas bloques de código Markdown (\`\`\`json), comentarios ni texto extra. Devuelve únicamente el JSON crudo:
+         {
+           "title": "Título épico y motivador del proyecto (ej: Super Mario Bros: Tu Primer Salto)",
+           "description": "Una narrativa inspiradora del Dojo que enmarque la idea del alumno en una misión de programación galáctica.",
+           "objective": "Estructura paso a paso para desarrollar el proyecto. Divide la idea del alumno en 3-4 hitos o pasos concretos para lograr el objetivo. IMPORTANTE: Cada hito o paso debe estar separado por dos saltos de línea ('\\n\\n') de forma estricta. Usa una enumeración clara (ej: '1. Hito 1: ...\\n\\n2. Hito 2: ...\\n\\n3. Hito 3: ...'). Prohibido entregar código directo.",
+           "learning_objectives": ["Concepto 1 (ej: Control de colisiones)", "Concepto 2 (ej: Gravedad en Scratch)"],
+           "sensei_tips": "Guía socrática para cada uno de los pasos lógicos. Explica cómo abordar la programación paso a paso de manera reflexiva.",
+           "estimated_time": "Tiempo estimado (ej: 45 min)",
+           "reward_xp": 100,
+           "recommended_resources": ["Editor de ${planetName}", "Dojo Socrático"]
+         }
+         Genera un desafío progresivo, motivante y de excelente calidad pedagógica para el nivel del alumno.`;
+    }
+
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash", 
+      systemInstruction
     });
 
-    const cleanMessage = (message || "").trim() || (mode === 'mission_generator' ? "Genera una nueva misión épica" : "");
+    const cleanMessage = (message || "").trim() || 
+      (mode === 'mission_generator' ? "Genera una nueva misión épica" : 
+       mode === 'custom_mission_generator' ? "Genera una misión personalizada" : "");
     if (!cleanMessage) return NextResponse.json({ success: false, error: 'Mensaje vacío' }, { status: 400 });
 
     console.log(`[Tutor API] Consultando Gemini 1.5 Flash...`);

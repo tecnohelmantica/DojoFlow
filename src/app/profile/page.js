@@ -570,7 +570,8 @@ function ProfileContent() {
       type: 'mission',
       title: mission?.title || 'esta misión',
       objective: mission?.objective || '',
-      missionId: mission?.id
+      missionId: mission?.id,
+      isCustom: mission?.metadata?.is_custom || false
     });
     setIsValidationChatOpen(true);
   };
@@ -1948,16 +1949,76 @@ function ProfileContent() {
 
               {/* MISIONES DEL SENSEI (Excepto en Code.org) */}
               {activePlanet !== 'code' && (
-                <div style={{ marginTop: '40px' }}>
-                  <SenseiMissions 
-                    planetId={activePlanet} 
-                    userId={isGuest ? 'guest_user' : session?.user?.id}
-                    studentLevel={studentLevel}
-                    accentColor={planet?.barColor}
-                    onValidateMission={handleValidateSenseiMission}
-                    refreshTrigger={senseiRefreshTrigger}
-                  />
+                <>
+                  <style dangerouslySetInnerHTML={{__html: `
+                    .missions-grid-layout {
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: 30px;
+                      width: 100%;
+                      margin-top: 40px;
+                    }
+                    @media (max-width: 1024px) {
+                      .missions-grid-layout {
+                        grid-template-columns: 1fr;
+                      }
+                    }
+                  `}} />
+                  <div className="missions-grid-layout">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.45)',
+                      border: '1px solid rgba(0, 0, 0, 0.04)',
+                      padding: '18px 24px',
+                      borderRadius: '20px',
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
+                        🎯 Misiones del Sensei
+                      </h3>
+                      <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
+                        Desafíos listos creados por el Sensei según tu nivel actual para fortalecer tus bases técnicas en este planeta.
+                      </p>
+                    </div>
+                    <SenseiMissions 
+                      planetId={activePlanet} 
+                      userId={isGuest ? 'guest_user' : session?.user?.id}
+                      studentLevel={studentLevel}
+                      accentColor={planet?.barColor}
+                      onValidateMission={handleValidateSenseiMission}
+                      refreshTrigger={senseiRefreshTrigger}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.45)',
+                      border: '1px solid rgba(0, 0, 0, 0.04)',
+                      padding: '18px 24px',
+                      borderRadius: '20px',
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.01)',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1a1a2e', margin: '0 0 6px 0', fontFamily: 'Outfit' }}>
+                        🎨 Diseña tu Propia Misión
+                      </h3>
+                      <p style={{ fontSize: '0.8rem', color: '#555', margin: 0, lineHeight: '1.45' }}>
+                        Define tu propio reto. Explica qué quieres construir y el Sensei te guiará socráticamente para lograr tu objetivo.
+                      </p>
+                    </div>
+                    <SenseiMissions 
+                      planetId={activePlanet} 
+                      userId={isGuest ? 'guest_user' : session?.user?.id}
+                      studentLevel={studentLevel}
+                      accentColor={planet?.barColor}
+                      onValidateMission={handleValidateSenseiMission}
+                      refreshTrigger={senseiRefreshTrigger}
+                      isCustomOnly={true}
+                    />
+                  </div>
                 </div>
+              </>
               )}
             </>
           )}

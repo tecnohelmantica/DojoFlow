@@ -50,13 +50,16 @@ export default function ValidationChat({
       setInputText('');
 
       const isChallenge = context.type === 'challenge';
+      const isCustom = context.isCustom || false;
       const name = context.title || (isChallenge ? 'este reto' : 'esta misión');
       const obj = context.objective || '';
-
+ 
       const welcomeMsg = isChallenge
         ? `🎯 **MODO VALIDACIÓN — ${name.toUpperCase()}**\n\n¡Hola! He recibido tu entrega. Para validar que has comprendido realmente el reto, necesito hacerte unas preguntas.\n\n¿Podrías explicarme cómo funciona la lógica principal de tu solución? ¿Qué fue lo más difícil y cómo lo resolviste?`
+        : isCustom
+        ? `⚔️ **VALIDACIÓN DE TU PROPIA MISIÓN — ${name.toUpperCase()}**\n\n¡Enhorabuena por completar tu propio proyecto libre!\n\nTu objetivo era: _${obj}_\n\nPara completar la validación, cuéntame:\n1. ¿Funciona todo exactamente como tú querías? ¿Has conseguido tu objetivo?\n2. Explícame brevemente cómo funciona la lógica que has creado.`
         : `⚔️ **VALIDACIÓN DE MISIÓN SENSEI — ${name.toUpperCase()}**\n\n¡Excelente entrega!${obj ? `\n\nObjetivo: _${obj}_` : ''}\n\nPara completar la validación, cuéntame: ¿Qué concepto nuevo has aplicado en esta misión y cómo lo explicarías a un compañero que no lo entiende?`;
-
+ 
       setMessages([{ role: 'sensei', text: welcomeMsg }]);
 
       // Focus en el input tras la animación
@@ -95,7 +98,8 @@ export default function ValidationChat({
           context: {
             type: context?.type,
             title: context?.title,
-            objective: context?.objective
+            objective: context?.objective,
+            isCustom: context?.isCustom || false
           }
         })
       });

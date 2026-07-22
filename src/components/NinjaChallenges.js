@@ -2816,6 +2816,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                           <input 
                             type="file" 
                             id="evidence-file-input"
+                            accept="image/*,video/*,.pdf,.zip,.sb3,.aia,.py,.ino,.hex,.json"
                             onChange={(e) => setEvidenceFile(e.target.files[0])}
                             style={{ display: 'none' }}
                           />
@@ -2836,7 +2837,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                               {evidenceFile ? <FileText size={16} color="white" /> : <Upload size={16} color="#666" />}
                             </div>
                             <span style={{ fontSize: '0.85rem', color: evidenceFile ? '#1a1a2e' : '#666', fontWeight: evidenceFile ? '600' : '400', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {evidenceFile ? evidenceFile.name : 'Haz clic para elegir un archivo...'}
+                              {evidenceFile ? evidenceFile.name : 'Haz clic para elegir un archivo (.sb3, .aia, captura, pdf, zip...)'}
                             </span>
                             {evidenceFile && (
                               <button 

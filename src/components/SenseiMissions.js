@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import SocraticTutor from './SocraticTutor';
 
-export default function SenseiMissions({ planetId, userId, studentLevel, accentColor = '#0097e6', onValidateMission, refreshTrigger }) {
+export default function SenseiMissions({ planetId, userId, studentLevel, accentColor = '#0097e6', onValidateMission, refreshTrigger, isCustomOnly = false }) {
   const [mission, setMission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
@@ -41,7 +41,8 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const [config, setConfig] = useState({
     level: studentLevel || 'Intermedio',
     type: 'Creativo',
-    theme: ''
+    theme: '',
+    customIdea: ''
   });
 
   useEffect(() => {
@@ -59,11 +60,19 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
     try {
       if (userId === 'guest_user') {
         const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
-        // Filter by both status AND planetId to avoid leakage between planets
-        const activeMission = guestMissions.find(m => m.status === 'active' && m.planet_id === planetId);
+        // Filter by status, planetId AND is_custom
+        const activeMission = guestMissions.find(m => 
+          m.status === 'active' && 
+          m.planet_id === planetId && 
+          (isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom)
+        );
         if (activeMission) setMission(activeMission);
 
-        const completed = guestMissions.filter(m => m.status === 'completed' && m.planet_id === planetId);
+        const completed = guestMissions.filter(m => 
+          m.status === 'completed' && 
+          m.planet_id === planetId && 
+          (isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom)
+        );
         const totalXp = completed.reduce((acc, m) => acc + (m.reward_xp || 50), 0);
         
         setStats({
@@ -76,38 +85,46 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         return;
       }
 
-      // 1. Load active mission
-      const { data: missionData } = await supabase
+      // 1. Load active or in review mission for this custom type
+      const { data: missionsList } = await supabase
         .from('sensei_missions')
         .select('*')
         .eq('student_id', userId)
         .eq('planet_id', planetId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .in('status', ['active', 'En revisión'])
+        .order('created_at', { ascending: false });
 
-      if (missionData) {
-        setMission(missionData);
+      if (missionsList) {
+        const found = missionsList.find(m => 
+          isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom
+        );
+        if (found) {
+          setMission(found);
+        } else {
+          setMission(null);
+        }
       } else {
         setMission(null);
       }
 
-      // 2. Load stats (completed missions)
+      // 2. Load stats (completed missions of same type)
       const { data: allMissions } = await supabase
         .from('sensei_missions')
-        .select('status, reward_xp')
+        .select('status, reward_xp, metadata')
         .eq('student_id', userId)
         .eq('planet_id', planetId);
 
       if (allMissions) {
-        const completed = allMissions.filter(m => m.status === 'completed');
+        const completed = allMissions.filter(m => 
+          m.status === 'completed' && 
+          (isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom)
+        );
         const totalXp = completed.reduce((acc, m) => acc + (m.reward_xp || 50), 0);
         
         setStats({
           completed: completed.length,
           xp: totalXp,
-          streak: Math.min(completed.length, 7), // Mocking streak for now
+          streak: Math.min(completed.length, 7), 
           medals: completed.length >= 5 ? ['Veterano', 'Explorador'] : completed.length >= 1 ? ['Iniciado'] : []
         });
       }
@@ -144,11 +161,12 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId,
-          mode: 'mission_generator',
+          mode: isCustomOnly ? 'custom_mission_generator' : 'mission_generator',
           planet: planetId,
           level: config.level,
-          missionType: config.type,
-          missionTheme: config.theme,
+          message: isCustomOnly ? config.customIdea : undefined,
+          missionType: isCustomOnly ? undefined : config.type,
+          missionTheme: isCustomOnly ? undefined : config.theme,
           randomSeed: Date.now(),
           excludeList: excludeList
         })
@@ -182,6 +200,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
             status: 'active',
             metadata: { 
               config,
+              is_custom: isCustomOnly ? true : false,
               generated_at: new Date().toISOString()
             }
           };
@@ -205,6 +224,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
               status: 'active',
               metadata: { 
                 config,
+                is_custom: isCustomOnly ? true : false,
                 generated_at: new Date().toISOString()
               }
             })
@@ -344,59 +364,78 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
             <div className="config-card glass animate-fade-in">
               <div className="config-header">
                 <Settings size={20} />
-                <h3>Personaliza tu Desafío</h3>
+                <h3>{isCustomOnly ? 'Diseña tu Propia Misión' : 'Personaliza tu Desafío'}</h3>
                 <button className="close-btn" onClick={() => setShowConfig(false)}>×</button>
               </div>
               
               <div className="config-body">
-                <div className="input-group">
-                  <label>Nivel de Maestría</label>
-                  <div className="toggle-group">
-                    {['Principiante', 'Intermedio', 'Ninja'].map(l => (
-                      <button 
-                        key={l}
-                        className={config.level === l ? 'active' : ''}
-                        onClick={() => setConfig({...config, level: l})}
-                      >{l}</button>
-                    ))}
+                {isCustomOnly ? (
+                  <div className="input-group">
+                    <label>¿Qué proyecto o juego te gustaría programar?</label>
+                    <textarea 
+                      rows={3}
+                      placeholder="Ej: Un juego de plataformas de Mario Bros con saltos, monedas y enemigos..."
+                      value={config.customIdea}
+                      onChange={(e) => setConfig({...config, customIdea: e.target.value})}
+                      style={{
+                        width: '100%', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)',
+                        background: 'rgba(0, 0, 0, 0.3)', color: 'white', outline: 'none',
+                        transition: 'border-color 0.3s', fontFamily: 'inherit', resize: 'vertical'
+                      }}
+                    />
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <div className="input-group">
+                      <label>Nivel de Maestría</label>
+                      <div className="toggle-group">
+                        {['Principiante', 'Intermedio', 'Ninja'].map(l => (
+                          <button 
+                            key={l}
+                            className={config.level === l ? 'active' : ''}
+                            onClick={() => setConfig({...config, level: l})}
+                          >{l}</button>
+                        ))}
+                      </div>
+                    </div>
 
-                <div className="input-group">
-                  <label>Tipo de Reto</label>
-                  <select 
-                    value={config.type} 
-                    onChange={(e) => setConfig({...config, type: e.target.value})}
-                  >
-                    <option>Creativo</option>
-                    <option>Técnico</option>
-                    <option>Rápido (10 min)</option>
-                    <option>Proyecto Largo</option>
-                    <option>Cooperativo</option>
-                    <option>Aleatorio</option>
-                  </select>
-                </div>
+                    <div className="input-group">
+                      <label>Tipo de Reto</label>
+                      <select 
+                        value={config.type} 
+                        onChange={(e) => setConfig({...config, type: e.target.value})}
+                      >
+                        <option>Creativo</option>
+                        <option>Técnico</option>
+                        <option>Rápido (10 min)</option>
+                        <option>Proyecto Largo</option>
+                        <option>Cooperativo</option>
+                        <option>Aleatorio</option>
+                      </select>
+                    </div>
 
-                <div className="input-group">
-                  <label>Tema Opcional (ej: Espacio, Robots...)</label>
-                  <input 
-                    type="text" 
-                    placeholder="Escribe un tema..."
-                    value={config.theme}
-                    onChange={(e) => setConfig({...config, theme: e.target.value})}
-                  />
-                </div>
+                    <div className="input-group">
+                      <label>Tema Opcional (ej: Espacio, Robots...)</label>
+                      <input 
+                        type="text" 
+                        placeholder="Escribe un tema..."
+                        value={config.theme}
+                        onChange={(e) => setConfig({...config, theme: e.target.value})}
+                      />
+                    </div>
+                  </>
+                )}
 
                 <GlowButton 
                   onClick={generateNewMission}
-                  disabled={requesting}
+                  disabled={requesting || (isCustomOnly && !config.customIdea?.trim())}
                   variant="primary"
                   className="w-full mt-4"
                 >
                   {requesting ? (
-                    <><Loader2 size={20} className="animate-spin mr-2" /> Canalizando Energía...</>
+                    <><Loader2 size={20} className="animate-spin mr-2" /> {isCustomOnly ? 'Estructurando Misión...' : 'Canalizando Energía...'}</>
                   ) : (
-                    <><Sparkles size={20} className="mr-2" /> GENERAR MISIÓN ✨</>
+                    <><Sparkles size={20} className="mr-2" /> {isCustomOnly ? 'CREAR MI MISIÓN PERSONALIZADA ✨' : 'GENERAR MISIÓN ✨'}</>
                   )}
                 </GlowButton>
               </div>
@@ -407,15 +446,19 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                 <div className="pulse-ring"></div>
                 <Brain size={48} className="hero-icon" />
               </div>
-              <h1 className="hero-title">Misiones del Sensei</h1>
-              <p className="hero-subtitle">Desafíos inteligentes para aprender creando</p>
+              <h1 className="hero-title">{isCustomOnly ? 'Diseña tu Propia Misión' : 'Misiones del Sensei'}</h1>
+              <p className="hero-subtitle">
+                {isCustomOnly 
+                  ? 'Cuéntale al Sensei qué quieres programar y él te ayudará para conseguir tu objetivo' 
+                  : 'Desafíos inteligentes para aprender creando'}
+              </p>
               
               <GlowButton 
                 onClick={() => setShowConfig(true)}
                 variant="primary"
                 style={{ padding: '16px 48px', fontSize: '1.2rem' }}
               >
-                ✨ INICIAR NUEVA AVENTURA
+                {isCustomOnly ? '🎨 DISEÑAR MI MISIÓN' : '✨ INICIAR NUEVA AVENTURA'}
               </GlowButton>
             </div>
           )}
@@ -429,7 +472,10 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                 {getPlanetIcon()}
               </div>
               <div className="title-group">
-                <span className="badge">MISIÓN DE NIVEL {mission.metadata?.config?.level || 'NINJA'}</span>
+                <span className="badge">
+                  {mission.metadata?.is_custom ? 'PROYECTO PROPIO - ' : 'MISIÓN DE NIVEL '}
+                  {(mission.metadata?.config?.level || 'NINJA').toUpperCase()}
+                </span>
                 <h2>{mission.title}</h2>
               </div>
             </div>
@@ -451,7 +497,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
 
           <div className="mission-grid">
             <div className="mission-content">
-              <div className="narrative-box">
+              <div className="narrative-box" style={{ whiteSpace: 'pre-line', lineHeight: '1.6' }}>
                 <p>{mission.description}</p>
               </div>
 
@@ -460,7 +506,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                   <Target size={18} />
                   <span>OBJETIVO MAESTRO</span>
                 </div>
-                <div className="objective-card">
+                <div className="objective-card" style={{ whiteSpace: 'pre-line', lineHeight: '1.7', fontSize: '0.95rem' }}>
                   {mission.objective}
                 </div>
               </div>
@@ -515,7 +561,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                     <div className="evidence-divider"><span>o</span></div>
 
                     <div className="evidence-field">
-                      <label><Paperclip size={14} /> Archivo (captura, vídeo, PDF...)</label>
+                      <label><Paperclip size={14} /> Archivo (proyecto .sb3, .aia, captura, vídeo, PDF, zip...)</label>
                       <label className="evidence-file-label">
                         {evidenceFile ? (
                           <span className="evidence-file-name">
@@ -527,7 +573,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                         )}
                         <input
                           type="file"
-                          accept="image/*,video/*,.pdf,.zip"
+                          accept="image/*,video/*,.pdf,.zip,.sb3,.aia,.py,.ino,.hex,.json"
                           style={{ display: 'none' }}
                           onChange={e => setEvidenceFile(e.target.files?.[0] || null)}
                         />
@@ -592,6 +638,10 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           max-width: 1200px;
           margin: 0 auto 60px;
           font-family: 'Outfit', sans-serif;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
         }
 
         /* --- GLASS DESIGN --- */
@@ -638,28 +688,46 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         }
 
         /* --- HERO SECTION --- */
-        .welcome-section { text-align: center; padding: 40px 0; }
+        .welcome-section { text-align: center; padding: 10px 0; height: 100%; display: flex; flex-direction: column; }
         .hero-card { 
-          padding: 80px 40px; 
+          padding: 50px 30px; 
+          width: 100%;
           max-width: 800px; 
           margin: 0 auto; 
           position: relative; 
           overflow: hidden;
-          background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.15) 0%, rgba(13, 17, 30, 0.9) 100%);
+          background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.15) 0%, rgba(30, 41, 74, 0.95) 100%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          min-height: 440px;
+          box-sizing: border-box;
+          border-radius: 32px;
+          border: 1px solid rgba(var(--accent-rgb), 0.2);
+          flex: 1;
         }
         .hero-title { 
-          font-size: 3.5rem; 
+          font-size: 2.2rem; 
           font-weight: 900; 
           color: white; 
-          margin-bottom: 12px; 
-          letter-spacing: -1px;
+          margin-top: 10px;
+          margin-bottom: 8px; 
+          letter-spacing: -0.5px;
           text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
+          text-align: center;
         }
         .hero-subtitle { 
-          font-size: 1.3rem; 
-          color: rgba(255,255,255,0.7); 
-          margin-bottom: 45px;
-          font-weight: 300;
+          font-size: 0.95rem; 
+          color: rgba(255,255,255,0.75); 
+          margin-bottom: 24px;
+          font-weight: 400;
+          text-align: center;
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1.5;
         }
         
         .hero-icon-container { position: relative; width: 140px; height: 140px; margin: 0 auto 35px; }
@@ -712,7 +780,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         .mission-active-card { 
           padding: 45px; 
           text-align: left;
-          background: linear-gradient(135deg, rgba(13, 17, 30, 0.9) 0%, rgba(10, 10, 20, 1) 100%);
+          background: linear-gradient(135deg, rgba(30, 41, 74, 0.95) 0%, rgba(20, 25, 46, 0.98) 100%);
         }
         .mission-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 45px; }
         .header-left { display: flex; gap: 28px; align-items: center; }
@@ -972,7 +1040,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         }
         .evidence-divider span {
           position: relative;
-          background: rgba(13,17,30,0.9);
+          background: rgba(20, 25, 46, 0.95);
           padding: 0 12px;
           font-size: 0.7rem;
           color: rgba(255,255,255,0.3);
