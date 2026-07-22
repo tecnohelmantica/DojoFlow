@@ -9,7 +9,7 @@ import {
   Brain, Timer, Star, Award, 
   Settings, RefreshCw, Layers, 
   Gamepad2, Cpu, Box, Code2, Palette,
-  Upload, Paperclip, Link2, X as XIcon
+  Upload, Paperclip, Link2, X as XIcon, BookOpen, ChevronDown, ChevronUp, Clock
 } from 'lucide-react';
 import SocraticTutor from './SocraticTutor';
 
@@ -51,11 +51,59 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
     customIdea: ''
   });
 
+  const [journal, setJournal] = useState('');
+  const [journalSavedAt, setJournalSavedAt] = useState(null);
+  const [showJournal, setShowJournal] = useState(false);
+  const [sessionLog, setSessionLog] = useState([]);
+
   useEffect(() => {
     if (userId && planetId) {
       loadData();
     }
   }, [userId, planetId, refreshTrigger]);
+
+  // Load journal notes and register session when mission becomes active
+  useEffect(() => {
+    if (!mission) { setJournal(''); setSessionLog([]); return; }
+    const missionId = mission.id || `${planetId}_${isCustomOnly}`;
+    const journalKey = `dojo_journal_${planetId}_${missionId}`;
+    const savedNotes = mission.metadata?.journal || localStorage.getItem(journalKey) || '';
+    setJournal(savedNotes);
+
+    const sessionsKey = `dojo_sessions_${planetId}_${missionId}`;
+    const savedSessions = JSON.parse(localStorage.getItem(sessionsKey) || '[]');
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const lastSession = savedSessions[savedSessions.length - 1];
+    if (!lastSession || lastSession.date !== todayStr) {
+      const updated = [...savedSessions, { date: todayStr, time: timeStr, id: Date.now() }];
+      localStorage.setItem(sessionsKey, JSON.stringify(updated));
+      setSessionLog(updated);
+    } else {
+      setSessionLog(savedSessions);
+    }
+  }, [mission?.id]);
+
+  // Auto-save journal with 1.5s debounce
+  useEffect(() => {
+    if (!mission || journal === undefined) return;
+    const missionId = mission.id || `${planetId}_${isCustomOnly}`;
+    const journalKey = `dojo_journal_${planetId}_${missionId}`;
+    const timer = setTimeout(async () => {
+      localStorage.setItem(journalKey, journal);
+      if (userId !== 'guest_user' && mission.id) {
+        try {
+          await supabase.from('sensei_missions')
+            .update({ metadata: { ...mission.metadata, journal } })
+            .eq('id', mission.id);
+        } catch (e) { console.warn('[Diario] Supabase save error:', e); }
+      }
+      setJournalSavedAt(new Date());
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [journal]);
+
 
   const loadData = async () => {
     setLoading(true);
@@ -542,6 +590,80 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                   studentLevel={studentLevel}
                   accentColor={accentColor}
                 />
+              </div>
+
+              {/* ── DIARIO DEL DOJO ── */}
+              <div className="hints-section mt-8" style={{ marginBottom: 0 }}>
+                <button
+                  onClick={() => setShowJournal(!showJournal)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '10px',
+                    width: '100%', background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)', borderRadius: '14px',
+                    padding: '14px 18px', cursor: 'pointer', color: 'white',
+                    fontFamily: 'Outfit, sans-serif', fontSize: '0.85rem', fontWeight: '700',
+                    textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: showJournal ? '12px' : 0,
+                    transition: 'background 0.2s'
+                  }}
+                >
+                  <BookOpen size={18} style={{ color: '#0dcfcf' }} />
+                  <span style={{ flex: 1, textAlign: 'left' }}>📓 Diario del Dojo</span>
+                  {journalSavedAt && (
+                    <span style={{ fontSize: '0.7rem', color: '#888', fontWeight: '400', textTransform: 'none' }}>
+                      💾 Guardado · {journalSavedAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
+                  {showJournal ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+
+                {showJournal && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Notas del alumno */}
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0dcfcf', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'block' }}>
+                        ✏️ Mis notas y avances
+                      </label>
+                      <textarea
+                        value={journal}
+                        onChange={e => setJournal(e.target.value)}
+                        placeholder="Escribe aquí lo que llevas hecho, tus dudas, lo que funciona... El Sensei y tu profe podrán verlo para ayudarte mejor."
+                        rows={5}
+                        style={{
+                          width: '100%', background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
+                          padding: '14px', color: '#e2e8f0', fontSize: '0.88rem',
+                          fontFamily: 'Outfit, sans-serif', lineHeight: '1.6', resize: 'vertical',
+                          outline: 'none', boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+
+                    {/* Historial de sesiones */}
+                    {sessionLog.length > 0 && (
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0dcfcf', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px', display: 'block' }}>
+                          <Clock size={13} style={{ display: 'inline', marginRight: '6px' }} />
+                          Historial de sesiones ({sessionLog.length})
+                        </label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {sessionLog.slice().reverse().map((s, i) => (
+                            <div key={s.id || i} style={{
+                              display: 'flex', alignItems: 'center', gap: '10px',
+                              background: 'rgba(255,255,255,0.04)', borderRadius: '10px',
+                              padding: '8px 14px', fontSize: '0.8rem', color: '#94a3b8'
+                            }}>
+                              <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: i === 0 ? '#0dcfcf' : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '700', color: i === 0 ? '#0d1117' : '#94a3b8', flexShrink: 0 }}>
+                                {sessionLog.length - i}
+                              </span>
+                              <span>Sesión {sessionLog.length - i}</span>
+                              <span style={{ marginLeft: 'auto', color: '#64748b' }}>{s.date} · {s.time}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="action-footer mt-8">
