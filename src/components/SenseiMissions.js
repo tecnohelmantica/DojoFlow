@@ -55,6 +55,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const [journalSavedAt, setJournalSavedAt] = useState(null);
   const [showJournal, setShowJournal] = useState(false);
   const [sessionLog, setSessionLog] = useState([]);
+  const [pendingMissions, setPendingMissions] = useState([]);
 
   useEffect(() => {
     if (userId && planetId) {
@@ -105,6 +106,26 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   }, [journal]);
 
 
+  const abandonMission = async (mToAbandon) => {
+    if (!confirm("¿Seguro que quieres abandonar esta misión? Desaparecerá de tus misiones abiertas.")) return;
+    try {
+      if (userId === 'guest_user') {
+        const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
+        const updated = guestMissions.map(m => m.id === mToAbandon.id ? {...m, status: 'abandoned'} : m);
+        localStorage.setItem('guest_sensei_missions', JSON.stringify(updated));
+      } else {
+        await supabase.from('sensei_missions').update({ status: 'abandoned' }).eq('id', mToAbandon.id);
+      }
+      setPendingMissions(prev => prev.filter(p => p.id !== mToAbandon.id));
+      if (mission?.id === mToAbandon.id) {
+        updateMission(null);
+        setShowConfig(false);
+      }
+    } catch (e) {
+      console.error("Error al abandonar misión:", e);
+    }
+  };
+
   const loadData = async () => {
     setLoading(true);
     // Reset state for the new planet
@@ -115,12 +136,14 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
       if (userId === 'guest_user') {
         const guestMissions = JSON.parse(localStorage.getItem('guest_sensei_missions') || '[]');
         // Filter by status, planetId AND is_custom
-        const activeMission = guestMissions.find(m => 
-          m.status === 'active' && 
+        const activeMissions = guestMissions.filter(m => 
+          (m.status === 'active' || m.status === 'En revisión') && 
           m.planet_id === planetId && 
           (isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom)
         );
-        if (activeMission) updateMission(activeMission);
+        activeMissions.sort((a,b) => (b.id||0) - (a.id||0));
+        setPendingMissions(activeMissions);
+        if (activeMissions.length > 0) updateMission(activeMissions[0]);
 
         const completed = guestMissions.filter(m => 
           m.status === 'completed' && 
@@ -149,15 +172,17 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
         .order('created_at', { ascending: false });
 
       if (missionsList) {
-        const found = missionsList.find(m => 
+        const foundList = missionsList.filter(m => 
           isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom
         );
-        if (found) {
-          updateMission(found);
+        setPendingMissions(foundList);
+        if (foundList.length > 0) {
+          updateMission(foundList[0]);
         } else {
           updateMission(null);
         }
       } else {
+        setPendingMissions([]);
         updateMission(null);
       }
 
@@ -510,10 +535,33 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
               <GlowButton 
                 onClick={() => setShowConfig(true)}
                 variant="primary"
-                style={{ padding: '16px 48px', fontSize: '1.2rem' }}
+                style={{ padding: '16px 48px', fontSize: '1.2rem', marginBottom: pendingMissions.length > 0 ? '24px' : '0' }}
               >
-                {isCustomOnly ? '🎨 DISEÑAR MI MISIÓN' : '✨ INICIAR NUEVA AVENTURA'}
+                {isCustomOnly ? '🎨 DISEÑAR NUEVA MISIÓN' : '✨ INICIAR NUEVA AVENTURA'}
               </GlowButton>
+
+              {pendingMissions.length > 0 && (
+                <div style={{ marginTop: '20px', width: '100%', textAlign: 'left', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: '#0dcfcf', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '800' }}>
+                    <Layers size={18} /> Misiones Abiertas ({pendingMissions.length})
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '250px', overflowY: 'auto', paddingRight: '5px' }}>
+                    {pendingMissions.map(pm => (
+                      <div key={pm.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', padding: '14px 18px', borderRadius: '14px' }}>
+                        <div>
+                          <span style={{ fontSize: '1rem', fontWeight: '800', color: 'white', display: 'block', marginBottom: '4px' }}>{pm.title}</span>
+                          <span style={{ fontSize: '0.8rem', color: '#94a3b8', background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: '4px' }}>
+                            {pm.metadata?.is_custom ? 'Proyecto Propio' : `Nivel ${pm.metadata?.config?.level || 'Ninja'}`}
+                          </span>
+                        </div>
+                        <GlowButton variant="secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }} onClick={() => updateMission(pm)}>
+                          RETOMAR
+                        </GlowButton>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -535,17 +583,16 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
             </div>
             <div className="header-right flex flex-col items-end gap-3">
               <div className="xp-badge">+{mission.reward_xp || 50} XP</div>
-              <button 
-                className="ask-another-btn" 
+              <GlowButton 
                 onClick={() => {
-                  if(confirm("¿Quieres pausar esta misión y generar una nueva? Podrás retomarla luego si sigue activa.")) {
-                    updateMission(null);
-                    setShowConfig(true);
-                  }
+                  updateMission(null);
+                  setShowConfig(false);
                 }}
+                variant="secondary"
+                style={{ padding: '8px 16px', fontSize: '0.85rem' }}
               >
-                <Sparkles size={14} /> PEDIR OTRA MISIÓN
-              </button>
+                <Layers size={16} className="mr-2" /> {pendingMissions.length > 1 ? 'CAMBIAR DE MISIÓN' : 'MISIONES ABIERTAS'}
+              </GlowButton>
             </div>
           </div>
 
@@ -748,12 +795,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                 </div>
               )}
 
-              <button className="regenerate-btn" onClick={() => {
-                if(confirm("¿Seguro que quieres abandonar esta misión y generar otra?")) {
-                  updateMission(null);
-                  setShowConfig(true);
-                }
-              }}>
+              <button className="regenerate-btn" onClick={() => abandonMission(mission)}>
                 <RefreshCw size={14} /> ABANDONAR MISIÓN
               </button>
             </div>
