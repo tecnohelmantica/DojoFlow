@@ -15,6 +15,10 @@ import SocraticTutor from './SocraticTutor';
 
 export default function SenseiMissions({ planetId, userId, studentLevel, accentColor = '#0097e6', onValidateMission, refreshTrigger, isCustomOnly = false }) {
   const [mission, setMission] = useState(null);
+  
+  useEffect(() => {
+    onMissionStateChange?.(!!mission);
+  }, [mission, onMissionStateChange]);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
