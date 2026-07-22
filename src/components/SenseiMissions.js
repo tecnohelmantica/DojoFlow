@@ -13,12 +13,8 @@ import {
 } from 'lucide-react';
 import SocraticTutor from './SocraticTutor';
 
-export default function SenseiMissions({ planetId, userId, studentLevel, accentColor = '#0097e6', onValidateMission, refreshTrigger, isCustomOnly = false }) {
+export default function SenseiMissions({ planetId, userId, studentLevel, accentColor = '#0097e6', onValidateMission, refreshTrigger, isCustomOnly = false, onMissionStateChange }) {
   const [mission, setMission] = useState(null);
-  
-  useEffect(() => {
-    onMissionStateChange?.(!!mission);
-  }, [mission, onMissionStateChange]);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
@@ -41,6 +37,12 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
 
   const accentRgb = hexToRgb(accentColor);
 
+  // Helper to update mission and notify parent in a single call (avoids re-render loop)
+  const updateMission = (newMission) => {
+    setMission(newMission);
+    onMissionStateChange?.(!!newMission);
+  };
+
   // Config State
   const [config, setConfig] = useState({
     level: studentLevel || 'Intermedio',
@@ -58,7 +60,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
   const loadData = async () => {
     setLoading(true);
     // Reset state for the new planet
-    setMission(null);
+    updateMission(null);
     setStats({ completed: 0, xp: 0, streak: 0, medals: [] });
 
     try {
@@ -70,7 +72,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           m.planet_id === planetId && 
           (isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom)
         );
-        if (activeMission) setMission(activeMission);
+        if (activeMission) updateMission(activeMission);
 
         const completed = guestMissions.filter(m => 
           m.status === 'completed' && 
@@ -103,12 +105,12 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           isCustomOnly ? m.metadata?.is_custom === true : !m.metadata?.is_custom
         );
         if (found) {
-          setMission(found);
+          updateMission(found);
         } else {
-          setMission(null);
+          updateMission(null);
         }
       } else {
-        setMission(null);
+        updateMission(null);
       }
 
       // 2. Load stats (completed missions of same type)
@@ -238,7 +240,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
           if (saveError) throw saveError;
           savedMission = sM;
         }
-        setMission(savedMission);
+        updateMission(savedMission);
         setShowConfig(false);
       } else {
         throw new Error(data.error || "Error al conectar con el Sensei");
@@ -489,7 +491,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
                 className="ask-another-btn" 
                 onClick={() => {
                   if(confirm("¿Quieres pausar esta misión y generar una nueva? Podrás retomarla luego si sigue activa.")) {
-                    setMission(null);
+                    updateMission(null);
                     setShowConfig(true);
                   }
                 }}
@@ -626,7 +628,7 @@ export default function SenseiMissions({ planetId, userId, studentLevel, accentC
 
               <button className="regenerate-btn" onClick={() => {
                 if(confirm("¿Seguro que quieres abandonar esta misión y generar otra?")) {
-                  setMission(null);
+                  updateMission(null);
                   setShowConfig(true);
                 }
               }}>
