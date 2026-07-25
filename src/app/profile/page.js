@@ -1200,9 +1200,14 @@ function ProfileContent() {
             
             {/* LANZADERAS */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase' }}>
-                <Rocket size={16} /> LANZADERAS
-              </h3>
+              <div>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', marginBottom: '8px' }}>
+                  <Rocket size={16} /> LANZADERAS
+                </h3>
+                <p style={{ fontSize: '0.72rem', color: '#aaa', margin: '0' }}>
+                  Accede a la clase virtual generada por tu profesor sin salir de DojoFlow.
+                </p>
+              </div>
               <GlassCard style={{ padding: '30px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,0,0,0.05)' }}>
                 {planetLaunchers.length > 0 ? (
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
