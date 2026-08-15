@@ -120,7 +120,6 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [jsCourse, setJsCourse] = useState([]);
   const [fccHtml, setFccHtml] = useState([]);
   const [fccJs, setFccJs] = useState([]);
-  const [learningML, setLearningML] = useState([]);
   const [tinkercad3d, setTinkercad3d] = useState([]);
   const [tinkercad3dChallenges, setTinkercad3dChallenges] = useState([]);
   const [tinkercadCodeblocks, setTinkercadCodeblocks] = useState([]);
