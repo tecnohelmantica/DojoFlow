@@ -83,7 +83,7 @@ export default function HomePage() {
       try {
         const { data: vincs } = await supabase
           .from('clase_alumnos')
-          .select('clase_id, clases(id, nombre)')
+          .select('clase_id, clases(id, nombre, planetas_activos)')
           .eq('alumno_id', activeUserId);
         
         const aulas = (vincs || []).map(v => v.clases).filter(Boolean);
@@ -220,8 +220,19 @@ export default function HomePage() {
     fetchStudentData();
   }, [session?.user?.id, role, isGuest]);
 
+  // Determinar planetas permitidos según las clases del alumno
+  let allowedPlanets = new Set(PLANETS.map(p => p.id));
+  if (role === 'alumno' && !isGuest && studentAulas.length > 0) {
+    allowedPlanets = new Set();
+    studentAulas.forEach(aula => {
+      if (aula.planetas_activos && aula.planetas_activos.length > 0) {
+        aula.planetas_activos.forEach(pid => allowedPlanets.add(pid));
+      }
+    });
+  }
+
   // Construir planetas enriquecidos con progresos reales
-  const dynamicPlanets = PLANETS.map(p => {
+  const dynamicPlanets = PLANETS.filter(p => allowedPlanets.has(p.id) || role === 'profesor').map(p => {
     const prog = studentProgress[p.id] || {
       complete: 0,
       level: 1,

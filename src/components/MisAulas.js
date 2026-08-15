@@ -394,6 +394,30 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
 
   const [activeTab, setActiveTab] = useState('alumnos');
   const [showVincular, setShowVincular] = useState(false);
+  const [activePlanets, setActivePlanets] = useState(clase.planetas_activos || []);
+  const [savingPlanets, setSavingPlanets] = useState(false);
+
+  const togglePlanet = (planetId) => {
+    setActivePlanets(prev => prev.includes(planetId) ? prev.filter(p => p !== planetId) : [...prev, planetId]);
+  };
+
+  const handleSavePlanets = async () => {
+    setSavingPlanets(true);
+    try {
+      const { error } = await supabase
+        .from('clases')
+        .update({ planetas_activos: activePlanets })
+        .eq('id', clase.id);
+      
+      if (error) throw error;
+      if (onMsg) onMsg('ok', 'Configuración de planetas actualizada');
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      if (onMsg) onMsg('err', 'Error al guardar configuración');
+    } finally {
+      setSavingPlanets(false);
+    }
+  };
   const [launcherPlatform, setLauncherPlatform] = useState('');
   const [launcherUrl, setLauncherUrl] = useState('');
   const [activeLaunchers, setActiveLaunchers] = useState({});
@@ -529,6 +553,9 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
         </button>
         <button onClick={() => setActiveTab('lanzadores')} style={{ background: activeTab === 'lanzadores' ? '#9c27b0' : 'white', color: activeTab === 'lanzadores' ? 'white' : '#666', border: '1.5px solid ' + (activeTab === 'lanzadores' ? '#9c27b0' : '#ddd'), borderRadius: '10px', padding: '10px 20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '700', fontFamily: 'Outfit' }}>
           🚀 Lanzadores
+        </button>
+        <button onClick={() => setActiveTab('configuracion')} style={{ background: activeTab === 'configuracion' ? '#9c27b0' : 'white', color: activeTab === 'configuracion' ? 'white' : '#666', border: '1.5px solid ' + (activeTab === 'configuracion' ? '#9c27b0' : '#ddd'), borderRadius: '10px', padding: '10px 20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '700', fontFamily: 'Outfit' }}>
+          ⚙️ Configuración
         </button>
       </div>
 
@@ -679,6 +706,37 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                   </GlassCard>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'configuracion' && (
+            <div>
+              <div style={{ marginBottom: '30px' }}>
+                <h3 style={{ fontFamily: 'Outfit', color: '#1a1a2e', marginBottom: '10px' }}>🌍 Planetas Activos</h3>
+                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
+                  Selecciona los planetas que estarán visibles para los alumnos de esta clase. Los planetas desactivados no aparecerán en sus mapas galácticos.
+                </p>
+              </div>
+              <GlassCard style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: '15px', marginBottom: '25px' }}>
+                  {platforms.map(p => (
+                    <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '10px', background: activePlanets.includes(p.id) ? '#f3e5f5' : 'white', border: `1.5px solid ${activePlanets.includes(p.id) ? '#9c27b0' : '#e2e8f0'}`, cursor: 'pointer', transition: 'all 0.2s' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={activePlanets.includes(p.id)} 
+                        onChange={() => togglePlanet(p.id)} 
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }} 
+                      />
+                      <span style={{ fontSize: '0.9rem', fontWeight: '700', color: activePlanets.includes(p.id) ? '#9c27b0' : '#64748b' }}>{p.name}</span>
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <GlowButton color="purple" onClick={handleSavePlanets} disabled={savingPlanets} style={{ padding: '12px 24px' }}>
+                    {savingPlanets ? 'GUARDANDO...' : 'GUARDAR CONFIGURACIÓN'}
+                  </GlowButton>
+                </div>
+              </GlassCard>
             </div>
           )}
         </>
