@@ -1198,33 +1198,55 @@ function ProfileContent() {
               {/* FILA 2: LANZADERAS Y PÁGINA OFICIAL */}
           <div className="launchers-grid">
             
-            {/* LANZADERAS */}
+            {/* MATERIALES DE TU CLASE (antes Lanzaderas) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div>
                 <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                  <Rocket size={16} /> LANZADERAS
+                  <FileText size={16} /> MATERIALES DE TU CLASE
+                  <span style={{ fontSize: '0.55rem', background: 'rgba(92,106,196,0.15)', color: '#5c6ac4', padding: '2px 8px', borderRadius: '8px', fontWeight: '900', letterSpacing: '0.5px' }}>TU PROFESOR</span>
                 </h3>
                 <p style={{ fontSize: '0.72rem', color: '#aaa', margin: '0' }}>
-                  Accede a la clase virtual generada por tu profesor sin salir de DojoFlow.
+                  Recursos y accesos compartidos por tu profesor.
                 </p>
               </div>
-              <GlassCard style={{ padding: '30px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,0,0,0.05)' }}>
-                {planetLaunchers.length > 0 ? (
-                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {planetLaunchers.map(l => (
-                      <GlowButton 
-                        key={l.id} 
-                        color="purple" 
-                        onClick={() => setActiveResource(l)} 
-                        className="w-100" 
-                        style={{ padding: '15px' }}
-                      >
-                        {l.nombre_recurso} <ExternalLink size={14} style={{ marginLeft: '10px' }} />
-                      </GlowButton>
-                    ))}
+              <GlassCard style={{ padding: '30px', minHeight: '300px', display: 'flex', flexDirection: 'column', border: '1px solid rgba(0,0,0,0.05)' }}>
+                {classOnlyResources.filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas').length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', flex: 1 }}>
+                    {classOnlyResources
+                      .filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
+                      .map(r => {
+                        const type = r.tipo_recurso?.toLowerCase() || '';
+                        const Icon = type.includes('video') ? Play : (type.includes('enlace') || type.includes('lanzadera') ? ExternalLink : FileText);
+                        return (
+                          <GlassCard
+                            key={r.id}
+                            onClick={() => setSelectedScroll(r)}
+                            style={{
+                              padding: '16px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '14px',
+                              transition: 'all 0.3s',
+                              border: selectedScroll?.id === r.id ? '2px solid #5c6ac4' : '1px solid rgba(92,106,196,0.12)',
+                              background: selectedScroll?.id === r.id ? 'rgba(92,106,196,0.08)' : 'rgba(255,255,255,0.85)'
+                            }}
+                          >
+                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(92,106,196,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <Icon size={18} color="#5c6ac4" />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.nombre_recurso || r.contenido?.meta?.filename || 'Recurso'}</p>
+                              <p style={{ fontSize: '0.6rem', color: '#5c6ac4', fontWeight: '700', margin: 0 }}>{type.toUpperCase()}</p>
+                            </div>
+                          </GlassCard>
+                        );
+                      })}
                   </div>
                 ) : (
-                  <p style={{ fontSize: '0.85rem', color: '#cbd5e1', fontStyle: 'italic' }}>Sin lanzaderas activas en este sector.</p>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p style={{ fontSize: '0.85rem', color: '#cbd5e1', fontStyle: 'italic', textAlign: 'center' }}>Sin materiales adicionales en este sector.</p>
+                  </div>
                 )}
               </GlassCard>
             </div>
@@ -1433,48 +1455,6 @@ function ProfileContent() {
             </div>
           )}
 
-          {/* FILA 3B: RECURSOS DEL PROFESOR (materiales propios de la clase) */}
-          {classOnlyResources.filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas').length > 0 && (
-            <div style={{ marginBottom: '40px' }}>
-              <h3 style={{ fontSize: '0.75rem', fontWeight: '900', color: '#8a8a9e', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                <FileText size={16} /> MATERIALES DE TU CLASE
-                <span style={{ fontSize: '0.55rem', background: 'rgba(92,106,196,0.15)', color: '#5c6ac4', padding: '2px 8px', borderRadius: '8px', fontWeight: '900', letterSpacing: '0.5px' }}>TU PROFESOR</span>
-              </h3>
-              <p style={{ fontSize: '0.72rem', color: '#aaa', margin: '0 0 14px' }}>Recursos adicionales compartidos por tu profesor para esta clase.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '16px' }}>
-                {classOnlyResources
-                  .filter(r => r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
-                  .map(r => {
-                    const type = r.tipo_recurso?.toLowerCase() || '';
-                    const Icon = type.includes('video') ? Play : (type.includes('enlace') || type.includes('lanzadera') ? ExternalLink : FileText);
-                    return (
-                      <GlassCard
-                        key={r.id}
-                        onClick={() => setSelectedScroll(r)}
-                        style={{
-                          padding: '20px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '14px',
-                          transition: 'all 0.3s',
-                          border: selectedScroll?.id === r.id ? '2px solid #5c6ac4' : '1px solid rgba(92,106,196,0.12)',
-                          background: selectedScroll?.id === r.id ? 'rgba(92,106,196,0.08)' : 'rgba(255,255,255,0.85)'
-                        }}
-                      >
-                        <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(92,106,196,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Icon size={18} color="#5c6ac4" />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.nombre_recurso || r.contenido?.meta?.filename || 'Recurso'}</p>
-                          <p style={{ fontSize: '0.6rem', color: '#5c6ac4', fontWeight: '700', margin: 0 }}>{type.toUpperCase()}</p>
-                        </div>
-                      </GlassCard>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
 
                     {/* CURSO LUIS LLAMAS (Solo para Arduino) */}
           {activePlanet === 'arduino' && (
