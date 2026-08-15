@@ -991,7 +991,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
 // ══════════════════════════════════════════════════════════
 function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
   const searchParams = useSearchParams();
-  const [view, setView]         = useState('lista'); 
+  const [view, setView]         = useState('biblioteca'); 
   const [clases, setClases]     = useState([]);
   const [claseActiva, setClaseActiva] = useState(null);
   const [dashData, setDashData] = useState(null);
@@ -1210,9 +1210,9 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
                       </div>
                       <div>
                         <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#128989', background: '#e0f5f5', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                          {PLANET_LABELS[r.tecnologia] || r.tecnologia || 'General'}
+                          {String(PLANET_LABELS[r.tecnologia] || r.tecnologia || 'General')}
                         </span>
-                        <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: '800', color: '#1a1a2e' }}>{r.nombre_recurso || r.contenido?.meta?.filename || 'Sin título'}</h4>
+                        <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: '800', color: '#1a1a2e' }}>{String(r.nombre_recurso || r.contenido?.meta?.filename || 'Sin título')}</h4>
                       </div>
                     </div>
 
