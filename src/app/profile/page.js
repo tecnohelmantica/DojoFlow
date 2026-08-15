@@ -1248,7 +1248,7 @@ function ProfileContent() {
                             key={r.id}
                             onClick={() => {
                               if (type.includes('enlace') || type.includes('lanzadera')) {
-                                window.open(r.contenido?.url, '_blank');
+                                window.open(r.contenido?.url || r.contenido?.markdown, '_blank');
                               } else {
                                 setSelectedScroll(r);
                               }
@@ -1426,7 +1426,7 @@ function ProfileContent() {
                         key={r.id}
                         onClick={() => {
                           if (type.includes('enlace') || type.includes('lanzadera')) {
-                            window.open(r.contenido?.url, '_blank');
+                            window.open(r.contenido?.url || r.contenido?.markdown, '_blank');
                           } else {
                             setSelectedScroll(r);
                           }
