@@ -125,11 +125,13 @@ export default function HomePage() {
       try {
         const { data: dbChalls } = await supabase
           .from('user_challenges')
+          .select('*')
           .eq('student_id', activeUserId);
         userChalls = dbChalls || [];
 
         const { data: dbExplore } = await supabase
           .from('explore_progress')
+          .select('*')
           .eq('student_id', activeUserId);
         exploreProg = dbExplore || [];
       } catch (e) {

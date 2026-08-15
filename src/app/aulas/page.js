@@ -5,9 +5,11 @@ import MisAulas from '../../components/MisAulas';
 import TopHeader from '../../components/TopHeader';
 import { supabase } from '../../lib/supabaseClient';
 
+import { useRouter } from 'next/navigation';
+
 export default function AulasPage() {
   const { session, role, loading } = useAuth();
-  const router = React.useMemo(() => typeof window !== 'undefined' ? require('next/navigation').useRouter() : null, []);
+  const router = useRouter();
   const [misRecursos, setMisRecursos] = useState([]);
 
   React.useEffect(() => {
