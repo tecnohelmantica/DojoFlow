@@ -67,6 +67,11 @@ import {
   APP_INVENTOR_ACADEMIA,
   APP_INVENTOR_SOCIAL
 } from '../lib/appinventor';
+import {
+  SQL_BEGINNER,
+  SQL_INTERMEDIATE,
+  SQL_ADVANCED
+} from '../lib/sql';
 import { PLANETS } from '../lib/planets';
 import { 
   Medal, Clock, CheckCircle2, Zap, Star, Trophy,
@@ -99,6 +104,10 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [appInventorAcademia, setAppInventorAcademia] = useState([]);
   const [appInventorSocial, setAppInventorSocial] = useState([]);
   const [mlForKids, setMlForKids] = useState([]);
+  const [learningML, setLearningML] = useState([]);
+  const [sqlBeginner, setSqlBeginner] = useState([]);
+  const [sqlIntermediate, setSqlIntermediate] = useState([]);
+  const [sqlAdvanced, setSqlAdvanced] = useState([]);
   const [arduinoBeginner, setArduinoBeginner] = useState([]);
   const [arduinoIntermediate, setArduinoIntermediate] = useState([]);
   const [arduinoAdvanced, setArduinoAdvanced] = useState([]);
@@ -204,7 +213,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     if (!pid) return;
 
     // Si el diagnóstico no está hecho, y el planeta tiene diagnóstico, la pestaña por defecto es 'assessment'
-    if (['scratch', 'microbit', 'makecode-microbit', 'arcade', 'makecode-arcade', 'arduino', 'tinkercad-arduino'].includes(pid) && !assessmentCompleted) {
+    if (['scratch', 'microbit', 'makecode-microbit', 'arcade', 'makecode-arcade', 'arduino', 'tinkercad-arduino', 'sql'].includes(pid) && !assessmentCompleted) {
       setActiveTab('assessment');
       return;
     }
@@ -268,6 +277,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
     else if (pid === 'tinkercad' || pid === '3d') {
       setActiveTab('challenges');
     }
+    else if (pid === 'sql') {
+      setActiveTab('sql_beginner');
+    }
     else {
       // Fallback genérico
       if (tutorials && tutorials.length > 0) {
@@ -327,6 +339,9 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       setAppInventorAcademia([]);
       setAppInventorSocial([]);
       setMlForKids([]);
+      setSqlBeginner([]);
+      setSqlIntermediate([]);
+      setSqlAdvanced([]);
     };
 
     resetLists();
@@ -393,6 +408,12 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       } else if (pid === 'makecode-arcade') {
         setChallenges(ARCADE_CHALLENGES); 
         setTutorials(ARCADE_TUTORIALS);
+      } else if (pid === 'sql') {
+        setSqlBeginner(SQL_BEGINNER);
+        setSqlIntermediate(SQL_INTERMEDIATE);
+        setSqlAdvanced(SQL_ADVANCED);
+        setChallenges(SQL_BEGINNER);
+        setActiveTab('sql_beginner');
       }
       
       // Intentar recuperar progreso local de invitados si existe
@@ -611,6 +632,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         } else if (pid === 'makecode-arcade' || pid === 'arcade') {
           setChallenges(ARCADE_CHALLENGES);
           setTutorials(ARCADE_TUTORIALS);
+        } else if (pid === 'sql') {
+          setChallenges(SQL_BEGINNER);
+          setSqlBeginner(SQL_BEGINNER);
+          setSqlIntermediate(SQL_INTERMEDIATE);
+          setSqlAdvanced(SQL_ADVANCED);
         }
       } else {
         // Map based on Planet
@@ -656,6 +682,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
           const academia = populateState(setAppInventorAcademia, dbChallenges, 'academia', APP_INVENTOR_ACADEMIA);
           const social = populateState(setAppInventorSocial, dbChallenges, 'social', APP_INVENTOR_SOCIAL);
           setChallenges(itinerary === 'social' ? social : academia);
+        } else if (pid === 'sql') {
+          populateState(setSqlBeginner, dbChallenges, 'sql-beginner', SQL_BEGINNER);
+          populateState(setSqlIntermediate, dbChallenges, 'sql-intermediate', SQL_INTERMEDIATE);
+          populateState(setSqlAdvanced, dbChallenges, 'sql-advanced', SQL_ADVANCED);
+          populateState(setChallenges, dbChallenges, 'sql-beginner', SQL_BEGINNER);
         } else if (pid === 'ia') {
           populateState(setLearningML, dbChallenges, 'learningml', ML_LEARNINGML);
           populateState(setMlForKids, dbChallenges, 'mlforkids', ML_FOR_KIDS);
@@ -1410,6 +1441,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       // IA Planet
       'mlfk_challenges': mlForKids,
       
+      // SQL Planet
+      'sql_beginner': sqlBeginner,
+      'sql_intermediate': sqlIntermediate,
+      'sql_advanced': sqlAdvanced,
+      
       // Other standard tabs
       'raspberry_l1': raspberryL1,
       'raspberry_l2': raspberryL2,
@@ -1856,6 +1892,64 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                   }}
                 >
                   AVANZADO (42)
+                </button>
+              </>
+            ) : pid === 'sql' ? (
+              <>
+                {!assessmentCompleted && (
+                  <button 
+                    onClick={() => { setActiveTab('assessment'); setSelectedTutorial(null); }}
+                    style={{ 
+                      flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.7rem', fontWeight: '900', fontFamily: 'Outfit',
+                      background: activeTab === 'assessment' ? accentColor : 'white',
+                      color: activeTab === 'assessment' ? 'white' : '#FF6B00',
+                      boxShadow: '0 4px 12px rgba(255,107,0,0.2)',
+                      transition: 'all 0.2s', minWidth: 'fit-content',
+                      border: activeTab === 'assessment' ? 'none' : '1px solid #FF6B00'
+                    }}
+                  >
+                    🎯 DESAFÍO NINJA
+                  </button>
+                )}
+                <button 
+                  onClick={() => { setActiveTab('sql_beginner'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'sql_beginner' ? 'white' : 'transparent',
+                    color: activeTab === 'sql_beginner' ? accentColor : '#666',
+                    boxShadow: activeTab === 'sql_beginner' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  PRINCIPIANTE (1)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('sql_intermediate'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'sql_intermediate' ? 'white' : 'transparent',
+                    color: activeTab === 'sql_intermediate' ? accentColor : '#666',
+                    boxShadow: activeTab === 'sql_intermediate' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  INTERMEDIO (1)
+                </button>
+                <button 
+                  onClick={() => { setActiveTab('sql_advanced'); setSelectedTutorial(null); }}
+                  style={{ 
+                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                    background: activeTab === 'sql_advanced' ? 'white' : 'transparent',
+                    color: activeTab === 'sql_advanced' ? accentColor : '#666',
+                    boxShadow: activeTab === 'sql_advanced' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                    transition: 'all 0.2s', minWidth: 'fit-content'
+                  }}
+                >
+                  AVANZADO (1)
                 </button>
               </>
             ) : pid === 'html' ? (
