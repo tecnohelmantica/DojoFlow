@@ -2387,6 +2387,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                         if (planetId === 'code') return "/planets/code-pro.png";
                         if (planetId?.toLowerCase() === 'appinventor') return "/planets/app%20inventor.png";
                         if (planetId === 'ia') return "/planets/machine_learning_v2.png";
+                        if (planetId === 'sql') return "/planets/sql.png";
                         
                         // Default fallback
                         return "/planets/microbit.jpeg";
@@ -2867,6 +2868,45 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                               </div>
                             </>
 
+                          ) : planetId === 'sql' ? (
+                            <>
+                              <div style={{ marginBottom: '20px' }}>
+                                <GlowButton 
+                                  color="blue" 
+                                  onClick={() => window.open(currentItem.url, '_blank')}
+                                  style={{ 
+                                    padding: '12px 25px', 
+                                    fontSize: '0.95rem', 
+                                    fontWeight: '800',
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '10px'
+                                  }}
+                                >
+                                  <ExternalLink size={18} /> ABRIR PLATAFORMA SQL
+                                </GlowButton>
+                              </div>
+                              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>1</div>
+                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                  Haz clic en el botón superior para acceder a la plataforma web.
+                                </p>
+                              </div>
+                              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>2</div>
+                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                  Resuelve los ejercicios propuestos mediante consultas SQL.
+                                </p>
+                              </div>
+                              <div style={{ display: 'flex', gap: '15px' }}>
+                                <div style={{ minWidth: '32px', height: '32px', background: accentColor, color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: '900', boxShadow: `0 4px 10px ${accentColor}40` }}>3</div>
+                                <p style={{ fontSize: '1rem', color: '#1a1a2e', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                  Sube una captura de tus resultados correctos o tu certificado de FreeCodeCamp para validarlo.
+                                </p>
+                              </div>
+                            </>
                           ) : (
                             <>
                               <div style={{ display: 'flex', gap: '15px' }}>
