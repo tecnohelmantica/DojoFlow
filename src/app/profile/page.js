@@ -264,7 +264,8 @@ function ProfileContent() {
           const { data: globalRes, error: resError } = await supabase
             .from('recursos_docentes')
             .select('*')
-            .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->>isGlobal.eq.true,contenido->>isMaster.eq.true`);
+            .eq('profesor_id', MASTER_PROFESOR_ID)
+            .or('contenido->isGlobal.eq.true,contenido->isMaster.eq.true');
           
           if (resError) throw resError;
 
@@ -886,10 +887,28 @@ function ProfileContent() {
     );
   }
 
-  // ── VISTA DE APRENDIZAJE (PLANETA) ──
+  let currentActiveActivities = null;
+  if (!isGuest && userClasses && userClasses.length > 0) {
+    const allAllowed = userClasses.some(aula => {
+      return aula.planetas_activos?.includes(activePlanet) && 
+             (!aula.actividades_activas || !aula.actividades_activas[activePlanet]);
+    });
+
+    if (!allAllowed) {
+      const activeSet = new Set();
+      userClasses.forEach(aula => {
+        if (aula.planetas_activos?.includes(activePlanet) && aula.actividades_activas?.[activePlanet]) {
+          aula.actividades_activas[activePlanet].forEach(id => activeSet.add(id?.toString()));
+        }
+      });
+      currentActiveActivities = Array.from(activeSet);
+    }
+  }
+
+  // ✨ VISTA DE APRENDIZAJE (PLANETA) ✨
   if (role === 'alumno' && activePlanet) {
     const planet = getPlanetById(activePlanet);
-    const planetLaunchers = teacherResources.filter(r => 
+    const planetLaunchers = (teacherResources || []).filter(r => 
       (r.tipo_recurso?.toLowerCase() === 'lanzadera' || r.tipo_recurso?.toLowerCase() === 'enlace') && 
       (r.tecnologia?.toLowerCase() === activePlanet.toLowerCase() || r.tecnologia?.toLowerCase() === 'todas')
     );
@@ -2169,24 +2188,6 @@ function ProfileContent() {
     );
   }
 
-
-    let currentActiveActivities = null;
-    if (!isGuest && userClasses && userClasses.length > 0) {
-      const allAllowed = userClasses.some(aula => {
-        return aula.planetas_activos?.includes(activePlanet) && 
-               (!aula.actividades_activas || !aula.actividades_activas[activePlanet]);
-      });
-
-      if (!allAllowed) {
-        const activeSet = new Set();
-        userClasses.forEach(aula => {
-          if (aula.planetas_activos?.includes(activePlanet) && aula.actividades_activas?.[activePlanet]) {
-            aula.actividades_activas[activePlanet].forEach(id => activeSet.add(id?.toString()));
-          }
-        });
-        currentActiveActivities = Array.from(activeSet);
-      }
-    }
 
     // ✨ VISTA DE DASHBOARD / AJUSTES ✨
   return (
