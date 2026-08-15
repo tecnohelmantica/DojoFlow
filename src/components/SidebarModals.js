@@ -81,7 +81,8 @@ export default function SidebarModals({ activeModal, onClose, userId, role }) {
         const { data: masterRecs } = await supabase
           .from('recursos_docentes')
           .select('*')
-          .or(`profesor_id.eq.${MASTER_PROFESOR_ID},contenido->>isGlobal.eq.true,contenido->>isMaster.eq.true`);
+          .eq('profesor_id', MASTER_PROFESOR_ID)
+          .or('contenido->isGlobal.eq.true,contenido->isMaster.eq.true');
 
         // 3. Obtener recursos de sus clases
         let classRecs = [];

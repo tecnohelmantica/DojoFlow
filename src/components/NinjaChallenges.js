@@ -217,6 +217,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         }
       } else if (itinerary === 'javascript') {
         setActiveTab('js_basics');
+      } else if (itinerary === 'freecodecamp') {
+        setActiveTab('fcc_html');
       } else {
         setActiveTab('html_academy');
       }
@@ -3082,7 +3084,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
               ) :
               planetId === 'html' ? (
                 <>
-                  <a href="https://code.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Code.org</a>, <a href="https://projects.raspberrypi.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Raspberry Pi Foundation</a>, <a href="https://www.luisllamas.es/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Luis Llamas</a>, recursos de MDN Web Docs y <a href="https://learnjavascript.online" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Learn JavaScript Online</a> (Jad Joubran).
+                  <a href="https://code.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Code.org</a>, <a href="https://projects.raspberrypi.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Raspberry Pi Foundation</a>, <a href="https://www.luisllamas.es/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Luis Llamas</a>, recursos de MDN Web Docs, <a href="https://learnjavascript.online" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Learn JavaScript Online</a> (Jad Joubran) y <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>FreeCodeCamp</a>.
                 </>
               ) :
               planetId === 'appinventor' ? (
