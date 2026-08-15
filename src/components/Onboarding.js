@@ -139,7 +139,7 @@ export default function Onboarding() {
     },
     {
       title: "Gestión de Aulas",
-      content: "Desde la pestaña 'Mis Aulas' de cada planeta, vincula tus recursos a tus clases. Tus alumnos los verán instantáneamente mientras trabajan en sus retos.",
+      content: "Desde el Centro de Aulas en el menú principal, gestiona tus clases y vincula tus recursos de la biblioteca a cada aula. Tus alumnos los verán instantáneamente mientras trabajan en sus retos.",
       icon: <Users size={48} color="#00cc55" />,
       color: "#00cc55"
     },
