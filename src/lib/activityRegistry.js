@@ -9,6 +9,7 @@ import { ROBOTIX_CHALLENGES } from './robotix';
 import { MICROBIT_CHALLENGES } from './microbit';
 import { ARCADE_CHALLENGES } from './arcade';
 import { APP_INVENTOR_ACADEMIA, APP_INVENTOR_SOCIAL } from './appinventor';
+import { SQL_BEGINNER, SQL_INTERMEDIATE, SQL_ADVANCED } from './sql';
 
 export const ACTIVITY_REGISTRY = {
   'code': [
@@ -63,5 +64,10 @@ export const ACTIVITY_REGISTRY = {
   'appinventor': [
     { title: 'Academia', items: APP_INVENTOR_ACADEMIA || [] },
     { title: 'Social', items: APP_INVENTOR_SOCIAL || [] }
+  ],
+  'sql': [
+    { title: 'Básico', items: SQL_BEGINNER || [] },
+    { title: 'Intermedio', items: SQL_INTERMEDIATE || [] },
+    { title: 'Avanzado', items: SQL_ADVANCED || [] }
   ]
 };

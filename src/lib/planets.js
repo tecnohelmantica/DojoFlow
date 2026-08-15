@@ -213,6 +213,27 @@ export const PLANETS = [
     ],
     attribution: "Contenidos y retos adaptados de: Luis Llamas (luisllamas.es), CodePen y MDN Web Docs."
   },
+  { 
+    id: 'sql', 
+    name: 'Bases de Datos', 
+    image: '/planets/sql.png', 
+    icon: 'Database',
+    color: '#e6f2ff', 
+    barColor: '#0055a4', 
+    url: 'https://www.mycompiler.io/es/new/sql', 
+    notebook: '46bfc031-197e-44db-bba3-d4bc6bc773de', 
+    subtitle: 'Gestión y consulta de datos estructurados.',
+    description: 'Aprende a diseñar, consultar y administrar bases de datos relacionales usando SQL.',
+    recommendation: 'Te sugerimos empezar practicando consultas básicas (SELECT, FROM, WHERE) antes de crear tus propias tablas.',
+    buttons: [
+      { label: 'MYCOMPILER (SQL)', url: 'https://www.mycompiler.io/es/new/sql', color: 'blue' }
+    ],
+    tips: [
+      "No olvides poner un punto y coma (;) al final de cada sentencia SQL.",
+      "Usa la cláusula WHERE para filtrar la información que no necesitas antes de procesarla.",
+      "Cuando uses comodines con LIKE, recuerda usar comillas simples (')."
+    ]
+  }
 ];
 
 export const getPlanetById = (id) => {
