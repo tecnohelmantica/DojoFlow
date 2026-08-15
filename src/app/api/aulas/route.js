@@ -50,9 +50,10 @@ export async function POST(req) {
 
         if (action === 'unirse_con_codigo') {
             const { codigo, alumnoId } = body;
-            const { data: clase } = await supabase.from('clases').select('id, nombre, nombre_clase, profesor_id').ilike('codigo_invitacion', codigo.trim()).single();
+            const { data: clase, error: errClase } = await supabase.from('clases').select('id, nombre_clase').ilike('codigo_invitacion', codigo.trim()).single();
+            if (errClase) console.error('Error fetching clase:', errClase);
             if (!clase) return NextResponse.json({ error: 'Codigo invalido' }, { status: 404 });
-            const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId, profesor_id: clase.profesor_id });
+            const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId });
             
             if (insertError) {
                 // Si ya está unido (error de clave duplicada), lo tratamos como éxito pero con mensaje
