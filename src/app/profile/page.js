@@ -76,8 +76,7 @@ function ProfileContent() {
   const [hasActiveCustomMission, setHasActiveCustomMission] = useState(false);
   const [validationContext, setValidationContext] = useState(null);
   const [studentClassrooms, setStudentClassrooms] = useState([]);
-
-  // ── Recursos del Maestro ──
+  const [userClasses, setUserClasses] = useState([]);
   const [teacherResources, setTeacherResources] = useState([]);
   const [classOnlyResources, setClassOnlyResources] = useState([]); // recursos del profe para esta clase (no maestros)
   const [loadingResources, setLoadingResources] = useState(false);
@@ -375,7 +374,9 @@ function ProfileContent() {
             clase_id,
             clases:clase_id (
               id,
-              nombre
+              nombre_clase,
+              planetas_activos,
+              actividades_activas
             )
           `)
           .eq('alumno_id', session.user.id);
@@ -383,9 +384,15 @@ function ProfileContent() {
         const seenClaseIds = new Set();
         const classroomNames = (memberships || [])
           .filter(m => { if (seenClaseIds.has(m.clase_id)) return false; seenClaseIds.add(m.clase_id); return true; })
-          .map(m => m.clases?.nombre)
+          .map(m => m.clases?.nombre_clase)
           .filter(Boolean);
         
+        const userClases = (memberships || [])
+          .filter(m => m.clases)
+          .map(m => m.clases);
+            
+        setUserClasses(userClases);
+
         setStudentClassrooms(classroomNames);
         // Deduplicar por clase_id para evitar membresías duplicadas
         const claseIds = [...new Set((memberships || []).map(m => m.clase_id))];
@@ -1220,7 +1227,13 @@ function ProfileContent() {
                         return (
                           <GlassCard
                             key={r.id}
-                            onClick={() => setSelectedScroll(r)}
+                            onClick={() => {
+                              if (type.includes('enlace') || type.includes('lanzadera')) {
+                                window.open(r.contenido?.url, '_blank');
+                              } else {
+                                setSelectedScroll(r);
+                              }
+                            }}
                             style={{
                               padding: '16px',
                               cursor: 'pointer',
@@ -1392,7 +1405,13 @@ function ProfileContent() {
                     return (
                       <GlassCard
                         key={r.id}
-                        onClick={() => setSelectedScroll(r)}
+                        onClick={() => {
+                          if (type.includes('enlace') || type.includes('lanzadera')) {
+                            window.open(r.contenido?.url, '_blank');
+                          } else {
+                            setSelectedScroll(r);
+                          }
+                        }}
                         style={{
                           padding: '25px',
                           cursor: 'pointer',
@@ -1931,6 +1950,7 @@ function ProfileContent() {
                   assessmentCompleted={assessmentCompleted}
                   studentLevel={studentLevel}
                   onValidateChallenge={handleValidateChallenge}
+                  activeActivities={currentActiveActivities}
                 />
               </div>
 
@@ -2150,7 +2170,25 @@ function ProfileContent() {
   }
 
 
-  // ── VISTA DE DASHBOARD / AJUSTES ──
+    let currentActiveActivities = null;
+    if (!isGuest && userClasses && userClasses.length > 0) {
+      const allAllowed = userClasses.some(aula => {
+        return aula.planetas_activos?.includes(activePlanet) && 
+               (!aula.actividades_activas || !aula.actividades_activas[activePlanet]);
+      });
+
+      if (!allAllowed) {
+        const activeSet = new Set();
+        userClasses.forEach(aula => {
+          if (aula.planetas_activos?.includes(activePlanet) && aula.actividades_activas?.[activePlanet]) {
+            aula.actividades_activas[activePlanet].forEach(id => activeSet.add(id?.toString()));
+          }
+        });
+        currentActiveActivities = Array.from(activeSet);
+      }
+    }
+
+    // ✨ VISTA DE DASHBOARD / AJUSTES ✨
   return (
     <div className="layout-container profile-dashboard-wrapper">
       <TopHeader />

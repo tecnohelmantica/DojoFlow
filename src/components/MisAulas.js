@@ -5,10 +5,11 @@ import GlassCard from './GlassCard';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthProvider';
 import GlowButton from './GlowButton';
+import { ACTIVITY_REGISTRY } from '../lib/activityRegistry';
 import {
   Plus, Copy, Check, Users, ChevronRight, ChevronLeft,
   Trash2, UserPlus, RefreshCw, AlertCircle, Clock,
-  CheckCircle, XCircle, Search, FileText, Zap, BookOpen, Link, Tv, FileBarChart, Sparkles, Clipboard, User, HardDrive, Pencil, Download, DownloadCloud, ExternalLink, Paperclip, Star
+  CheckCircle, XCircle, Search, FileText, Zap, BookOpen, Link, Tv, FileBarChart, Sparkles, Clipboard, User, HardDrive, Pencil, Download, DownloadCloud, ExternalLink, Paperclip, Star, Settings
 } from 'lucide-react';
 import ResourceUploader from './ResourceUploader';
 
@@ -396,6 +397,8 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
   const [showVincular, setShowVincular] = useState(false);
   const [activePlanets, setActivePlanets] = useState(clase.planetas_activos || []);
   const [savingPlanets, setSavingPlanets] = useState(false);
+  const [configuringPlanet, setConfiguringPlanet] = useState(null);
+  const [activeActivities, setActiveActivities] = useState(clase.actividades_activas || {});
 
   const togglePlanet = (planetId) => {
     setActivePlanets(prev => prev.includes(planetId) ? prev.filter(p => p !== planetId) : [...prev, planetId]);
@@ -406,7 +409,10 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
     try {
       const { error } = await supabase
         .from('clases')
-        .update({ planetas_activos: activePlanets })
+        .update({ 
+          planetas_activos: activePlanets,
+          actividades_activas: activeActivities 
+        })
         .eq('id', clase.id);
       
       if (error) throw error;
@@ -720,15 +726,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
               <GlassCard style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: '15px', marginBottom: '25px' }}>
                   {platforms.map(p => (
-                    <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '10px', background: activePlanets.includes(p.id) ? '#f3e5f5' : 'white', border: `1.5px solid ${activePlanets.includes(p.id) ? '#9c27b0' : '#e2e8f0'}`, cursor: 'pointer', transition: 'all 0.2s' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={activePlanets.includes(p.id)} 
-                        onChange={() => togglePlanet(p.id)} 
-                        style={{ width: '18px', height: '18px', cursor: 'pointer' }} 
-                      />
-                      <span style={{ fontSize: '0.9rem', fontWeight: '700', color: activePlanets.includes(p.id) ? '#9c27b0' : '#64748b' }}>{p.name}</span>
-                    </label>
+                    <div key={p.id} style={{ display: "flex", gap: "5px", alignItems: "center" }}><label style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px", padding: "10px", borderRadius: "10px", background: activePlanets.includes(p.id) ? "#f3e5f5" : "white", border: `1.5px solid ${activePlanets.includes(p.id) ? "#9c27b0" : "#e2e8f0"}`, cursor: "pointer", transition: "all 0.2s" }}><input type="checkbox" checked={activePlanets.includes(p.id)} onChange={() => togglePlanet(p.id)} style={{ width: "18px", height: "18px", cursor: "pointer" }} /><span style={{ fontSize: "0.9rem", fontWeight: "700", color: activePlanets.includes(p.id) ? "#9c27b0" : "#64748b" }}>{p.name}</span></label>{activePlanets.includes(p.id) && ACTIVITY_REGISTRY[p.id] && (<button onClick={() => setConfiguringPlanet(p.id)} style={{ background: "rgba(156, 39, 176, 0.1)", border: "none", borderRadius: "8px", padding: "8px", cursor: "pointer", color: "#9c27b0", display: "flex", alignItems: "center", justifyContent: "center" }} title="Configurar actividades"><Settings size={18} /></button>)}</div>
                   ))}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -741,6 +739,111 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
           )}
         </>
       )}
+
+        {/* Modal Configurar Actividades */}
+        {configuringPlanet && ACTIVITY_REGISTRY[configuringPlanet] && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <div style={{ background: 'white', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '600px', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', fontFamily: 'Outfit', margin: 0 }}>Configurar Actividades</h3>
+                <button onClick={() => setConfiguringPlanet(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa' }}><XCircle size={20}/></button>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#8a8a9e', margin: '0 0 16px' }}>
+                Selecciona las actividades que estarán disponibles para el alumnado. Si deseleccionas todas, se mostrarán todas por defecto (sin restricciones).
+              </p>
+              
+              <div style={{ overflowY: 'auto', flex: 1, paddingRight: '10px' }}>
+                {ACTIVITY_REGISTRY[configuringPlanet].map((group, gIdx) => {
+                  if (!group.items || group.items.length === 0) return null;
+                  
+                  const groupIds = group.items.filter(act => act.id).map(act => act.id.toString());
+                  if (groupIds.length === 0) return null;
+
+                  const activeForPlanet = activeActivities[configuringPlanet] || [];
+                  const allGroupActive = groupIds.every(id => activeForPlanet.includes(id));
+        
+                  const toggleGroup = () => {
+                    setActiveActivities(prev => {
+                      const current = prev[configuringPlanet] || [];
+                      let updated;
+                      if (allGroupActive) {
+                        updated = current.filter(id => !groupIds.includes(id));
+                      } else {
+                        updated = [...new Set([...current, ...groupIds])];
+                      }
+                      return { ...prev, [configuringPlanet]: updated };
+                    });
+                  };
+        
+                  const toggleActivity = (actId) => {
+                    const strId = actId.toString();
+                    setActiveActivities(prev => {
+                      const current = prev[configuringPlanet] || [];
+                      let updated;
+                      if (current.includes(strId)) {
+                        updated = current.filter(id => id !== strId);
+                      } else {
+                        updated = [...current, strId];
+                      }
+                      return { ...prev, [configuringPlanet]: updated };
+                    });
+                  };
+        
+                  return (
+                    <div key={gIdx} style={{ marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', padding: '10px 15px', borderRadius: '12px', marginBottom: '10px' }}>
+                        <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#1e293b' }}>{group.title}</span>
+                        <button 
+                          onClick={toggleGroup}
+                          style={{ background: 'none', border: 'none', color: '#6366f1', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
+                        >
+                          {allGroupActive ? 'Deseleccionar Grupo' : 'Seleccionar Grupo'}
+                        </button>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px', paddingLeft: '10px' }}>
+                        {group.items.map((act, idx) => {
+                          if (!act.id) return null;
+                          const isActActive = (activeActivities[configuringPlanet] || []).includes(act.id.toString());
+                          return (
+                            <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#64748b', cursor: 'pointer' }}>
+                              <input 
+                                type="checkbox"
+                                checked={isActActive}
+                                onChange={() => toggleActivity(act.id)}
+                                style={{ cursor: 'pointer' }}
+                              />
+                              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={act.title || act.titulo || `Actividad ${act.id}`}>
+                                {act.title || act.titulo || `Actividad ${act.id}`}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+        
+              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button 
+                  onClick={() => {
+                    setActiveActivities(prev => {
+                      const copy = { ...prev };
+                      delete copy[configuringPlanet];
+                      return copy;
+                    });
+                  }} 
+                  style={{ background: 'none', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: '700', color: '#64748b' }}
+                >
+                  RESET (TODAS)
+                </button>
+                <GlowButton color="blue" onClick={() => setConfiguringPlanet(null)} style={{ padding: '10px 20px' }}>
+                  HECHO
+                </GlowButton>
+              </div>
+            </div>
+          </div>
+        )}
 
       {/* Modal Vincular */}
       {showVincular && (
@@ -1305,3 +1408,4 @@ export default function MisAulas(props) {
     </Suspense>
   );
 }
+

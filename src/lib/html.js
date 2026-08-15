@@ -9,9 +9,30 @@ export const JS_LEARN_COURSE = [
   {
     id: 501,
     numero: 1,
-    titulo: 'Curso de JavaScript',
+    titulo: 'Curso de JavaScript (Jad Joubran)',
     description: 'Aprende JavaScript de forma progresiva e interactiva. Completa el curso a tu ritmo directamente en la plataforma.',
     url: 'https://learnjavascript.online/app.html?id=1435'
+  }
+];
+
+// ─── FREECODECAMP: Certificaciones Web ───────────────────────────────────────
+export const FCC_HTML_COURSE = [
+  {
+    id: 'fcc-html-1',
+    numero: 1,
+    titulo: 'Certificación Responsive Web Design',
+    description: 'Aprende los lenguajes fundamentales de la web y obtén tu certificación oficial de FreeCodeCamp. Sube aquí tu certificado (o captura) al terminar para que sea validado por tu profesor.',
+    url: 'https://www.freecodecamp.org/espanol/learn/responsive-web-design-v9/'
+  }
+];
+
+export const FCC_JS_COURSE = [
+  {
+    id: 'fcc-js-1',
+    numero: 1,
+    titulo: 'Certificación JavaScript Algorithms',
+    description: 'Aprende algoritmos y estructuras de datos en JavaScript y obtén tu certificación oficial de FreeCodeCamp. Sube aquí tu certificado (o captura) al terminar para que sea validado.',
+    url: 'https://www.freecodecamp.org/espanol/learn/javascript-v9/'
   }
 ];
 

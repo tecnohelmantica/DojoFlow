@@ -83,7 +83,7 @@ export default function HomePage() {
       try {
         const { data: vincs } = await supabase
           .from('clase_alumnos')
-          .select('clase_id, clases(id, nombre, planetas_activos)')
+          .select('clase_id, clases(id, nombre_clase, planetas_activos, actividades_activas)')
           .eq('alumno_id', activeUserId);
         
         const aulas = (vincs || []).map(v => v.clases).filter(Boolean);

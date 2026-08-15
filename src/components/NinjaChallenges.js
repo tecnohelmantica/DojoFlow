@@ -11,6 +11,8 @@ import {
 import { 
   HTML_CODE_ORG, 
   JS_LEARN_COURSE, 
+  FCC_HTML_COURSE,
+  FCC_JS_COURSE,
   RASPBERRY_WEB_LEVEL_1, 
   RASPBERRY_WEB_LEVEL_2, 
   RASPBERRY_WEB_LEVEL_3 
@@ -74,7 +76,7 @@ import {
 
 import { getPlanetById } from '../lib/planets';
 
-export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcfcf', targetLevel = 'Junior', onValidateChallenge, isAutodidact = true, itinerary, setItinerary, refreshTrigger, assessmentCompleted, studentLevel }) {
+export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcfcf', targetLevel = 'Junior', onValidateChallenge, isAutodidact = true, itinerary, setItinerary, refreshTrigger, assessmentCompleted, studentLevel, activeActivities = null }) {
   const pid = planetId === 'tinkercad-arduino' ? 'arduino' : (planetId === 'makecode-microbit' ? 'microbit' : (planetId || '').toLowerCase());
   const searchParams = useSearchParams();
   const [challenges, setChallenges] = useState([]);
@@ -107,6 +109,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
   const [tutorials, setTutorials] = useState([]);
   const [htmlCodeOrg, setHtmlCodeOrg] = useState([]);
   const [jsCourse, setJsCourse] = useState([]);
+  const [fccHtml, setFccHtml] = useState([]);
+  const [fccJs, setFccJs] = useState([]);
   const [learningML, setLearningML] = useState([]);
   const [tinkercad3d, setTinkercad3d] = useState([]);
   const [tinkercad3dChallenges, setTinkercad3dChallenges] = useState([]);
@@ -280,11 +284,25 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       return aVal - bVal;
     };
 
+    const filterActive = (list) => {
+      if (!list || !Array.isArray(list)) return [];
+      if (!activeActivities || activeActivities.length === 0) return list; // If null/empty array, everything is allowed by default
+      return list.filter(item => {
+        const itemId = item.id?.toString() || item.numero?.toString();
+        return activeActivities.includes(itemId);
+      });
+    };
+
     const resetLists = () => {
+      setHtmlCodeOrg([]);
+      setJsCourse([]);
+      setFccHtml([]);
+      setFccJs([]);
+      setLearningML([]);
+      setDifficultyChallenges(null);
       setChallenges([]);
       setTutorials([]);
       setExpertChallenges([]);
-      setDifficultyChallenges(null);
       setRaspberryL1([]);
       setRaspberryL2([]);
       setTinkercad3d([]);
@@ -317,7 +335,14 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       if (pid === 'code') {
         setChallenges(CODE_MODERN_COURSES); setCodeModern(CODE_MODERN_COURSES); setCodeHourOfCode(CODE_HOUR_OF_CODE); setCodeHourOfAI(CODE_HOUR_OF_AI);
       } else if (pid === 'html') {
-        setHtmlCodeOrg(HTML_CODE_ORG); setJsCourse(JS_LEARN_COURSE); setRaspberryL1(RASPBERRY_WEB_LEVEL_1); setRaspberryL2(RASPBERRY_WEB_LEVEL_2); setExpertChallenges(RASPBERRY_WEB_LEVEL_3); setChallenges(HTML_CODE_ORG);
+          setHtmlCodeOrg(filterActive(HTML_CODE_ORG)); 
+          setJsCourse(filterActive(JS_LEARN_COURSE)); 
+          setFccHtml(filterActive(FCC_HTML_COURSE));
+          setFccJs(filterActive(FCC_JS_COURSE));
+          setRaspberryL1(filterActive(RASPBERRY_WEB_LEVEL_1)); 
+          setRaspberryL2(filterActive(RASPBERRY_WEB_LEVEL_2)); 
+          setExpertChallenges(filterActive(RASPBERRY_WEB_LEVEL_3)); 
+          setChallenges(filterActive(HTML_CODE_ORG));
       } else if (pid === 'scratch') {
         setChallenges(ROBOTIX_CHALLENGES); setRaspberryL1(RASPBERRY_SCRATCH_L1); setRaspberryL2(RASPBERRY_SCRATCH_L2); setExpertChallenges(RASPBERRY_SCRATCH_CHALLENGES); setTutorials(SCRATCH_TUTORIALS);
       } else if (pid === 'tinkercad' || pid === '3d') {
@@ -524,7 +549,14 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         if (pid === 'code') {
           setChallenges(CODE_MODERN_COURSES); setCodeModern(CODE_MODERN_COURSES); setCodeHourOfCode(CODE_HOUR_OF_CODE); setCodeHourOfAI(CODE_HOUR_OF_AI);
         } else if (pid === 'html') {
-          setHtmlCodeOrg(HTML_CODE_ORG); setJsCourse(JS_LEARN_COURSE); setRaspberryL1(RASPBERRY_WEB_LEVEL_1); setRaspberryL2(RASPBERRY_WEB_LEVEL_2); setExpertChallenges(RASPBERRY_WEB_LEVEL_3); setChallenges(HTML_CODE_ORG);
+          setHtmlCodeOrg(filterActive(HTML_CODE_ORG)); 
+          setJsCourse(filterActive(JS_LEARN_COURSE)); 
+          setFccHtml(filterActive(FCC_HTML_COURSE));
+          setFccJs(filterActive(FCC_JS_COURSE));
+          setRaspberryL1(filterActive(RASPBERRY_WEB_LEVEL_1)); 
+          setRaspberryL2(filterActive(RASPBERRY_WEB_LEVEL_2)); 
+          setExpertChallenges(filterActive(RASPBERRY_WEB_LEVEL_3)); 
+          setChallenges(filterActive(HTML_CODE_ORG));
         } else if (pid === 'scratch') {
           setChallenges(ROBOTIX_CHALLENGES); setRaspberryL1(RASPBERRY_SCRATCH_L1); setRaspberryL2(RASPBERRY_SCRATCH_L2); setExpertChallenges(RASPBERRY_SCRATCH_CHALLENGES); setTutorials(SCRATCH_TUTORIALS);
         } else if (pid === 'tinkercad' || pid === '3d') {
@@ -895,6 +927,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
 
   const htmlCodeOrgCompleted = htmlCodeOrg.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado').length;
   const jsCourseCompleted = jsCourse.filter(c => userProgress[`${pid}-js-reto-${c.id}`]?.status === 'Validado').length;
+  const fccHtmlCompleted = fccHtml.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado').length;
+  const fccJsCompleted = fccJs.filter(c => userProgress[`${pid}-reto-${c.id}`]?.status === 'Validado').length;
 
 
   const iaLearningMLCompleted = challenges.filter(c => userProgress[`ia-reto-${c.id || c.order_index}`]?.status === 'Validado' || userProgress[`ia-learningml-reto-${c.id || c.order_index}`]?.status === 'Validado').length;
@@ -1379,6 +1413,8 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       'raspberry_l2': raspberryL2,
       'expert': expertChallenges,
       'js_basics': jsCourse,
+      'fcc_html': fccHtml,
+      'fcc_js': fccJs,
       'html_academy': htmlCodeOrg,
       'tutorials': tutorials
     };
@@ -1861,7 +1897,20 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                       transition: 'all 0.2s'
                     }}
                   >
-                    ⚡ JS (LEARN JAVASCRIPT)
+                    💡 JS (LEARN JAVASCRIPT)
+                  </button>
+                  <button 
+                    onClick={() => { setItinerary('fcc'); setActiveTab('fcc_html'); }}
+                    style={{
+                      flex: 1, padding: '12px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                      fontSize: '0.75rem', fontWeight: '800', fontFamily: 'Outfit',
+                      background: itinerary === 'fcc' ? 'white' : 'transparent',
+                      color: itinerary === 'fcc' ? '#0a0a23' : '#666',
+                      boxShadow: itinerary === 'fcc' ? '0 4px 12px rgba(10,10,35,0.2)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    🎓 FREECODECAMP
                   </button>
                 </div>
 
@@ -1932,7 +1981,34 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                       >
                         CURSO ({jsCourseCompleted}/{jsCourse.length})
                       </button>
-                  ) : null}
+                  ) : itinerary === 'fcc' ? (
+                      <>
+                        <button 
+                            onClick={() => setActiveTab('fcc_html')}
+                            style={{ 
+                              flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                              fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                              background: activeTab === 'fcc_html' ? 'rgba(10,10,35,0.1)' : 'transparent',
+                              color: activeTab === 'fcc_html' ? '#0a0a23' : '#666',
+                              transition: 'all 0.2s', minWidth: 'fit-content'
+                            }}
+                          >
+                            RESPONSIVE WEB DESIGN ({fccHtmlCompleted}/{fccHtml.length})
+                          </button>
+                          <button 
+                            onClick={() => setActiveTab('fcc_js')}
+                            style={{ 
+                              flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                              fontSize: '0.7rem', fontWeight: '700', fontFamily: 'Outfit',
+                              background: activeTab === 'fcc_js' ? 'rgba(10,10,35,0.1)' : 'transparent',
+                              color: activeTab === 'fcc_js' ? '#0a0a23' : '#666',
+                              transition: 'all 0.2s', minWidth: 'fit-content'
+                            }}
+                          >
+                            JAVASCRIPT ({fccJsCompleted}/{fccJs.length})
+                          </button>
+                      </>
+                    ) : null}
                 </div>
 
                 {/* Atribución JS */}
