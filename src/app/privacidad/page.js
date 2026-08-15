@@ -78,7 +78,7 @@ export default function PrivacyPage() {
           </div>
           <div style={textStyle}>
             <p><strong>Responsable:</strong> DojoFlow</p>
-            <p><strong>Contacto:</strong> <span style={highlightStyle}>monsapri@gmail.com</span></p>
+            <p><strong>Contacto:</strong> <span style={highlightStyle}>tecnohelmantica@gmail.com</span></p>
           </div>
         </div>
 

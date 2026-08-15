@@ -45,7 +45,7 @@ export default function AvisoLegalPage() {
             <h3 style={{ color: '#0f172a', marginTop: '32px', marginBottom: '12px' }}>🔹 Identificación del titular</h3>
             <p>En cumplimiento de lo dispuesto en la Ley de Servicios de la Sociedad de la Información (LSSI-CE), se informa que:</p>
             <p style={{ marginLeft: '12px' }}><strong>Titular:</strong> DojoFlow</p>
-            <p style={{ marginLeft: '12px' }}><strong>Contacto:</strong> monsapri@gmail.com</p>
+            <p style={{ marginLeft: '12px' }}><strong>Contacto:</strong> tecnohelmantica@gmail.com</p>
 
             <h3 style={{ color: '#0f172a', marginTop: '32px', marginBottom: '12px' }}>🔹 Finalidad del sitio web</h3>
             <p>DojoFlow es una plataforma educativa cuyo objetivo es facilitar el aprendizaje de programación y tecnología mediante la organización, creación y acceso a recursos educativos digitales.</p>
