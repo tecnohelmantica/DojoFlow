@@ -152,9 +152,11 @@ ul {
   font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
+  text-align: center;
   gap: 6px;
   transition: color 0.2s ease;
-  width: 60px;
+  min-width: 60px;
+  max-width: 80px;
 }
 
 .nav-item:hover, .nav-item.active {

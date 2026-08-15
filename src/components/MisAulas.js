@@ -29,9 +29,16 @@ const PLANET_LABELS = {
   html: 'HTML/JS', appinventor: 'App Inventor',
 };
 
-const fmtDate = (iso) => iso
-  ? new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
-  : '';
+const fmtDate = (iso) => {
+    try {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch(e) {
+      return '';
+    }
+  };
 
 // ── Estilos reutilizables ──
 const BTN_PRIMARY = {
@@ -1193,9 +1200,10 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
               {misRecursos.map(r => {
+                if (!r) return null;
                 const isConfirming = confirmingDelete === r.id;
                 return (
-                  <div key={r.id} style={{ background: 'white', borderRadius: '18px', padding: '20px', border: isConfirming ? '2px solid #ff6b6b' : '1.5px solid #eee', position: 'relative', transition: 'all 0.2s', boxShadow: isConfirming ? '0 10px 30px rgba(255,107,107,0.2)' : 'none' }}>
+                  <div key={r.id || Math.random()} style={{ background: 'white', borderRadius: '18px', padding: '20px', border: isConfirming ? '2px solid #ff6b6b' : '1.5px solid #eee', position: 'relative', transition: 'all 0.2s', boxShadow: isConfirming ? '0 10px 30px rgba(255,107,107,0.2)' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                       <div style={{ padding: '8px', borderRadius: '10px', background: '#f5f5f5' }}>
                         {r.tipo_recurso === 'video' ? <Tv size={18} color="#9c27b0" /> : <FileText size={18} color="#128989" />}
