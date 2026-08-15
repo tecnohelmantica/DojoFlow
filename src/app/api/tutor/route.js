@@ -17,6 +17,7 @@ import iaKnowledge from '../../../data/ia_knowledge.json';
 import pythonKnowledge from '../../../data/python_knowledge.json';
 import htmlKnowledge from '../../../data/html_knowledge.json';
 import appinventorKnowledge from '../../../data/appinventor_knowledge.json';
+import sqlKnowledge from '../../../data/sql_knowledge.json';
 
 const STATIC_KNOWLEDGE = {
   'scratch': scratchKnowledge,
@@ -28,7 +29,8 @@ const STATIC_KNOWLEDGE = {
   'ia': iaKnowledge,
   'python': pythonKnowledge,
   'html': htmlKnowledge,
-  'appinventor': appinventorKnowledge
+  'appinventor': appinventorKnowledge,
+  'sql': sqlKnowledge
 };
 
 function extractUuid(val) {
