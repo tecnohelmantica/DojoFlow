@@ -215,7 +215,7 @@ export const PLANETS = [
   },
   { 
     id: 'sql', 
-    name: 'Bases de Datos', 
+    name: 'SQL', 
     image: '/planets/sql.png', 
     icon: 'Database',
     color: '#e6f2ff', 
