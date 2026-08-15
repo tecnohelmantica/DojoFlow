@@ -344,7 +344,7 @@ export default function HomePage() {
       const data = await response.json();
 
       if (data.success) {
-        showToast('ok', data.message || `¡Genial! Ya eres parte de ${data.clase.nombre}`);
+        showToast('ok', data.message || `¡Genial! Ya eres parte de ${data.clase.nombre_clase || data.clase.nombre}`);
         setIsJoinModalOpen(false);
         fetchStudentData(); // Recargar datos del alumno
       } else {
