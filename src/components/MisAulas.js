@@ -1224,8 +1224,8 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
                             <a href={r.contenido?.url} target="_blank" rel="noreferrer" style={{ padding: '4px 10px', borderRadius: '6px', background: '#f0f0f5', color: '#333', fontSize: '0.7rem', fontWeight: '700', textDecoration: 'none' }}>Ver</a>
                             
                             {/* Solo permitir Editar/Borrar si no es Maestro, o si es el Profe Maestro */}
-                             {/* Solo permitir Editar/Borrar si el usuario es el DUEÑO del recurso */}
-                             {currentUser?.id === r.profesor_id ? (
+                             {/* Solo permitir Editar/Borrar si el usuario es el DUEÑO del recurso y (si es maestro, solo monsapri@gmail.com) */}
+                             {currentUser?.id === r.profesor_id && (!(r.contenido?.meta?.isGlobal || r.contenido?.isGlobal || r.contenido?.isMaster) || currentUser?.email === 'monsapri@gmail.com') ? (
                                <>
                                  <button 
                                    onClick={() => { setEditingRecurso(r); setShowUploadModal(true); }}
