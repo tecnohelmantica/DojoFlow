@@ -382,5 +382,43 @@ export const diagnosticQuizzes = {
       correcta: 1,
       explicacion: "¡Es donde ocurre la magia de los juegos! Permite detectar toques y mover personajes por la pantalla."
     }
+  ],
+  sql: [
+    {
+      pregunta: "¿Qué es una clave primaria (Primary Key) en una base de datos?",
+      opciones: ["Un campo que identifica de forma única cada registro", "Una contraseña para entrar", "Un tipo de dato de texto"],
+      correcta: 0,
+      explicacion: "La clave primaria funciona como el DNI de cada fila de la tabla, identificándola de manera única y sin poder estar vacía."
+    },
+    {
+      pregunta: "¿Qué comando SQL se utiliza para buscar y extraer información de una tabla?",
+      opciones: ["GET", "EXTRACT", "SELECT"],
+      correcta: 2,
+      explicacion: "La sentencia SELECT es la instrucción estándar y más utilizada en SQL para realizar consultas de datos."
+    },
+    {
+      pregunta: "¿Para qué sirve la cláusula WHERE en una consulta SQL?",
+      opciones: ["Para ordenar los resultados de mayor a menor", "Para filtrar las filas que cumplen una condición específica", "Para eliminar la tabla completa"],
+      correcta: 1,
+      explicacion: "WHERE actúa como un filtro inteligente que solo deja pasar al resultado final aquellas filas que cumplen con la condición que le indiques."
+    },
+    {
+      pregunta: "¿Qué comando DDL se usa para vaciar todos los registros de una tabla rápidamente conservando su estructura intacta?",
+      opciones: ["DROP", "DELETE", "TRUNCATE"],
+      correcta: 2,
+      explicacion: "TRUNCATE realiza un 'reseteo de fábrica' masivo y muy rápido, vaciando el contenido pero dejando el cascarón de la tabla listo para usarse."
+    },
+    {
+      pregunta: "¿Cuál de estos NO es un tipo de relación válida en el diseño de bases de datos?",
+      opciones: ["Uno a Uno", "Varios a Infinito", "Varios a Varios"],
+      correcta: 1,
+      explicacion: "Las relaciones lógicas en bases de datos son Uno a Uno (1:1), Uno a Varios (1:N) y Varios a Varios (N:M)."
+    },
+    {
+      pregunta: "¿Para qué sirve el operador LIKE junto con el comodín '%' en SQL?",
+      opciones: ["Para calcular porcentajes matemáticos", "Para realizar búsquedas aproximadas de texto", "Para dar me gusta a una fila"],
+      correcta: 1,
+      explicacion: "El operador LIKE con el comodín '%' permite buscar cadenas de texto, como por ejemplo encontrar todos los nombres que empiecen por la letra A (LIKE 'A%')."
+    }
   ]
 };
