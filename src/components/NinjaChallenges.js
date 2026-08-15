@@ -1922,7 +1922,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  PRINCIPIANTE (1)
+                  J.J. SÁNCHEZ (1)
                 </button>
                 <button 
                   onClick={() => { setActiveTab('sql_intermediate'); setSelectedTutorial(null); }}
@@ -1935,7 +1935,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  INTERMEDIO (1)
+                  SQL PLAYGROUND (1)
                 </button>
                 <button 
                   onClick={() => { setActiveTab('sql_advanced'); setSelectedTutorial(null); }}
@@ -1948,7 +1948,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                     transition: 'all 0.2s', minWidth: 'fit-content'
                   }}
                 >
-                  AVANZADO (1)
+                  FREECODECAMP (1)
                 </button>
               </>
             ) : pid === 'html' ? (
@@ -3160,6 +3160,11 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
                 </>
               ) :
               planetId === 'makecode-arcade' ? <a href="https://www.weteachrobotics.com/videojuegos/proyecto-con-makecode-arcade/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Fuente: OBO We Teach Robotics</a> : 
+              planetId === 'sql' ? (
+                <>
+                  <a href="https://josejuansanchez.org/bd/ejercicios-consultas-sql/index.html" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>José Juan Sánchez</a>, <a href="https://sql-playground.com/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>SQL Playground</a> y <a href="https://www.freecodecamp.org/espanol/learn/relational-databases-v9/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>FreeCodeCamp</a>
+                </>
+              ) :
               planetId === 'code' ? (
                 <>
                    <a href="https://code.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>Code.org</a>, <a href="https://www.picuino.com/es/prog-codeorg.html" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>picuino.com</a> y <a href="https://csforall.org/" target="_blank" rel="noopener noreferrer" style={{ color: accentColor, textDecoration: 'underline' }}>csforall.org</a>
