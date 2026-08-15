@@ -28,7 +28,7 @@ export default function Navigation({ onOpenModal }) {
 
   const navItems = isTeacher ? [
     { name: 'Dojo', href: '/', icon: Castle },
-    { name: 'Notificaciones', href: '/aulas', icon: Bell, badge: notifications.length },
+    { name: 'Centro de Aulas', href: '/aulas', icon: Users, badge: notifications.length },
     { name: 'Perfil', href: '/profile', icon: UserCircle },
   ] : [
     { name: 'Dojo', href: '/', icon: Castle },

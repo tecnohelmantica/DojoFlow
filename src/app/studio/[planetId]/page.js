@@ -378,9 +378,8 @@ Audiencia objetivo: ${audiencia || 'Exploradores de DojoFlow.'}
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '28px', borderBottom: '2px solid var(--color-border)', paddingBottom: '0' }}>
         {[
-          { id: 'forjar',   label: '🧠 Ingeniero de Prompts', icon: <Sparkles size={16} /> },
-          { id: 'recursos', label: '📂 Mi Biblioteca', icon: <BookOpen size={16} /> },
-          { id: 'aulas',    label: 'Mis Aulas', icon: <Users size={16} /> }
+          { id: 'forjar',   label: '✨ Ingeniero de Prompts', icon: <Sparkles size={16} /> },
+          { id: 'recursos', label: '📖 Mi Biblioteca', icon: <BookOpen size={16} /> }
         ].map(tab => (
           <button
             key={tab.id}
@@ -890,14 +889,6 @@ Audiencia objetivo: ${audiencia || 'Exploradores de DojoFlow.'}
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════ */}
-      {/* TAB: MIS AULAS                                 */}
-      {/* ═══════════════════════════════════════════════ */}
-      {activeTab === 'aulas' && (
-        <MisAulas currentUser={currentUser} misRecursos={misRecursos} onRefreshRecursos={loadMisRecursos} />
-      )}
-
-      {/* Unified Dojo Artifact Uploader Modal */}
       {isUploading && (
         <div style={{ 
           position: 'fixed', 
