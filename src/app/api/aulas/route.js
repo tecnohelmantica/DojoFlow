@@ -50,9 +50,17 @@ export async function POST(req) {
 
         if (action === 'unirse_con_codigo') {
             const { codigo, alumnoId } = body;
+            
+            // Validar que el alumnoId sea un UUID válido (no "guest_user")
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            if (!alumnoId || !uuidRegex.test(alumnoId)) {
+                return NextResponse.json({ error: 'Debes estar registrado como alumno para unirte a un aula.' }, { status: 400 });
+            }
+
             const { data: clase, error: errClase } = await supabase.from('clases').select('id, nombre_clase').ilike('codigo_invitacion', codigo.trim()).single();
             if (errClase) console.error('Error fetching clase:', errClase);
             if (!clase) return NextResponse.json({ error: 'Codigo invalido' }, { status: 404 });
+            
             const { error: insertError } = await supabase.from('clase_alumnos').insert({ clase_id: clase.id, alumno_id: alumnoId });
             
             if (insertError) {

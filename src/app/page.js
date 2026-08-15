@@ -323,6 +323,12 @@ export default function HomePage() {
   }
 
   const handleJoinClass = async (code) => {
+    if (isGuest || session?.user?.id === 'guest_user') {
+      showToast('err', 'Debes registrarte o iniciar sesión para unirte a un aula.');
+      setIsJoinModalOpen(false);
+      return;
+    }
+    
     setJoinLoading(true);
     try {
       const response = await fetch('/api/aulas', {
