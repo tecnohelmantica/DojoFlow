@@ -1,8 +1,1186 @@
 {
-  "base_conocimiento": [
-    {
-      "titulo": "SQL Básico",
-      "contenido": "SQL (Structured Query Language) es el lenguaje estándar para gestionar bases de datos relacionales."
-    }
-  ]
+ "base_conocimiento": [
+ {
+ "titulo": "Concepto de Base de Datos",
+ "contenido": "Una base de datos es un conjunto organizado de información
+estructurada que se almacena de forma permanente en un sistema digital. Imagínala como
+un gran archivador de oficina, pero en versión digital, inteligente y extremadamente
+rápido. El propósito principal de una base de datos es permitir el almacenamiento masivo
+de datos para que puedan ser buscados, consultados, modificados o eliminados con
+facilidad por los usuarios. En nuestra vida cotidiana, interactuamos con bases de datos
+constantemente sin darnos cuenta: al buscar una canción en Spotify, subir una foto a
+Instagram, comprar un artículo en una tienda en línea o consultar nuestro historial
+académico en la plataforma del instituto. Para que una base de datos sea realmente útil
+y eficiente en un entorno profesional, debe cumplir con dos condiciones básicas muy
+importantes: garantizar la integridad de los datos, es decir, asegurar que la
+información almacenada sea siempre correcta y consistente, y reducir al mínimo la
+redundancia, lo que significa evitar que la misma información se repita innecesariamente
+en diferentes lugares de la memoria física.",
+ "tema": "Bases de Datos",
+ "subtema": "Conceptos Fundamentales",
+ "nivel": "básico",
+ "palabras_clave": [
+ "base de datos",
+ "información estructurada",
+ "almacenamiento digital",
+ "integridad",
+ "redundancia"
+ ]
+ },
+ {
+ "titulo": "Sistemas Gestores de Bases de Datos",
+ "contenido": "Un Sistema Gestor de Bases de Datos (SGBD) es el programa de
+software que sirve como intermediario directo entre los usuarios, las aplicaciones y los
+datos físicos guardados en el disco duro del ordenador. Piensa en el SGBD como el
+bibliotecario jefe de una gran biblioteca pública: los usuarios no entran libremente a
+los pasillos a revolver las estanterías de libros, sino que le piden al bibliotecario lo
+que buscan, y él se encarga de recuperarlo de forma rápida, ordenada y segura. Este
+software especializado gestiona el almacenamiento físico, protege la seguridad
+controlando qué personas o programas pueden acceder a qué información específica, y
+asegura que no ocurran errores de consistencia si muchos usuarios acceden de forma
+concurrente a la vez a la misma base de datos. Existen muchos gestores muy conocidos y
+utilizados en la industria informática actual, tales como MySQL, PostgreSQL, Oracle,
+Microsoft SQL Server, Microsoft Access y la alternativa de software libre LibreOffice
+Base.",
+ "tema": "Bases de Datos",
+ "subtema": "Software de Gestión",
+ "nivel": "básico",
+ "palabras_clave": [
+ "SGBD",
+ "gestor de bases de datos",
+ "software",
+ "concurrencia",
+ "seguridad"
+ ]
+ },
+ {
+ "titulo": "El Modelo Relacional y las Tablas",
+ "contenido": "El modelo relacional es la estructura de organización de datos más
+utilizada en el mundo informático actual por su gran sencillez y potencia. En este
+modelo, la información se organiza de forma clara y lógica en tablas de dos dimensiones,
+parecidas a las cuadrículas de una hoja de cálculo. Cada tabla representa una entidad o
+categoría del mundo real de la que queremos registrar información, como por ejemplo la
+tabla 'Alumnos' o la tabla 'Libros'. Las tablas relacionales están constituidas por
+filas y columnas bien definidas. Cada fila de la tabla se denomina técnicamente registro
+o tupla, y contiene todos los datos pertenecientes a un único elemento concreto, como la
+información individual de un alumno específico. Por otro lado, cada columna representa
+un campo o atributo, que describe una propiedad o característica común a todos los
+registros de la tabla, como el nombre, la edad o el correo electrónico de los alumnos.",
+ "tema": "Bases de Datos",
+ "subtema": "Modelo Relacional",
+ "nivel": "básico",
+ "palabras_clave": [
+ "modelo relacional",
+ "tabla",
+ "registro",
+ "campo",
+ "tupla"
+ ]
+ },
+ {
+ "titulo": "Tipos de Datos en las Columnas",
+ "contenido": "En una base de datos relacional, cada columna o campo de una tabla
+debe tener asignado un tipo de dato específico de forma obligatoria durante su diseño.
+El tipo de dato define qué tipo de valores se admitirán en esa columna y qué operaciones
+lógicas se pueden realizar con ellos. Al obligar a que todos los registros tengan el
+mismo tipo de información en una columna, evitamos errores graves de integridad, como
+intentar meter letras en un campo reservado para operaciones matemáticas. Los tipos de
+datos más comunes que encontraremos son: tipo texto o alfanumérico (para nombres,
+direcciones o descripciones), tipo numérico entero o decimal (para cantidades, precios o
+edades), tipo fecha u hora (para registrar nacimientos o momentos de transacciones), y
+tipo booleano o de opción binaria (sí/no, para saber si un libro está prestado o si un
+alumno está matriculado). Al diseñar una tabla, elegir con cuidado el tipo de dato de
+cada columna es fundamental para optimizar la memoria del sistema.",
+ "tema": "Bases de Datos",
+ "subtema": "Estructura de Datos",
+ "nivel": "básico",
+ "palabras_clave": [
+ "tipo de dato",
+ "alfanumérico",
+ "entero",
+ "fecha",
+ "booleano"
+ ]
+ },
+ {
+ "titulo": "Claves Primarias",
+ "contenido": "Una clave primaria (también llamada Primary Key) es un campo
+especial de una tabla que identifica de manera única e inequívoca a cada registro que
+almacenamos en ella. Imagina la clave primaria como el número de DNI de una persona o el
+código de barras de un artículo de supermercado: no pueden existir dos personas con el
+mismo DNI ni dos productos con el mismo código en el sistema. Gracias a la clave
+primaria, el gestor de la base de datos puede encontrar un registro específico entre
+millones de filas de forma instantánea sin riesgo de confusión. Por definición, la clave
+primaria de una tabla debe cumplir dos reglas estrictas que nunca se pueden romper bajo
+ningún concepto: su valor debe ser único para cada fila de la tabla y no puede contener
+nunca un valor nulo o vacío. Si una tabla no tiene un identificador natural claro, los
+programadores suelen crear un campo numérico secuencial que se incrementa
+automáticamente cada vez que se añade un nuevo registro.",
+ "tema": "Bases de Datos",
+ "subtema": "Claves y Relaciones",
+ "nivel": "básico",
+ "palabras_clave": [
+ "clave primaria",
+ "primary key",
+ "identificador único",
+ "consistencia",
+ "registro"
+ ]
+ },
+ {
+ "titulo": "Claves Foráneas",
+ "contenido": "Una clave foránea (también conocida como Foreign Key o llave ajena)
+es un campo especial en una tabla secundaria cuyos valores coinciden exactamente con la
+clave primaria de una tabla principal. Sirve como un puente físico y lógico para
+relacionar e interconectar los datos almacenados en diferentes tablas. Por ejemplo, si
+tenemos una tabla de 'Alumnos' y una tabla de 'Cursos', podemos colocar una columna
+llamada 'Curso_ID' dentro de la tabla de 'Alumnos'. Esta columna será la clave foránea
+que apuntará directamente a la clave primaria de la tabla de 'Cursos', indicando en qué
+curso está matriculado cada estudiante en la escuela. De este modo, evitamos tener que
+repetir toda la información detallada del curso en la ficha de cada alumno, ahorrando
+espacio de almacenamiento en el sistema y manteniendo los datos organizados de forma
+limpia. El uso de claves foráneas es la clave para conectar y dar sentido al modelo de
+base de datos relacional.",
+ "tema": "Bases de Datos",
+ "subtema": "Claves y Relaciones",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "clave foránea",
+ "foreign key",
+ "relación",
+ "tabla principal",
+ "tabla secundaria"
+ ]
+ },
+ {
+ "titulo": "Integridad Referencial",
+ "contenido": "La integridad referencial es un conjunto de reglas automáticas de
+seguridad que aplican los gestores de bases de datos para asegurar que las relaciones
+entre las tablas sigan siendo correctas y consistentes a lo largo del tiempo. Gracias a
+la integridad referencial, el SGBD impide que ocurran errores lógicos que corrompan la
+base de datos, como crear un registro huérfano en una tabla secundaria que apunte a un
+registro inexistente en la tabla principal. Por ejemplo, no te permitirá registrar una
+venta asociada a un código de producto que no existe en el catálogo de productos.
+Asimismo, si intentas borrar un producto del catálogo que tiene ventas registradas, la
+integridad referencial entrará en acción bloqueando el borrado para evitar que esas
+ventas queden asociadas a la nada, o bien aplicando borrados en cascada si así lo
+definimos, eliminando automáticamente los registros dependientes para mantener la
+limpieza estructural de nuestro sistema de información.",
+ "tema": "Bases de Datos",
+ "subtema": "Claves y Relaciones",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "integridad referencial",
+ "consistencia",
+ "registro huérfano",
+ "cascada",
+ "seguridad de datos"
+ ]
+ },
+ {
+ "titulo": "Redundancia e Inconsistencia de Datos",
+ "contenido": "La redundancia de datos ocurre cuando la misma información se
+almacena repetida innecesariamente en diferentes archivos o tablas de una base de datos.
+Esto es un problema clásico que debe evitarse a toda costa por dos motivos principales.
+Primero, porque consume espacio de almacenamiento en el disco duro del servidor de forma
+inútil. Segundo, y mucho más peligroso, porque da lugar a la inconsistencia de los
+datos. La inconsistencia se produce cuando se modifica la información repetida en un
+lugar pero se olvida actualizarla en los demás, creando contradicciones en el sistema.
+Por ejemplo, si el número de teléfono de un cliente está copiado en cinco tablas
+distintas y el cliente cambia de número, tendríamos que actualizarlo en los cinco sitios
+a la vez; si nos equivocamos en uno solo, tendremos datos contradictorios en el sistema.
+Diseñar correctamente las tablas y relacionarlas de forma inteligente con claves elimina
+la redundancia y garantiza la consistencia permanente del sistema.",
+ "tema": "Bases de Datos",
+ "subtema": "Conceptos Fundamentales",
+ "nivel": "básico",
+ "palabras_clave": [
+ "redundancia",
+ "inconsistencia",
+ "duplicación",
+ "consistencia de datos",
+ "diseño lógico"
+ ]
+ },
+ {
+ "titulo": "Modelo Entidad-Relación: Entidades",
+ "contenido": "El Modelo Entidad-Relación es una herramienta gráfica de diseño que
+los desarrolladores utilizan para planificar la estructura de una base de datos antes de
+programarla físicamente en el ordenador. En este modelo conceptual, una entidad
+representa cualquier objeto, concepto, persona o elemento del mundo real que tiene una
+existencia independiente y sobre el cual nos interesa guardar información en el sistema.
+En los diagramas, las entidades se dibujan de forma muy sencilla utilizando rectángulos
+que contienen su nombre en mayúsculas, como por ejemplo la entidad 'ESTUDIANTE', 'COCHE'
+o 'FACTURA'. Las entidades se clasifican en dos tipos principales: entidades fuertes,
+que se identifican por sí mismas en el sistema de información mediante sus propios
+atributos, y entidades débiles, que son aquellas que no pueden existirse de manera
+independiente en la base de datos sin estar asociadas obligatoriamente a otra entidad
+fuerte que les preste soporte lógico para identificarse de forma única.",
+ "tema": "Diseño de Bases de Datos",
+ "subtema": "Modelo Entidad-Relación",
+ "nivel": "básico",
+ "palabras_clave": [
+ "entidad",
+ "modelo entidad-relación",
+ "entidad fuerte",
+ "entidad débil",
+ "diagrama conceptual"
+ ]
+ },
+ {
+ "titulo": "Modelo Entidad-Relación: Atributos",
+ "contenido": "Los atributos representan las características, propiedades o
+cualidades específicas que describen y dan detalle a una entidad dentro del Modelo
+Entidad-Relación. Por ejemplo, si tenemos la entidad 'ALUMNO', sus atributos lógicos
+serían el nombre, los apellidos, la dirección, la fecha de nacimiento y el número de
+expediente. En la representación gráfica de los diagramas conceptuales, los atributos se
+dibujan como óvalos o elipses conectados mediante líneas finas al rectángulo de la
+entidad a la que pertenecen. Dentro de este modelo de diseño, destaca el atributo clave
+o identificador, que representa la propiedad que tiene un valor único para cada elemento
+de la entidad (como el número de expediente del alumno); en el diagrama, este atributo
+se dibuja siempre subrayado para llamar la atención del diseñador. Al trasladar el
+modelo conceptual al ordenador, cada entidad se convertirá en una tabla física y cada
+atributo se transformará en una columna de dicha tabla.",
+ "tema": "Diseño de Bases de Datos",
+ "subtema": "Modelo Entidad-Relación",
+ "nivel": "básico",
+ "palabras_clave": [
+ "atributo",
+ "propiedad",
+ "identificador clave",
+ "óvalo",
+ "diseño conceptual"
+ ]
+ },
+ {
+ "titulo": "Modelo Entidad-Relación: Relaciones",
+ "contenido": "Las relaciones representan las asociaciones, conexiones o vínculos
+lógicos que existen entre dos o más entidades en el mundo real, reflejando cómo
+interactúan esos elementos en el sistema informático que queremos diseñar. Por ejemplo,
+un 'CLIENTE' realiza un 'PEDIDO', o un 'ESTUDIANTE' cursa una 'ASIGNATURA'. En los
+diagramas visuales del Modelo Entidad-Relación, estas conexiones lógicas se representan
+dibujando un rombo que se coloca en medio de las entidades conectadas, unido a ellas
+mediante líneas rectas. El rombo suele contener un verbo en infinitivo o indicativo que
+describe la acción de forma muy clara, como 'COMPRA', 'TIENE' o 'PERTENECE'. Establecer
+relaciones precisas entre las entidades en el diseño conceptual de la base de datos es
+absolutamente esencial para asegurar que los programadores puedan cruzar información en
+el futuro mediante código y obtener respuestas coherentes sobre el funcionamiento del
+sistema. Dominar el diseño de relaciones en el diagrama conceptual evita que cometamos
+errores de estructura muy difíciles de corregir más tarde cuando la base de datos ya
+está creada en el ordenador de desarrollo.",
+ "tema": "Diseño de Bases de Datos",
+ "subtema": "Modelo Entidad-Relación",
+ "nivel": "básico",
+ "palabras_clave": [
+ "relación",
+ "vínculo",
+ "asociación",
+ "rombo",
+ "diseño conceptual"
+ ]
+ },
+ {
+ "titulo": "Cardinalidad Uno a Uno",
+ "contenido": "La cardinalidad Uno a Uno (representada de forma matemática como
+1:1) es un tipo de relación lógica donde un registro de una tabla A se pasa a asociar de
+forma exclusiva con un único registro de una tabla B, y viceversa. En la práctica, este
+tipo de relación es el menos común en las bases de datos relacionales, pero se utiliza
+principalmente por razones de seguridad, para organizar la información de forma separada
+o para mejorar el rendimiento de consultas de tablas gigantescas. Un ejemplo muy claro y
+fácil de entender es la relación entre un 'País' y su 'Gobernante': un país solo puede
+tener un gobernante en un momento dado, y ese gobernante solo lo es de un único país.
+Otro ejemplo clásico en sistemas web es separar los datos personales públicos de un
+usuario (como nombre y foto) en una tabla, y sus datos de acceso altamente
+confidenciales (como usuario y contraseña cifrada) en otra tabla separada por
+seguridad.",
+ "tema": "Diseño de Bases de Datos",
+ "subtema": "Modelo Entidad-Relación",
+ "nivel": "básico",
+ "palabras_clave": [
+ "uno a uno",
+ "cardinalidad",
+ "relación exclusiva",
+ "seguridad de datos",
+ "diseño relacional"
+ ]
+ },
+ {
+ "titulo": "Cardinalidad Uno a Varios",
+ "contenido": "La cardinalidad Uno a Varios (representada como 1:N o también como
+1:muchos) es, con diferencia, el tipo de relación más común e importante en el diseño de
+las bases de datos relacionales. En esta relación, un único registro de una tabla A
+puede estar conectado con varios registros de una tabla B, pero un registro de la tabla
+B solo puede estar conectado con un único registro de la tabla A. Para entenderlo con un
+ejemplo cercano, piensa en la relación entre un 'Cliente' y las 'Facturas' que emite: un
+cliente puede realizar muchas compras diferentes y tener muchas facturas asociadas en el
+sistema, pero cada factura individual pertenece única y exclusivamente a ese cliente
+concreto. Al llevar esto al diseño físico de las tablas, la relación se realiza de forma
+muy sencilla colocando la clave primaria de la tabla 'Uno' dentro de la tabla 'Varios'
+en forma de clave foránea.",
+ "tema": "Diseño de Bases de Datos",
+ "subtema": "Modelo Entidad-Relación",
+ "nivel": "básico",
+ "palabras_clave": [
+ "uno a varios",
+ "uno a muchos",
+ "cardinalidad",
+ "clave foránea",
+ "relación común"
+ ]
+ },
+ {
+ "titulo": "Cardinalidad Varios a Varios",
+ "contenido": "La cardinalidad Varios a Varios (representada de forma matemática
+como N:M o muchos a muchos) se presenta cuando múltiples registros de una tabla A pueden
+estar relacionados con múltiples registros de una tabla B, y viceversa. Un ejemplo
+cotidiano de esta relación ocurre entre 'Estudiantes' y 'Asignaturas': un estudiante
+puede estar matriculado en varias asignaturas a la vez, y una asignatura concreta
+contiene lógicamente a muchos alumnos diferentes. En el modelo relacional físico, los
+motores de bases de datos no permiten conectar directamente dos tablas en una relación
+muchos a muchos. Para resolver este límite técnico de diseño, los diseñadores crean una
+tabla intermedia de unión (por ejemplo, la tabla 'Matrícula') que almacena las
+relaciones individuales. Esta tabla intermedia guarda parejas formadas por las claves
+primarias de ambas tablas, transformando la compleja relación N:M en dos relaciones
+sencillas de tipo Uno a Varios interconectadas. En los sistemas reales de información de
+institutos o empresas, las relaciones de muchos a muchos son extremadamente comunes, por
+lo que dominar su resolución mediante tablas intermedias es un requisito indispensable
+para cualquier programador profesional.",
+ "tema": "Diseño de Bases de Datos",
+ "subtema": "Modelo Entidad-Relación",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "varios a varios",
+ "muchos a muchos",
+ "tabla intermedia",
+ "tabla de unión",
+ "cardinalidad"
+ ]
+ },
+ {
+ "titulo": "Interfaz de LibreOffice Base",
+ "contenido": "LibreOffice Base es un Sistema Gestor de Bases de Datos Relacionales
+de software libre muy popular en centros educativos. Su pantalla principal organiza las
+herramientas de administración en paneles de forma muy ordenada para que los alumnos
+aprendan cómodamente. En el extremo izquierdo encontramos el Panel de Objetos, que nos
+permite alternar de forma rápida entre los cuatro elementos de la base de datos: Tablas
+(donde se almacena la información física en filas y columnas), Consultas (para buscar
+datos), Formularios (pantallas interactivas para rellenar datos) e Informes (listados
+listos para imprimir). Al pulsar sobre un objeto, en la zona superior central aparece el
+Panel de Tareas, con las acciones rápidas del programa, como 'Crear en vista diseño' o
+'Usar asistente'. En la zona inferior central se listan los objetos creados. Esta
+interfaz visual es sensacional para aprender los conceptos básicos del diseño relacional
+antes de pasar a escribir código directo en una terminal.",
+ "tema": "Bases de Datos",
+ "subtema": "Software de Gestión",
+ "nivel": "básico",
+ "palabras_clave": [
+ "LibreOffice Base",
+ "interfaz",
+ "panel de objetos",
+ "tablas",
+ "consultas"
+ ]
+ },
+ {
+ "titulo": "Vista Diseño de Consultas en LibreOffice Base",
+ "contenido": "La Vista Diseño de Consultas en LibreOffice Base es una potente
+herramienta gráfica que permite a los estudiantes construir filtros de búsqueda sin
+necesidad de escribir código directamente con el teclado. La pantalla se divide de forma
+muy clara en dos zonas funcionales. En la zona superior, arrastramos y visualizamos las
+tablas implicadas en la búsqueda de datos, mostrando sus campos y las líneas de relación
+de claves entre ellas. En la zona inferior, encontramos una cuadrícula de filas donde
+definimos qué información queremos extraer. En la fila 'Campo' seleccionamos las
+columnas; en 'Alias' escribimos un nombre descriptivo de cabecera; en 'Orden' indicamos
+si queremos ordenar los datos de forma ascendente o descendente; en 'Visible' marcamos
+una casilla para ocultar o mostrar el campo; y en la fila 'Criterio' escribimos los
+filtros de búsqueda que el programa traducirá automáticamente a lenguaje SQL en segundo
+plano para su ejecución. A través de esta representación visual, podemos comprender de
+forma interactiva e intuitiva cómo se cruzan las distintas tablas antes de ponernos a
+escribir la sintaxis formal del lenguaje de consultas.",
+ "tema": "Bases de Datos",
+ "subtema": "Consultas en Base",
+ "nivel": "básico",
+ "palabras_clave": [
+ "vista diseño",
+ "consultas",
+ "rejilla",
+ "criterio de filtrado",
+ "LibreOffice Base"
+ ]
+ },
+ {
+ "titulo": "Formularios en Bases de Datos",
+ "contenido": "Un formulario es un objeto interactivo de la base de datos diseñado
+para actuar como una interfaz visual amigable, cómoda y segura que facilita a los
+usuarios la introducción, edición o visualización de los datos almacenados en las tablas
+de la base. En lugar de obligar al usuario a escribir información directamente en una
+tabla con aspecto de cuadrícula fría (lo que resulta bastante confuso y aumenta la
+posibilidad de cometer errores de tipeo accidentales), el formulario presenta un diseño
+interactivo atractivo con campos de texto, casillas de verificación, botones de acción y
+listas desplegables similares a las páginas web modernas. Al rellenar los campos de un
+formulario y pulsar un botón de guardar, el software valida los tipos de datos y los
+guarda físicamente en la tabla correspondiente de manera automática. Los formularios son
+elementos clave en cualquier aplicación informática para que personas sin conocimientos
+de bases de datos puedan utilizarlas con total seguridad.",
+ "tema": "Bases de Datos",
+ "subtema": "Componentes de Base",
+ "nivel": "básico",
+ "palabras_clave": [
+ "formulario",
+ "interfaz de usuario",
+ "entrada de datos",
+ "usabilidad",
+ "validación"
+ ]
+ },
+ {
+ "titulo": "Informes en Bases de Datos",
+ "contenido": "Un informe es un objeto de la base de datos que tiene como propósito
+exclusivo organizar, formatear y resumir la información de las tablas o de las consultas
+para presentarla de manera profesional, limpia y estructurada, lista para ser impresa en
+papel físico, guardada como documento PDF o enviada por correo electrónico a la
+dirección de una empresa. A diferencia de los formularios o de las tablas relacionales,
+los informes son elementos completamente estáticos de solo lectura: esto significa que
+un usuario no puede modificar, teclear ni borrar datos a través de la pantalla de un
+informe. El informe se conecta a las tablas, recopila los datos en tiempo real, permite
+agruparlos por categorías (por ejemplo, agrupar ventas por mes), calcula totales o
+promedios utilizando funciones integradas, y los distribuye elegantemente en secciones
+de encabezado de página, cuerpo de datos y pie de página de forma totalmente automática.
+Por ello, los informes son los objetos preferidos por los directivos de institutos o
+empresas para analizar el rendimiento o los datos históricos del sistema de forma
+clara.",
+ "tema": "Bases de Datos",
+ "subtema": "Componentes de Base",
+ "nivel": "básico",
+ "palabras_clave": [
+ "informe",
+ "presentación de datos",
+ "solo lectura",
+ "impresión",
+ "resumen de datos"
+ ]
+ },
+ {
+ "titulo": "Qué es SQL y su Importancia",
+ "contenido": "SQL, que significa Structured Query Language (Lenguaje de Consulta
+Estructurado), es el lenguaje de programación estándar internacional utilizado en todo
+el mundo para comunicarse con bases de datos relacionales. SQL es un lenguaje
+declarativo de alto nivel, lo que significa que el programador escribe qué datos desea
+obtener, y el propio gestor de la base de datos se encarga de realizar la búsqueda
+interna de la forma más rápida y eficiente posible sin que tengamos que indicarle cómo
+hacerlo paso a paso en el código. Al estar estandarizado por organizaciones
+internacionales como ISO y ANSI, los conocimientos básicos que adquieras de SQL te
+servirán para trabajar exactamente igual en casi cualquier motor de bases de datos del
+mercado tecnológico actual, incluyendo motores comerciales y libres muy populares como
+MySQL, PostgreSQL, Oracle, SQLite o Microsoft SQL Server, lo que lo convierte en una
+habilidad extremadamente demandada en el sector tecnológico. Aprender SQL es, por tanto,
+una de las mejores inversiones de tiempo que puede hacer cualquier persona interesada en
+iniciar una carrera profesional exitosa en el campo de la tecnología de desarrollo.",
+ "tema": "SQL",
+ "subtema": "Introducción a SQL",
+ "nivel": "básico",
+ "palabras_clave": [
+ "SQL",
+ "lenguaje declarativo",
+ "estándar internacional",
+ "portabilidad",
+ "motor relacional"
+ ]
+ },
+ {
+ "titulo": "Clasificación de SQL: DDL y DML",
+ "contenido": "Para facilitar su aprendizaje y uso profesional, las instrucciones
+del lenguaje SQL se clasifican en diferentes ramas o sublenguajes especializados según
+la función técnica que realizan sobre el sistema. Las dos ramas principales que debe
+conocer cualquier programador son el DDL y el DML de forma obligatoria. El sublenguaje
+DDL, cuyas siglas significan Data Definition Language (Lenguaje de Definición de Datos),
+se compone de comandos diseñados exclusivamente para crear, modificar o destruir la
+estructura física de las tablas y bases de datos (el cascarón o esqueleto donde vivirán
+los datos). Por otra parte, el sublenguaje DML, que significa Data Manipulation Language
+(Lenguaje de Manipulación de Datos), agrupa todas las sentencias que permiten
+interactuar directamente con la información real guardada dentro de ese cascarón,
+permitiéndonos realizar las operaciones cotidianas de buscar, insertar, actualizar o
+eliminar registros de las tablas lógicas existentes. Tener clara esta clasificación te
+ayudará a organizar mentalmente tu código de programación y a comprender de inmediato el
+propósito de cada sentencia que encuentres en los manuales de bases de datos.",
+ "tema": "SQL",
+ "subtema": "Introducción a SQL",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "DDL",
+ "DML",
+ "estructura de datos",
+ "manipulación de datos",
+ "sentencias SQL"
+ ]
+ },
+ {
+ "titulo": "Comandos DDL: CREATE, ALTER y DROP",
+ "contenido": "Los comandos DDL de SQL son las herramientas fundamentales que
+utilizan los ingenieros de bases de datos para definir y modificar la arquitectura
+física de una base de datos. El comando CREATE se emplea para construir nuevos objetos
+desde cero; su uso más común es 'CREATE TABLE', que permite crear una tabla indicando
+detalladamente el nombre de sus columnas, sus tipos de datos y sus restricciones (como
+definir qué campo es la clave primaria). El comando ALTER nos permite modificar la
+estructura de una tabla que ya existe y que contiene datos reales en producción; por
+ejemplo, si necesitamos añadir una nueva columna para guardar teléfonos de clientes o
+cambiar el tipo de datos de un campo para admitir más texto. Por último, el comando DROP
+se utiliza para eliminar por completo un objeto del sistema; al escribir 'DROP TABLE',
+la tabla y absolutamente todos los datos que almacenaba se destruyen de forma
+permanente.",
+ "tema": "SQL",
+ "subtema": "DDL (Definición de Datos)",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "CREATE TABLE",
+ "ALTER TABLE",
+ "DROP TABLE",
+ "DDL",
+ "arquitectura física"
+ ]
+ },
+ {
+ "titulo": "Comando DDL: TRUNCATE",
+ "contenido": "El comando TRUNCATE es una instrucción muy útil que pertenece al
+grupo de comandos DDL de SQL. Se utiliza para eliminar de forma inmediata y masiva todos
+los registros o filas almacenadas en una tabla física, pero con una característica muy
+especial: a diferencia de un borrado común, TRUNCATE conserva intacta la estructura
+vacía de la tabla (sus columnas, tipos de datos y restricciones de clave) para que pueda
+seguir siendo utilizada de inmediato en el futuro por las aplicaciones. Podríamos decir
+que TRUNCATE hace un 'reseteo de fábrica' de la tabla, vaciando el contenido pero
+dejando el cascarón. Aunque realiza una tarea similar al comando 'DELETE FROM' sin
+cláusula WHERE, TRUNCATE es extremadamente más rápido y eficiente en bases de datos con
+millones de registros, ya que no analiza las filas una a una ni registra los borrados de
+forma individual en el historial de transacciones del servidor, realizando un vaciado
+directo en el almacenamiento de disco.",
+ "tema": "SQL",
+ "subtema": "DDL (Definición de Datos)",
+ "nivel": "avanzado",
+ "palabras_clave": [
+ "TRUNCATE",
+ "vaciado de tablas",
+ "optimización",
+ "eficiencia",
+ "estructura vacía"
+ ]
+ },
+ {
+ "titulo": "La Sentencia SELECT",
+ "contenido": "La sentencia SELECT es el comando más potente, versátil y
+frecuentemente utilizado en todo el lenguaje SQL, ya que es la instrucción encargada de
+realizar consultas para buscar, filtrar y extraer información útil de nuestras tablas de
+bases de datos. Su estructura de escritura mínima consta de dos palabras clave
+obligatorias: 'SELECT columnas FROM tabla'. En el bloque de SELECT indicamos el nombre
+exacto de los campos o columnas específicas que deseamos que se muestren en el listado
+de resultados en la pantalla del usuario. En el bloque de FROM le indicamos al sistema
+de qué tabla concreta de la base de datos debe extraer esa información. Si queremos
+consultar todas las columnas de una tabla de forma rápida y cómoda sin tener que teclear
+el nombre de cada campo individual, podemos utilizar el comodín especial del asterisco,
+escribiendo simplemente 'SELECT * FROM Alumnos' en nuestro editor de código. A lo largo
+de este tema de aprendizaje, utilizaremos la sentencia SELECT de forma continua en todos
+nuestros proyectos prácticos para explorar los datos guardados en las tablas del
+servidor escolar.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "básico",
+ "palabras_clave": [
+ "SELECT",
+ "FROM",
+ "extracción de datos",
+ "comodín asterisco",
+ "consultas básicas"
+ ]
+ },
+ {
+ "titulo": "Orden Lógico de Ejecución en SQL",
+ "contenido": "Un concepto muy importante que todo desarrollador de software debe
+comprender es que el orden en el que escribimos las cláusulas al redactar una consulta
+SELECT es completamente diferente al orden lógico real en el que el motor de la base de
+datos procesa esas instrucciones internamente para optimizar el rendimiento. Cuando
+programamos una consulta, empezamos escribiendo la palabra SELECT, pero la base de datos
+no puede seleccionar ninguna columna si aún no sabe de dónde provienen las filas de
+datos. Por ello, el motor del SGBD ejecuta siempre en primer lugar la cláusula FROM para
+ubicar la tabla de origen en el disco duro. En segundo lugar, procesa el filtro de la
+cláusula WHERE para descartar de inmediato las filas que no cumplan la condición. En
+tercer lugar, ejecuta la selección de columnas del SELECT, realizando en ese momento los
+cálculos matemáticos requeridos. Finalmente, aplica la ordenación del ORDER BY y la
+limitación del LIMIT.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "avanzado",
+ "palabras_clave": [
+ "orden lógico de ejecución",
+ "motor de base de datos",
+ "procesamiento interno",
+ "cláusulas SQL",
+ "rendimiento"
+ ]
+ },
+ {
+ "titulo": "Filtrado con la Cláusula WHERE",
+ "contenido": "Al realizar consultas sobre bases de datos reales que guardan miles
+de registros, casi nunca queremos ver toda la información de golpe, sino únicamente
+aquellas filas específicas que cumplen con una condición que nos interesa de verdad.
+Para lograr esto de forma profesional, añadimos la cláusula WHERE dentro de nuestra
+sentencia SELECT. La cláusula WHERE actúa como un filtro inteligente que evalúa cada
+fila de la tabla de forma individual y permite pasar al resultado de salida solo
+aquellas filas donde la condición declarada resulta ser verdadera. Las condiciones de
+filtrado se construyen utilizando operadores de comparación estándar de SQL, tales como
+el signo igual (=) para buscar valores exactos, menor que (<), mayor que (>), menor o
+igual que (<=), mayor o igual que (>=), y el operador diferente (<> o !=) para excluir
+aquellos valores que no deseamos incluir en el listado resultante en pantalla. Saber
+formular condiciones de filtrado precisas en la cláusula WHERE es una de las habilidades
+más importantes y valoradas al trabajar con sistemas gestores de bases de datos
+relacionales en producción.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "básico",
+ "palabras_clave": [
+ "WHERE",
+ "filtrar registros",
+ "operadores de comparación",
+ "condiciones lógicas",
+ "selección de datos"
+ ]
+ },
+ {
+ "titulo": "Filtros Compuestos con Operadores Lógicos",
+ "contenido": "En la práctica, para obtener información muy específica de una base
+de datos, a menudo necesitamos aplicar múltiples filtros de búsqueda a la vez sobre
+diferentes columnas de una tabla en una única consulta SELECT. Para lograr esto de forma
+profesional y robusta, combinamos diferentes condiciones dentro de la cláusula WHERE
+utilizando operadores lógicos estándar. El operador lógico AND se utiliza cuando
+queremos que se cumplan de forma obligatoria todas las condiciones declaradas a la vez
+para que un registro se muestre en pantalla. El operador lógico OR se emplea cuando nos
+basta con que se cumpla al menos una de las condiciones lógicas para que el registro
+pase el filtro de salida. Por último, el operador NOT se encarga de invertir por
+completo el resultado de una condición, seleccionando precisamente aquellas filas que no
+cumplen con el criterio especificado en el código de la consulta. Dominar la lógica
+detrás de los operadores AND, OR y NOT te permitirá programar filtros de búsqueda
+extremadamente potentes, similares a los que utilizan los buscadores profesionales de
+internet.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "básico",
+ "palabras_clave": [
+ "AND",
+ "OR",
+ "NOT",
+ "operadores lógicos",
+ "filtros complejos",
+ "WHERE"
+ ]
+ },
+ {
+ "titulo": "Ordenar Resultados con ORDER BY",
+ "contenido": "Para que la información resultante de nuestras consultas sea mucho
+más fácil de leer, analizar y presentar a los usuarios, el lenguaje SQL nos ofrece la
+cláusula ORDER BY de forma integrada. Esta cláusula se coloca al final de la sentencia
+SELECT y sirve para ordenar las filas devueltas según los valores de una o varias
+columnas seleccionadas de la tabla. Por defecto, si no especificamos nada en el código,
+el sistema realiza una ordenación de tipo ascendente (representada por la palabra clave
+ASC), lo que significa que ordenará los números de menor a mayor y los textos
+alfabéticamente de la A a la Z. Si preferimos mostrar los resultados en sentido
+contrario, podemos forzar una ordenación descendente (de mayor a menor) escribiendo
+explícitamente la palabra clave DESC inmediatamente después del nombre de la columna en
+nuestro ORDER BY (por ejemplo, 'ORDER BY Precio DESC'). Recuerda que el orden de
+presentación es puramente visual y no altera físicamente la información que está grabada
+de forma permanente en las tablas lógicas del servidor de nuestra base de datos.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "ORDER BY",
+ "ordenación",
+ "ascendente",
+ "descendente",
+ "presentación de datos"
+ ]
+ },
+ {
+ "titulo": "Limitar Resultados con LIMIT",
+ "contenido": "La cláusula LIMIT es una instrucción muy útil e importante de SQL
+que nos permite restringir de forma estricta el número máximo de filas que la consulta
+SELECT va a devolver en la pantalla o aplicación del usuario. Por ejemplo, al añadir
+'LIMIT 5' al final de nuestro código de consulta, el motor de la base de datos se
+detendrá inmediatamente tras encontrar los primeros cinco registros que cumplan las
+condiciones, ignorando el resto. Esta cláusula es una herramienta sensacional por dos
+motivos principales: primero, para optimizar el rendimiento del servidor web evitando
+procesar millones de filas innecesarias, y segundo, para implementar sistemas de
+paginación en páginas web o aplicaciones móviles. Además, LIMIT tiene una opción llamada
+OFFSET que permite indicarle al motor de la base de datos que se salte un número
+determinado de filas antes de comenzar a contar los registros a devolver. En los
+entornos profesionales, el uso combinado de las cláusulas ORDER BY y LIMIT es la técnica
+estándar para recuperar de forma rápida elementos extremos, como los productos más caros
+de una tienda.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "LIMIT",
+ "OFFSET",
+ "paginación",
+ "optimización de consultas",
+ "restricción de filas"
+ ]
+ },
+ {
+ "titulo": "Eliminar Duplicados con DISTINCT",
+ "contenido": "Es sumamente común que, al realizar una consulta SELECT para
+recuperar datos de columnas específicas de una tabla, encontremos que los valores
+resultantes se repiten múltiples veces debido a la naturaleza de la información
+guardada. Por ejemplo, si consultamos la columna 'Ciudad' de una tabla de clientes,
+veremos que el nombre 'Madrid' se repite por cada cliente que viva allí. Si lo único que
+queremos obtener es un listado limpio de las ciudades únicas donde tenemos clientes
+registrados, colocamos la palabra clave DISTINCT inmediatamente después de la
+instrucción SELECT, escribiendo por ejemplo: 'SELECT DISTINCT Ciudad FROM Clientes'. Al
+procesar esto, el gestor analiza el conjunto de datos de salida de la consulta, detecta
+automáticamente todas las filas idénticas y elimina los duplicados de la visualización
+temporal, presentándonos una lista limpia con valores únicos registrados en el sistema.
+Esta instrucción resulta de enorme utilidad cuando queremos hacer recuentos estadísticos
+de valores únicos o simplemente explorar qué categorías de información existen en una
+base de datos muy grande.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "DISTINCT",
+ "valores únicos",
+ "eliminar duplicados",
+ "limpieza de datos",
+ "filtrado de salida"
+ ]
+ },
+ {
+ "titulo": "Utilizar Alias con la Palabra AS",
+ "contenido": "En el lenguaje SQL, un alias es un nombre temporal y personalizado
+que le asignamos a una columna o a una tabla dentro de una consulta SELECT para mejorar
+la legibilidad y la presentación de los resultados devueltos. Para crear un alias,
+utilizamos la palabra clave AS inmediatamente después del nombre original del campo,
+escribiendo por ejemplo 'SELECT Nombre AS Primer_Nombre'. Esto es de enorme utilidad
+práctica por tres razones: primero, para cambiar nombres de columnas físicos que sean
+complejos o confusos en el servidor por cabeceras descriptivas en español; segundo, para
+bautizar los resultados de columnas que realizan operaciones matemáticas o cálculos en
+tiempo real; y tercero, para evitar confusiones en consultas complejas sobre varias
+tablas que contienen columnas con nombres idénticos. Si el nombre personalizado del
+alias contiene espacios en blanco, es obligatorio encerrarlo entre comillas simples en
+el código. Recuerda que el alias creado mediante la palabra clave AS solo dura el tiempo
+de ejecución de la consulta SELECT en pantalla, sin cambiar de forma permanente el
+nombre de la columna física en el disco duro.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "AS",
+ "alias de columna",
+ "legibilidad",
+ "cabeceras de tabla",
+ "temporal"
+ ]
+ },
+ {
+ "titulo": "Funciones de Agregación: COUNT, SUM y AVG",
+ "contenido": "Las funciones de agregación son instrucciones especiales de SQL
+diseñadas para realizar cálculos matemáticos complejos sobre un conjunto de valores
+procedentes de múltiples filas de una tabla, devolviendo un único valor resumido como
+resultado de la consulta. La función COUNT() sirve para contar de forma automatizada el
+número total de registros o filas que cumplen una condición; por ejemplo, saber cuántos
+alumnos están matriculados en un colegio. La función SUM() realiza la suma aritmética de
+todos los valores numéricos almacenados en una columna específica, como calcular el
+total de dinero recaudado en las ventas del día. Por último, la función AVG() se encarga
+de calcular el promedio o media aritmética de los valores de una columna numérica de la
+tabla, como determinar la nota media de un examen de forma instantánea sin necesidad de
+hacer cálculos manuales en el ordenador. Estas herramientas de cálculo son fundamentales
+para la realización de informes estadísticos mensuales o anuales que permitan analizar
+de forma resumida el comportamiento del sistema sin saturar de datos al usuario.",
+ "tema": "SQL",
+ "subtema": "Funciones de Agregación",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "COUNT",
+ "SUM",
+ "AVG",
+ "funciones de agregación",
+ "resumen matemático",
+ "cálculos"
+ ]
+ },
+ {
+ "titulo": "Funciones de Agregación: MIN y MAX",
+ "contenido": "Dentro del grupo de funciones de agregación de SQL, las funciones
+MIN() y MAX() son herramientas sumamente útiles que permiten analizar rápidamente
+columnas numéricas, de texto o de fecha de una tabla para extraer valores extremos en un
+único paso de ejecución. La función MIN() examina todos los registros de una columna
+seleccionada y devuelve el valor más bajo o mínimo de todo el conjunto; por ejemplo,
+encontrar el producto más barato del catálogo de una tienda o la fecha más antigua de
+registro de un usuario en el sistema. Por el contrario, la función MAX() realiza la
+tarea opuesta, identificando y extrayendo el valor más alto o máximo del conjunto de
+datos de la columna; por ejemplo, para encontrar el sueldo más alto de una empresa o el
+pedido más caro que se ha realizado durante el año en curso, lo que facilita enormemente
+la toma de decisiones comerciales.",
+ "tema": "SQL",
+ "subtema": "Funciones de Agregación",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "MIN",
+ "MAX",
+ "valores extremos",
+ "funciones de agregación",
+ "búsqueda matemática",
+ "análisis"
+ ]
+ },
+ {
+ "titulo": "El Operador BETWEEN",
+ "contenido": "Al filtrar información en SQL, a menudo necesitamos buscar registros
+que se encuentren dentro de un rango específico de valores, como productos con precios
+entre 10 y 20 euros, o ventas realizadas entre dos fechas determinadas. Aunque podríamos
+resolver esto utilizando filtros compuestos en la cláusula WHERE uniendo condiciones con
+el operador AND (por ejemplo, 'WHERE Precio >= 10 AND Precio <= 20'), SQL nos ofrece un
+operador mucho más limpio, elegante y fácil de leer llamado BETWEEN. Al escribir 'WHERE
+Precio BETWEEN 10 AND 20', el motor de la base de datos realiza exactamente el mismo
+filtro de búsqueda pero con un código más sencillo. Es muy importante tener en cuenta
+que el operador BETWEEN es de tipo inclusivo de forma estándar en SQL, lo que significa
+que los valores límites que especificamos (en este caso, el 10 y el 20) se incluyen en
+el resultado de salida. Al simplificar la sintaxis del filtrado en nuestro editor de
+código, el operador BETWEEN hace que las consultas sean mucho más legibles y fáciles de
+entender para otros programadores del equipo.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "BETWEEN",
+ "filtrado por rango",
+ "WHERE",
+ "sintaxis limpia",
+ "inclusivo"
+ ]
+ },
+ {
+ "titulo": "El Operador IN",
+ "contenido": "El operador IN es una instrucción muy potente de SQL que nos permite
+filtrar los resultados de una consulta SELECT comparando los valores de una columna
+contra una lista de opciones específicas que definimos entre paréntesis, separadas por
+comas. Imagina que quieres buscar todos los productos cuyos fabricantes sean de código
+1, 3 o 5. Sin el operador IN, tendrías que escribir un código largo y repetitivo uniendo
+condiciones con el operador OR, como 'WHERE Fabricante = 1 OR Fabricante = 3 OR
+Fabricante = 5'. Con el operador IN, el código se simplifica drácticamente escribiendo
+de forma elegante: 'WHERE Fabricante IN (1, 3, 5)'. El motor de la base de datos
+analizará cada registro y lo seleccionará si su valor coincide con cualquiera de los
+elementos de la lista. Esto hace que las consultas complejas de bases de datos sean
+mucho más limpias y fáciles de mantener. El operador IN es ideal cuando queremos filtrar
+por un conjunto conocido de datos textuales o numéricos, permitiéndonos realizar
+búsquedas selectivas muy precisas con una sola línea de instrucción.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "IN",
+ "filtrado por lista",
+ "WHERE",
+ "sintaxis limpia",
+ "comparación múltiple"
+ ]
+ },
+ {
+ "titulo": "El Operador LIKE y los Comodines",
+ "contenido": "Cuando trabajamos con campos de texto en SQL, a veces no conocemos
+el valor exacto que queremos buscar, o necesitamos filtrar registros que sigan un
+determinado patrón de caracteres, como buscar personas cuyo apellido empiece por 'G' o
+correos que terminen en '@gmail.com'. Para realizar estas búsquedas aproximadas,
+empleamos el operador LIKE dentro de nuestra cláusula WHERE en combinación con comodines
+especiales de texto. El comodín más utilizado en SQL es el signo de porcentaje (%), que
+representa cualquier cadena de caracteres de cualquier longitud (incluyendo longitud
+cero). Por ejemplo, escribir 'WHERE Nombre LIKE 'A%'' buscará todos los nombres que
+empiecen obligatoriamente por la letra A, sin importar cuántas letras sigan después.
+Otro comodín muy útil es el guión bajo (_), que se utiliza para representar exactamente
+un único carácter individual en una posición específica de la cadena de texto. Las
+búsquedas aproximadas mediante LIKE y comodines son la base de los sistemas de
+autocompletado y de los motores de búsqueda internos que utilizamos a diario en las
+aplicaciones de nuestro móvil.",
+ "tema": "SQL",
+ "subtema": "Consultas SELECT",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "LIKE",
+ "comodines",
+ "búsqueda aproximada",
+ "% comodín",
+ "WHERE",
+ "filtrado de texto"
+ ]
+ },
+ {
+ "titulo": "Comandos de Acción: INSERT INTO",
+ "contenido": "El comando INSERT INTO es la instrucción estándar de SQL que
+pertenece al sublenguaje DML y se utiliza para agregar nuevos registros o filas
+completas de información dentro de una tabla que ya existe en nuestra base de datos. Su
+sintaxis básica se redacta de la siguiente manera para que el motor la procese: 'INSERT
+INTO nombre_tabla (columna1, columna2, ...) VALUES (valor1, valor2, ...)'. Al escribir
+esta instrucción, es de vital importancia mantener una correspondencia exacta en
+cantidad, orden lógico y tipo de datos entre los nombres de las columnas que declaramos
+entre el primer paréntesis y los valores que les asignamos dentro de VALUES. Por
+ejemplo, si una columna está diseñada en la estructura física para guardar números
+enteros, no debemos intentar insertarle una cadena de texto. Al escribir valores de tipo
+texto o fechas en SQL, es obligatorio colocarlos siempre entre comillas simples en el
+código. Gracias al comando INSERT INTO, las aplicaciones móviles y los sitios web de
+comercio electrónico pueden registrar las compras de los usuarios y guardar sus datos
+personales en el servidor.",
+ "tema": "SQL",
+ "subtema": "DML (Manipulación de Datos)",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "INSERT INTO",
+ "insertar registros",
+ "DML",
+ "valores",
+ "correspondencia de datos"
+ ]
+ },
+ {
+ "titulo": "Comandos de Acción: UPDATE",
+ "contenido": "El comando UPDATE es una instrucción del sublenguaje DML de SQL que
+nos brinda la capacidad de modificar de manera selectiva la información contenida en
+registros ya existentes dentro de una tabla de nuestra base de datos. Su estructura
+requiere el uso de la palabra clave SET para especificar qué columnas queremos
+actualizar y qué nuevos valores van a adoptar de forma física. Sin embargo, existe una
+regla de oro de seguridad informática que todo programador debe recordar siempre: las
+consultas de tipo UPDATE deben incluir obligatoriamente una cláusula WHERE que filtre
+con precisión quirúrgica qué filas se van a modificar. Si olvidas incluir la condición
+WHERE en tu sentencia UPDATE, el sistema aplicará los nuevos valores a absolutamente
+todas las filas de la tabla de forma irreversible, lo que podría corromper bases de
+datos completas de empresas y causar la pérdida de información de transacciones. Por
+esta razón, la mayoría de los editores profesionales de bases de datos incluyen sistemas
+de aviso que advierten al programador antes de ejecutar un comando UPDATE que carezca de
+filtro WHERE.",
+ "tema": "SQL",
+ "subtema": "DML (Manipulación de Datos)",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "UPDATE",
+ "SET",
+ "modificación de datos",
+ "cláusula WHERE",
+ "seguridad informática"
+ ]
+ },
+ {
+ "titulo": "Comandos de Acción: DELETE",
+ "contenido": "Para eliminar registros o filas completas de una tabla de forma
+permanente cuando sus datos ya no son necesarios o válidos para nuestro sistema,
+empleamos el comando DELETE de SQL. La sintaxis estándar para esta operación de borrado
+se escribe como 'DELETE FROM nombre_tabla WHERE condicion'. Al igual que ocurre con las
+actualizaciones de datos, el borrado de información requiere una precaución extrema y el
+uso riguroso de medidas de seguridad informática. La cláusula WHERE es la única
+encargada de dictaminar con exactitud qué registros específicos de la tabla serán
+eliminados físicamente del disco duro del servidor. Si por error ejecutas un comando
+DELETE omitiendo la cláusula WHERE, el motor del SGBD procederá a borrar todas y cada
+una de las filas almacenadas en la tabla de inmediato, dejándola vacía de datos reales
+de forma permanente. Dado que el comando DELETE elimina datos de forma permanente, los
+programadores suelen preferir realizar borrados lógicos mediante una columna de estado
+en lugar de usar DELETE de forma física.",
+ "tema": "SQL",
+ "subtema": "DML (Manipulación de Datos)",
+ "nivel": "intermedio",
+ "palabras_clave": [
+ "DELETE FROM",
+ "borrado de datos",
+ "cláusula WHERE",
+ "seguridad informática",
+ "eliminar registros"
+ ]
+ },
+ {
+ "titulo": "Unión de Tablas con INNER JOIN",
+ "contenido": "Una de las mayores virtudes de las bases de datos relacionales es la
+capacidad de cruzar información almacenada en diferentes tablas que están conectadas
+mediante claves para obtener respuestas consolidadas en una única consulta SELECT. Para
+lograr esto de forma limpia, utilizamos la cláusula INNER JOIN (o simplemente JOIN). El
+comando INNER JOIN funciona como un puente que une dos tablas basándose en una columna
+común (típicamente, la pareja formada por una clave primaria y una clave foránea). Su
+sintaxis requiere especificar la condición de unión utilizando la palabra clave ON; por
+ejemplo, escribir 'FROM Alumnos INNER JOIN Cursos ON Alumnos.Curso_ID = Cursos.ID'. El
+motor de la base de datos analizará ambas tablas en tiempo real y devolverá únicamente
+aquellas filas donde el identificador coincida exactamente en ambos lados,
+permitiéndonos ver en una sola pantalla el nombre del alumno junto al nombre real de su
+curso correspondiente. El uso correcto de la cláusula INNER JOIN es una de las
+competencias más valoradas en el desarrollo de software porque permite unificar
+información fragmentada de forma elegante y rápida.",
+ "tema": "SQL",
+ "subtema": "Consultas Multitabla",
+ "nivel": "avanzado",
+ "palabras_clave": [
+ "INNER JOIN",
+ "JOIN",
+ "cruce de tablas",
+ "cláusula ON",
+ "consultas multitabla"
+ ]
+ },
+ {
+ "titulo": "Bases de Datos NoSQL y Big Data",
+ "contenido": "Aunque las bases de datos relacionales basadas en tablas rígidas de
+filas y columnas predefinidas son excelentes para gestionar datos estructurados, el auge
+moderno de Internet, las redes sociales y las aplicaciones móviles ha generado un
+volumen colosal de datos no estructurados conocido técnicamente como Big Data (como
+vídeos, mensajes de voz o registros de actividad). Para dar respuesta a esta necesidad
+de procesamiento masivo en tiempo real, nacieron las tecnologías de bases de datos NoSQL
+(Not Only SQL). A diferencia del modelo relacional, las bases de datos NoSQL no guardan
+la información en tablas rígidas vinculadas por claves, sino que utilizan esquemas de
+almacenamiento totalmente flexibles y dinámicos, como documentos en formato JSON, pares
+de clave-valor o estructuras de grafos. Esto les otorga una escalabilidad horizontal
+incomparable, permitiendo repartir los datos de forma automática entre miles de
+servidores en la nube. Comprender cuándo utilizar bases de datos relacionales y cuándo
+decantarse por tecnologías NoSQL es una de las habilidades de arquitectura de software
+más importantes en la actualidad.",
+ "tema": "Bases de Datos",
+ "subtema": "Tecnologías Modernas",
+ "nivel": "avanzado",
+ "palabras_clave": [
+ "NoSQL",
+ "Big Data",
+ "esquemas dinámicos",
+ "escalabilidad horizontal",
+ "datos desestructurados"
+ ]
+ }
+ ],
+ "extra": {
+ "temas_detectados": [
+ "Bases de Datos",
+ "Diseño de Bases de Datos",
+ "SQL"
+ ],
+ "subtemas_detectados": [
+ "Claves y Relaciones",
+ "Componentes de Base",
+ "Conceptos Fundamentales",
+ "Consultas Multitabla",
+ "Consultas SELECT",
+ "Consultas en Base",
+ "DDL (Definición de Datos)",
+ "DML (Manipulación de Datos)",
+ "Estructura de Datos",
+ "Funciones de Agregación",
+ "Introducción a SQL",
+ "Modelo Entidad-Relación",
+ "Modelo Relacional",
+ "Software de Gestión",
+ "Tecnologías Modernas"
+ ],
+ "misiones_aprendizaje": [
+ {
+ "mision": "Misión 1: Los Cimientos del Almacenamiento Digital",
+ "descripcion": "Comprender conceptualmente qué es una base de datos, para qué
+sirve un sistema gestor (SGBD), cómo se organiza la información en tablas en el modelo
+relacional y la importancia de evitar la redundancia de datos.",
+ "fragmentos_incluidos": [
+ "Concepto de Base de Datos",
+ "Sistemas Gestores de Bases de Datos",
+ "El Modelo Relacional y las Tablas",
+ "Tipos de Datos en las Columnas",
+ "Redundancia e Inconsistencia de Datos"
+ ]
+ },
+ {
+ "mision": "Misión 2: Diseñando Planos de Datos (Modelo Entidad-Relación)",
+ "descripcion": "Aprender a conceptualizar y diagramar problemas del mundo real
+identificando entidades, atributos y los diferentes tipos de relaciones lógicas y
+cardinalidades básicas.",
+ "fragmentos_incluidos": [
+ "Modelo Entidad-Relación: Entidades",
+ "Modelo Entidad-Relación: Atributos",
+ "Modelo Entidad-Relación: Relaciones",
+ "Cardinalidad: Relación Uno a Uno",
+ "Cardinalidad: Relación Uno a Varios"
+ ]
+ },
+ {
+ "mision": "Misión 3: Estructuración y Relaciones Físicas (Claves e Integridad)",
+ "descripcion": "Establecer conexiones físicas lógicas e integridad referencial
+entre tablas utilizando correctamente claves primarias y claves foráneas, y resolver
+relaciones complejas de muchos a muchos.",
+ "fragmentos_incluidos": [
+ "Claves Primarias",
+ "Claves Foráneas",
+ "Integridad Referencial",
+ "Cardinalidad: Relación Varios a Varios"
+ ]
+ },
+ {
+ "mision": "Misión 4: Explorando Herramientas Ofimáticas (LibreOffice Base)",
+ "descripcion": "Familiarizarse con la interfaz de LibreOffice Base, la vista de
+diseño de consultas, y la utilidad práctica de formularios e informes para la entrada y
+exportación de datos.",
+ "fragmentos_incluidos": [
+ "Interfaz de LibreOffice Base",
+ "Vista Diseño de Consultas en LibreOffice Base",
+ "Formularios en Bases de Datos",
+ "Informes en Bases de Datos"
+ ]
+ },
+ {
+ "mision": "Misión 5: El Idioma de los Datos (Introducción a SQL y DDL)",
+ "descripcion": "Entrar en el mundo del estándar internacional SQL y aprender a
+crear, modificar y eliminar físicamente las estructuras de almacenamiento mediante
+comandos DDL.",
+ "fragmentos_incluidos": [
+ "Qué es SQL y su Importancia",
+ "Clasificación de SQL: DDL y DML",
+ "Comandos DDL: CREATE, ALTER y DROP",
+ "Comando DDL: TRUNCATE"
+ ]
+ },
+ {
+ "mision": "Misión 6: El Arte de Formular Preguntas (Consultas de Selección)",
+ "descripcion": "Dominar la estructura básica del comando SELECT, comprender el
+orden de ejecución interna del motor y aplicar filtros lógicos eficientes utilizando la
+cláusula WHERE.",
+ "fragmentos_incluidos": [
+ "La Sentencia SELECT",
+ "Orden Lógico de Ejecución en SQL",
+ "Filtrado con la Cláusula WHERE",
+ "Filtros Compuestos con Operadores Lógicos"
+ ]
+ },
+ {
+ "mision": "Misión 7: Control de Resultados y Funciones SQL",
+ "descripcion": "Aprender a ordenar, limitar y limpiar los datos devueltos por
+las consultas, personalizar cabeceras con alias y realizar resúmenes matemáticos con
+funciones de agregación.",
+ "fragmentos_incluidos": [
+ "Ordenar Resultados con ORDER BY",
+ "Limitar Resultados con LIMIT",
+ "Eliminar Duplicados con DISTINCT",
+ "Utilizar Alias con la Palabra AS",
+ "Funciones de Agregación: COUNT, SUM y AVG",
+ "Funciones de Agregación: MIN y MAX"
+ ]
+ },
+ {
+ "mision": "Misión 8: Filtros Avanzados y Modificación de Datos (CRUD)",
+ "descripcion": "Emplear operadores de rango y de patrón textual para búsquedas
+complejas, y dominar las operaciones de inserción, actualización y borrado de forma
+segura en bases de datos.",
+ "fragmentos_incluidos": [
+ "El Operador BETWEEN",
+ "El Operador IN",
+ "El Operador LIKE y los Comodines",
+ "Comandos de Acción: INSERT INTO",
+ "Comandos de Acción: UPDATE",
+ "Comandos de Acción: DELETE"
+ ]
+ },
+ {
+ "mision": "Misión 9: Cruzando Fronteras y Nuevas Tecnologías (JOIN y NoSQL)",
+ "descripcion": "Combinar datos almacenados en diferentes tablas relacionadas de
+forma física utilizando INNER JOIN y explorar el paradigma de bases de datos NoSQL ante
+el auge de Big Data.",
+ "fragmentos_incluidos": [
+ "Unión de Tablas con INNER JOIN",
+ "Bases de Datos NoSQL y Big Data"
+ ]
+ }
+ ]
+ }
 }
