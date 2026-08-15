@@ -217,7 +217,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
         }
       } else if (itinerary === 'javascript') {
         setActiveTab('js_basics');
-      } else if (itinerary === 'freecodecamp') {
+      } else if (itinerary === 'freecodecamp' || itinerary === 'fcc') {
         setActiveTab('fcc_html');
       } else {
         setActiveTab('html_academy');
