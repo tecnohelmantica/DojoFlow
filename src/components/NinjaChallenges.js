@@ -1600,7 +1600,7 @@ export default function NinjaChallenges({ planetId, userId, accentColor = '#0dcf
       )}
 
       {/* TABS SELECTOR */}
-      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'arcade' || pid === 'tinkercad' || pid === '3d' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html' || pid === 'ia') && (
+      {(pid === 'scratch' || pid?.includes('microbit') || pid === 'makecode-arcade' || pid === 'arcade' || pid === 'tinkercad' || pid === '3d' || pid === 'code' || pid === 'python' || pid === 'arduino' || pid === 'appinventor' || pid === 'html' || pid === 'ia' || pid === 'sql') && (
         <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' }}>
           
           {/* Ocultar pestaña CURSO en Arduino si está vacía */}
