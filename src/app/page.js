@@ -407,6 +407,50 @@ export default function HomePage() {
             ? 'Supervisa el progreso de tus aulas, gestiona tus materiales de biblioteca y valida los retos de tus alumnos.'
             : 'Bienvenido de nuevo, Explorador. Tus conexiones neuronales se expanden. Continúa tu viaje y desbloquea código.'}
         </p>
+
+        {isProfesor && (
+          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            <GlassCard style={{
+              maxWidth: '600px',
+              padding: '20px 24px',
+              background: 'rgba(156, 39, 176, 0.05)',
+              border: '1.5px dashed rgba(156, 39, 176, 0.3)',
+              borderRadius: '16px',
+              textAlign: 'center',
+              marginBottom: '15px'
+            }}>
+              <p style={{ margin: 0, color: 'var(--accent-purple)', fontSize: '0.85rem', fontWeight: '700', lineHeight: '1.5' }}>
+                👩‍🏫 DojoFlow te ofrece potentes herramientas de gestión. ¿Quieres un repaso rápido de tus poderes como docente?
+              </p>
+              <button
+                onClick={() => window.dispatchEvent(new Event('dojoflow_show_onboarding'))}
+                style={{
+                  marginTop: '12px',
+                  background: 'linear-gradient(135deg, var(--accent-purple), #d946ef)',
+                  border: 'none',
+                  color: 'white',
+                  fontWeight: '800',
+                  fontSize: '0.75rem',
+                  padding: '8px 18px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 10px rgba(156, 39, 176, 0.2)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 14px rgba(156, 39, 176, 0.35)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 10px rgba(156, 39, 176, 0.2)';
+                }}
+              >
+                💡 ABRIR GUÍA RÁPIDA DE DOCENTE
+              </button>
+            </GlassCard>
+          </div>
+        )}
         
         {!isProfesor && (
           <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>

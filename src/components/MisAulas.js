@@ -829,13 +829,26 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
                   onClick={() => {
                     setActiveActivities(prev => {
                       const copy = { ...prev };
+                      const allIds = ACTIVITY_REGISTRY[configuringPlanet].flatMap(g => (g.items || []).filter(act => act.id).map(act => act.id.toString()));
+                      copy[configuringPlanet] = allIds;
+                      return copy;
+                    });
+                  }}
+                  style={{ background: 'none', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: '700', color: '#64748b' }}
+                >
+                  SELECCIONAR TODAS
+                </button>
+                <button 
+                  onClick={() => {
+                    setActiveActivities(prev => {
+                      const copy = { ...prev };
                       delete copy[configuringPlanet];
                       return copy;
                     });
                   }} 
                   style={{ background: 'none', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: '700', color: '#64748b' }}
                 >
-                  RESET (TODAS)
+                  DESELECCIONAR TODAS
                 </button>
                 <GlowButton color="blue" onClick={() => setConfiguringPlanet(null)} style={{ padding: '10px 20px' }}>
                   HECHO

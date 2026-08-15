@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import GlassCard from './GlassCard';
 import GlowButton from './GlowButton';
-import { X, Rocket, BookOpen, Users, Sparkles, BrainCircuit, Trophy, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, Rocket, BookOpen, Users, Sparkles, BrainCircuit, Trophy, ChevronRight, ChevronLeft, Settings } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
@@ -142,6 +142,12 @@ export default function Onboarding() {
       content: "Desde la pestaña 'Mis Aulas' de cada planeta, vincula tus recursos a tus clases. Tus alumnos los verán instantáneamente mientras trabajan en sus retos.",
       icon: <Users size={48} color="#00cc55" />,
       color: "#00cc55"
+    },
+    {
+      title: "Personalización de Aulas",
+      content: "Además, puedes activar o desactivar planetas específicos y configurar exactamente qué actividades o retos estarán disponibles para cada clase.",
+      icon: <Settings size={48} color="#ff9800" />,
+      color: "#ff9800"
     }
   ];
 
