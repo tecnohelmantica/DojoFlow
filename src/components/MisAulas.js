@@ -1275,7 +1275,7 @@ function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
                         )}
                       </div>
                     </div>
-                    {r.contenido?.meta?.(isGlobal || r.contenido?.isGlobal || r.contenido?.isMaster) && (
+                    {(r.contenido?.meta?.isGlobal || r.contenido?.isGlobal || r.contenido?.isMaster) && (
                       <div style={{ position: 'absolute', top: '15px', right: '38px', background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '0.55rem', fontWeight: '900', boxShadow: '0 2px 8px rgba(255,165,0,0.3)' }}>MAESTRO</div>
                     )}
                   </div>
