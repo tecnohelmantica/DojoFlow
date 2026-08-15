@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { LogOut, Bell, User, CheckCircle, Clock, Trophy } from 'lucide-react';
+import { LogOut, Bell, User, CheckCircle, Clock, Trophy, Mail } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 
 const TopHeader = () => {
@@ -99,6 +99,28 @@ const TopHeader = () => {
               💡 GUÍA DE INICIO
             </button>
           )}
+          <div style={{ position: 'relative' }}>
+            <a 
+              href="mailto:tecnohelmantica@gmail.com?subject=Sugerencias%20DojoFlow&body=Hola,%20me%20gustar%C3%ADa%20comentar%20lo%20siguiente%20sobre%20la%20plataforma:%0D%0A%0D%0A"
+              style={{ 
+                cursor: 'pointer', 
+                color: 'var(--accent-teal)', 
+                position: 'relative',
+                padding: '8px',
+                borderRadius: '50%',
+                background: 'transparent',
+                transition: 'all 0.2s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Buzón de sugerencias"
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              <Mail size={22} />
+            </a>
+          </div>
           <div style={{ position: 'relative' }}>
             <div 
               onClick={() => setShowNotifications(!showNotifications)}
