@@ -513,7 +513,7 @@ export default function HomePage() {
                       fontSize: '0.8rem',
                       fontWeight: '800'
                     }}>
-                      <Castle size={14} /> AULA ACTIVA: {aula.nombre.toUpperCase()}
+                      <Castle size={14} /> AULA ACTIVA: {(aula.nombre_clase || aula.nombre || '').toUpperCase()}
                     </div>
                   ))}
                 </div>
