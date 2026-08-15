@@ -991,7 +991,7 @@ const ClaseDetail = ({ clase, onBack, onUpdateAlumnos, onCloseAnadir, onRefresh,
 // ══════════════════════════════════════════════════════════
 function MisAulasContent({ currentUser, misRecursos = [], onRefreshRecursos }) {
   const searchParams = useSearchParams();
-  const [view, setView]         = useState('biblioteca'); 
+  const [view, setView]         = useState('lista'); 
   const [clases, setClases]     = useState([]);
   const [claseActiva, setClaseActiva] = useState(null);
   const [dashData, setDashData] = useState(null);
